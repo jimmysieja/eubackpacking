@@ -264,7 +264,8 @@ def trace_movement(d: dict) -> str:
   <p class="tag">The line</p>
   <figure class="trace">{svg}</figure>
   <p class="caption">Every stop, joined in the order they happened &mdash; solid for rail,
-  dashed for road, dotted for sea, hairline for the few flights. The two trips never touch.{extra}</p>
+  dashed for road, dotted for sea, hairline for the few flights. The two trips never touch.{extra}
+  &nbsp;<a href="map/">Open the interactive map &rarr;</a></p>
 </section>"""
 
 
@@ -572,6 +573,66 @@ def export_assets(d: dict, out: Path = ASSETS) -> list[str]:
     return w
 
 
+def _photo_entries():
+    cap = PHOTOS / "captions.yml"
+    raw = yaml.safe_load(cap.read_text(encoding="utf-8")) if cap.is_file() else None
+    return [e for e in (raw or []) if isinstance(e, dict) and e.get("file")
+            and (PHOTOS / e["file"]).is_file()]
+
+
+def write_map_data(d: dict) -> None:
+    """docs/map/data.json — stops, legs and photos for the interactive map."""
+    import json
+    s = d["stops"]
+    s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
+    s = s.sort_values(["trip", "stop_number"])
+    legs, cities, seen = [], [], set()
+    for tid, grp in s.groupby("trip"):
+        recs = grp.to_dict("records")
+        for a, b in zip(recs, recs[1:]):
+            if a["city"] == b["city"]:
+                continue
+            legs.append({"trip": tid, "mode": b["transport"] or "train",
+                         "a": [round(a["lat"], 4), round(a["lon"], 4)],
+                         "b": [round(b["lat"], 4), round(b["lon"], 4)]})
+    for _, r in s.iterrows():
+        key = (r["trip"], r["city"])
+        if key in seen:
+            continue
+        seen.add(key)
+        cities.append({"city": r["city"], "country": r["country"], "trip": r["trip"],
+                       "lat": round(r["lat"], 4), "lon": round(r["lon"], 4),
+                       "nights": int(r["nights"] or 0), "slept": bool((r["nights"] or 0) > 0),
+                       "arrive": r["arrival_date"].strftime("%d %b %Y")})
+    photos = {}
+    for e in _photo_entries():
+        photos.setdefault(e.get("city", ""), []).append(
+            {"src": f"../photos/{e['file']}", "thumb": f"../photos/thumb/{e['file']}",
+             "caption": e.get("caption", "")})
+    (DOCS / "map").mkdir(parents=True, exist_ok=True)
+    (DOCS / "map" / "data.json").write_text(
+        json.dumps({"trips": [{"id": t, "name": r["name"]} for t, r in d["trips"].iterrows()],
+                    "cities": cities, "legs": legs, "photos": photos},
+                   separators=(",", ":")), encoding="utf-8")
+
+
+def _make_thumbs(imgs, dst, box=560):
+    try:
+        from PIL import Image
+    except ImportError:
+        return False
+    tdir = dst / "thumb"
+    tdir.mkdir(exist_ok=True)
+    for p in imgs:
+        try:
+            im = Image.open(p)
+            im.thumbnail((box, box))
+            im.convert("RGB").save(tdir / p.name, "JPEG", quality=78)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  thumb skipped {p.name}: {exc}")
+    return True
+
+
 def write_docs(d: dict) -> None:
     DOCS.mkdir(exist_ok=True)
     (DOCS / "index.html").write_text(build_html(d), encoding="utf-8")
@@ -584,6 +645,9 @@ def write_docs(d: dict) -> None:
         dst.mkdir()
         for p in imgs:
             shutil.copy2(p, dst / p.name)
+        if not _make_thumbs(imgs, dst):
+            print("  (Pillow not installed — map will use full-size images)")
+    write_map_data(d)
 
 
 def main() -> None:
