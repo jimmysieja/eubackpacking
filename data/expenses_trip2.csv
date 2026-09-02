@@ -1,0 +1,28 @@
+date,trip,country,city,category,description,amount_usd
+2026-03-02,trip2,France,Paris,transport,Airport RER B to city,12.80
+2026-03-02,trip2,France,Paris,lodging,Hostel dorm 6 nights,246.00
+2026-03-03,trip2,France,Paris,food,Groceries + bakery,31.40
+2026-03-04,trip2,France,Paris,activities,Louvre ticket,18.90
+2026-03-05,trip2,France,Paris,food,Dinner with hostel crew,27.10
+2026-03-06,trip2,France,Paris,transport,Metro carnet,17.35
+2026-03-08,trip2,France,Paris,transport,Thalys Paris to Amsterdam,79.00
+2026-03-08,trip2,Netherlands,Amsterdam,lodging,Hostel dorm 5 nights,205.00
+2026-03-09,trip2,Netherlands,Amsterdam,food,Groceries,28.60
+2026-03-10,trip2,Netherlands,Amsterdam,activities,Van Gogh Museum,22.40
+2026-03-13,trip2,Belgium,Brussels,transport,IC train Amsterdam to Brussels,29.00
+2026-03-13,trip2,Belgium,Brussels,lodging,Hostel dorm 3 nights,132.00
+2026-03-16,trip2,Germany,Cologne,transport,ICE Brussels to Cologne,42.00
+2026-03-19,trip2,Germany,Berlin,transport,ICE Cologne to Berlin,55.00
+2026-03-19,trip2,Germany,Berlin,lodging,Airbnb private room 7 nights,336.00
+2026-03-21,trip2,Germany,Berlin,activities,Reichstag dome + walking tour,15.00
+2026-03-26,trip2,Germany,Munich,transport,ICE Berlin to Munich,68.00
+2026-04-03,trip2,Switzerland,Zurich,transport,EC Innsbruck to Zurich,53.00
+2026-04-07,trip2,Switzerland,Interlaken,activities,Jungfraujoch rail excursion,119.00
+2026-04-15,trip2,Italy,Turin,transport,TGV Lucerne to Turin,41.00
+2026-04-23,trip2,Italy,Rome,transport,Frecciarossa Florence to Rome,29.90
+2026-04-23,trip2,Italy,Rome,lodging,Hostel dorm 6 nights,240.00
+2026-04-24,trip2,Italy,Rome,activities,Colosseum + Forum,24.00
+2026-05-02,trip2,France,Lyon,transport,TGV Bologna to Lyon,64.00
+2026-05-10,trip2,Spain,San Sebastian,transport,Bus Bordeaux to San Sebastian,18.00
+2026-05-23,trip2,Portugal,Lisbon,transport,IC Porto to Lisbon,27.00
+2026-05-30,trip2,Portugal,Lisbon,transport,Flight Lisbon to home,214.00

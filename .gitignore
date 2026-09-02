@@ -1,0 +1,19 @@
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# --- os / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- scratch ---
+*.local.html
+scratch/
+
+# NOTE: docs/ and assets/ ARE committed on purpose.
+# docs/ is what GitHub Pages serves; assets/*.svg is embedded in the README.

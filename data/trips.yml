@@ -1,0 +1,17 @@
+# The two backpacking trips. `expenses_complete` controls whether the site
+# presents that trip's spend as final or flags it as a partial figure.
+- id: trip1
+  name: Summer 2025
+  start: 2025-06-16
+  end: 2025-08-15
+  expenses_complete: false      # ~half the receipts are logged so far
+  home_currency: USD
+  blurb: Two months, Iberia to the Balkans, mostly overnight trains and hostels.
+
+- id: trip2
+  name: Spring 2026
+  start: 2026-03-02
+  end: 2026-05-30
+  expenses_complete: true       # fully itemised
+  home_currency: USD
+  blurb: Three months, Western Europe and the Alps, every euro accounted for.

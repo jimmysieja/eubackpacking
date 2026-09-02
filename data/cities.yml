@@ -1,0 +1,53 @@
+# Every place you slept at least one night. Order doesn't matter (the site sorts
+# by arrival date). `arrive`/`depart` are inclusive check-in / check-out dates;
+# nights = depart - arrive. lat/lon are optional but power the route map.
+#
+#   - city: Porto
+#     country: Portugal
+#     trip: trip1
+#     arrive: 2025-06-20
+#     depart: 2025-06-24
+#     lat: 41.15
+#     lon: -8.61
+#     lodging: hostel          # hostel | hotel | airbnb | rail | friends | camp
+#     notes: Optional one-liner shown in the cities table.
+
+# ---- Trip 1 — Summer 2025 (SAMPLE DATA, replace) --------------------------
+- { city: Lisbon,   country: Portugal,       trip: trip1, arrive: 2025-06-16, depart: 2025-06-20, lat: 38.72,  lon: -9.14,  lodging: hostel, notes: Jet-lagged start, pastéis every morning. }
+- { city: Porto,    country: Portugal,       trip: trip1, arrive: 2025-06-20, depart: 2025-06-24, lat: 41.15,  lon: -8.61,  lodging: hostel, notes: "" }
+- { city: Madrid,   country: Spain,          trip: trip1, arrive: 2025-06-24, depart: 2025-06-28, lat: 40.42,  lon: -3.70,  lodging: hostel, notes: "" }
+- { city: Barcelona, country: Spain,         trip: trip1, arrive: 2025-06-28, depart: 2025-07-03, lat: 41.39,  lon: 2.17,   lodging: airbnb, notes: "" }
+- { city: Marseille, country: France,        trip: trip1, arrive: 2025-07-03, depart: 2025-07-06, lat: 43.30,  lon: 5.37,   lodging: hostel, notes: "" }
+- { city: Nice,     country: France,         trip: trip1, arrive: 2025-07-06, depart: 2025-07-09, lat: 43.70,  lon: 7.27,   lodging: hostel, notes: "" }
+- { city: Milan,    country: Italy,          trip: trip1, arrive: 2025-07-09, depart: 2025-07-12, lat: 45.46,  lon: 9.19,   lodging: hostel, notes: "" }
+- { city: Venice,   country: Italy,          trip: trip1, arrive: 2025-07-12, depart: 2025-07-15, lat: 45.44,  lon: 12.34,  lodging: airbnb, notes: "" }
+- { city: Ljubljana, country: Slovenia,      trip: trip1, arrive: 2025-07-15, depart: 2025-07-18, lat: 46.06,  lon: 14.51,  lodging: hostel, notes: "" }
+- { city: Zagreb,   country: Croatia,        trip: trip1, arrive: 2025-07-18, depart: 2025-07-21, lat: 45.81,  lon: 15.98,  lodging: hostel, notes: "" }
+- { city: Split,    country: Croatia,        trip: trip1, arrive: 2025-07-21, depart: 2025-07-26, lat: 43.51,  lon: 16.44,  lodging: hostel, notes: "" }
+- { city: Sarajevo, country: Bosnia and Herzegovina, trip: trip1, arrive: 2025-07-26, depart: 2025-07-30, lat: 43.86, lon: 18.41, lodging: hostel, notes: "" }
+- { city: Belgrade, country: Serbia,         trip: trip1, arrive: 2025-07-30, depart: 2025-08-03, lat: 44.79,  lon: 20.45,  lodging: hostel, notes: "" }
+- { city: Budapest, country: Hungary,        trip: trip1, arrive: 2025-08-03, depart: 2025-08-08, lat: 47.50,  lon: 19.04,  lodging: hostel, notes: "" }
+- { city: Vienna,   country: Austria,        trip: trip1, arrive: 2025-08-08, depart: 2025-08-12, lat: 48.21,  lon: 16.37,  lodging: hostel, notes: "" }
+- { city: Prague,   country: Czechia,        trip: trip1, arrive: 2025-08-12, depart: 2025-08-15, lat: 50.09,  lon: 14.42,  lodging: hostel, notes: Last stop before the flight home. }
+
+# ---- Trip 2 — Spring 2026 (SAMPLE DATA, replace) -------------------------
+- { city: Paris,    country: France,         trip: trip2, arrive: 2026-03-02, depart: 2026-03-08, lat: 48.86,  lon: 2.35,   lodging: hostel, notes: "" }
+- { city: Amsterdam, country: Netherlands,   trip: trip2, arrive: 2026-03-08, depart: 2026-03-13, lat: 52.37,  lon: 4.90,   lodging: hostel, notes: "" }
+- { city: Brussels, country: Belgium,        trip: trip2, arrive: 2026-03-13, depart: 2026-03-16, lat: 50.85,  lon: 4.35,   lodging: hostel, notes: "" }
+- { city: Cologne,  country: Germany,        trip: trip2, arrive: 2026-03-16, depart: 2026-03-19, lat: 50.94,  lon: 6.96,   lodging: hostel, notes: "" }
+- { city: Berlin,   country: Germany,        trip: trip2, arrive: 2026-03-19, depart: 2026-03-26, lat: 52.52,  lon: 13.40,  lodging: airbnb, notes: "" }
+- { city: Munich,   country: Germany,        trip: trip2, arrive: 2026-03-26, depart: 2026-03-30, lat: 48.14,  lon: 11.58,  lodging: hostel, notes: "" }
+- { city: Innsbruck, country: Austria,       trip: trip2, arrive: 2026-03-30, depart: 2026-04-03, lat: 47.27,  lon: 11.39,  lodging: hostel, notes: "" }
+- { city: Zurich,   country: Switzerland,    trip: trip2, arrive: 2026-04-03, depart: 2026-04-07, lat: 47.38,  lon: 8.54,   lodging: hostel, notes: "" }
+- { city: Interlaken, country: Switzerland,  trip: trip2, arrive: 2026-04-07, depart: 2026-04-12, lat: 46.69,  lon: 7.86,   lodging: hostel, notes: Scenic rail everywhere. }
+- { city: Lucerne,  country: Switzerland,    trip: trip2, arrive: 2026-04-12, depart: 2026-04-15, lat: 47.05,  lon: 8.31,   lodging: hostel, notes: "" }
+- { city: Turin,    country: Italy,          trip: trip2, arrive: 2026-04-15, depart: 2026-04-18, lat: 45.07,  lon: 7.69,   lodging: hostel, notes: "" }
+- { city: Florence, country: Italy,          trip: trip2, arrive: 2026-04-18, depart: 2026-04-23, lat: 43.77,  lon: 11.26,  lodging: airbnb, notes: "" }
+- { city: Rome,     country: Italy,          trip: trip2, arrive: 2026-04-23, depart: 2026-04-29, lat: 41.90,  lon: 12.50,  lodging: hostel, notes: "" }
+- { city: Bologna,  country: Italy,          trip: trip2, arrive: 2026-04-29, depart: 2026-05-02, lat: 44.49,  lon: 11.34,  lodging: hostel, notes: "" }
+- { city: Lyon,     country: France,         trip: trip2, arrive: 2026-05-02, depart: 2026-05-06, lat: 45.76,  lon: 4.84,   lodging: hostel, notes: "" }
+- { city: Bordeaux, country: France,         trip: trip2, arrive: 2026-05-06, depart: 2026-05-10, lat: 44.84,  lon: -0.58,  lodging: hostel, notes: "" }
+- { city: San Sebastián, country: Spain,     trip: trip2, arrive: 2026-05-10, depart: 2026-05-14, lat: 43.32,  lon: -1.98,  lodging: hostel, notes: "" }
+- { city: Bilbao,   country: Spain,          trip: trip2, arrive: 2026-05-14, depart: 2026-05-18, lat: 43.26,  lon: -2.93,  lodging: hostel, notes: "" }
+- { city: Porto,    country: Portugal,       trip: trip2, arrive: 2026-05-18, depart: 2026-05-23, lat: 41.15,  lon: -8.61,  lodging: hostel, notes: "" }
+- { city: Lisbon,   country: Portugal,       trip: trip2, arrive: 2026-05-23, depart: 2026-05-30, lat: 38.72,  lon: -9.14,  lodging: hostel, notes: Flew home from here. }

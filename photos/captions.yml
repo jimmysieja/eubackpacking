@@ -1,0 +1,13 @@
+# One entry per photo file you drop in photos/. `file` is the filename,
+# `caption` shows under it in the gallery, `city` ties it to a place (optional,
+# used to group the gallery). `featured: true` pulls a photo into the README.
+#
+# Keep photos web-sized: long edge <= 2000px, JPimg quality ~80. The build does
+# NOT resize for you. Under ~100 photos total keeps the repo lean.
+#
+#   - file: lisbon-tram.jpg
+#     caption: The 28 grinding up to Graca at dawn.
+#     city: Lisbon
+#     featured: true
+
+# (no photos yet — drop files in photos/ and list them here)
