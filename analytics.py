@@ -333,6 +333,57 @@ def transport_timeline(d: dict) -> pd.DataFrame:
                          aggfunc="sum", fill_value=0.0)
 
 
+def active_span(d: dict):
+    """(first, last) date with any expense or journey — the axis for the strips."""
+    dates = []
+    if not d["expenses"].empty:
+        dates += [d["expenses"]["date"].min(), d["expenses"]["date"].max()]
+    if not d["legs"].empty:
+        dates += [d["legs"]["date"].min(), d["legs"]["date"].max()]
+    if not dates:
+        return None
+    return min(dates).date(), max(dates).date()
+
+
+def transit_by_day(d: dict) -> pd.DataFrame:
+    """Per-day hours in transit by mode. Long hauls listed in rail_<trip>.yml
+    `notable:` override the estimate for their day; then the whole train series
+    is rescaled so its total matches the real Eurail figure."""
+    tl = transport_timeline(d)
+    if tl.empty:
+        return tl
+    tl = tl.copy()
+    if "train" not in tl.columns:
+        tl["train"] = 0.0
+    for o in d.get("rail", {}).values():
+        for j in o.get("notable", []):
+            day = pd.to_datetime(j["date"]).date()
+            if day in tl.index:
+                tl.loc[day, "train"] = max(tl.loc[day, "train"], float(j["hours"]))
+            else:
+                tl.loc[day, "train"] = float(j["hours"])
+    tl = tl.fillna(0.0).sort_index()
+    ts = train_stats(d)
+    if not ts.get("estimated", True):
+        cur = tl["train"].sum()
+        if cur > 0:
+            tl["train"] = tl["train"] * (ts["rail_hours"] / cur)
+    return tl
+
+
+def spend_by_day(d: dict) -> pd.DataFrame:
+    """index=date, columns: total (USD) and country (the day's biggest-spend country)."""
+    exp = d["expenses"]
+    if exp.empty:
+        return pd.DataFrame()
+    total = exp.groupby(exp["date"].dt.date)["amount_usd"].sum().rename("total")
+    dom = (exp[exp["country"] != ""].groupby([exp["date"].dt.date, "country"])["amount_usd"].sum()
+           .reset_index())
+    dom = (dom.sort_values("amount_usd").groupby("date").tail(1).set_index("date")["country"]
+           .rename("country"))
+    return pd.concat([total, dom], axis=1)
+
+
 # --------------------------------------------------------------------------- #
 # text report
 # --------------------------------------------------------------------------- #

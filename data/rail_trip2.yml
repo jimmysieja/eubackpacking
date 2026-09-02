@@ -1,17 +1,29 @@
 # Real rail stats, straight from the Eurail / Interrail Rail Planner app
-# (My Trip → Statistics), spring 2026. These are NOT estimated — the app tracks
-# journeys actually taken. It showed 48 of 62 saved journeys completed; only the
-# completed ones are counted here.
-#
-# When present, the dashboard uses these for the "Time on trains" section and the
-# train row of the mode table instead of the distance-based estimate.
+# (My Trip → Statistics), spring 2026. NOT estimated — the app tracks journeys
+# actually taken. It showed 48 of 62 saved journeys completed; only completed
+# ones are counted.
 source: Eurail Rail Planner app — Statistics screen
 trains: 48
 distance_km: 7099
 hours: 101.87            # 4 days, 5 hours, 52 minutes
 countries: 12
+overnight: 1            # Kraków → Bratislava, dep 00:18
+
 longest:
   from: Ljubljana
   to: Split
   date: 2026-04-26
   hours: 13.62           # 13 h 37 m, one change
+
+# The long hauls, read off the app's journey list (yellow = actually ridden).
+# Used to shape the transit strip and pick out annotations; `from`/`to` match
+# the city names in trip2_stops.csv.
+notable:
+  - { date: 2026-04-26, from: Ljubljana, to: Split,      hours: 13.62 }
+  - { date: 2026-04-07, from: Cologne,   to: Copenhagen, hours: 11.83 }
+  - { date: 2026-04-06, from: Paris,     to: Cologne,    hours: 11.65 }
+  - { date: 2026-04-21, from: Kraków,    to: Bratislava, hours: 9.87, overnight: true }
+  - { date: 2026-04-20, from: Vilnius,   to: Warsaw,     hours: 7.65 }
+  - { date: 2026-04-17, from: Tallinn,   to: Riga,       hours: 6.63 }
+  - { date: 2026-04-10, from: Copenhagen, to: Stockholm, hours: 6.25 }
+  - { date: 2026-04-24, from: Vienna,    to: Bled,       hours: 6.20 }

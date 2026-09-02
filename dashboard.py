@@ -1,15 +1,13 @@
 """
-eubackpacking — dashboard renderer.
+eubackpacking — page renderer.
 
-Turns the numbers from ``analytics.py`` into one self-contained
-``docs/index.html`` (inline CSS, hand-built SVG, no external requests) plus the
-light/dark ``assets/*.svg`` files the README embeds.
+Reads the numbers from ``analytics.py`` and lays them out as one self-contained
+editorial page (``docs/index.html``): hand-built SVG, inline CSS, one webfont
+request. Also writes the light/dark ``assets/*.svg`` used on the repo page.
 
     python dashboard.py                 # build docs/index.html and open it
-    python dashboard.py --no-open       # just build the file
-    python dashboard.py --assets        # also (re)write assets/*.svg
-
-Re-run whenever you change anything in ``data/`` or ``photos/``.
+    python dashboard.py --no-open
+    python dashboard.py --assets        # also rewrite assets/*.svg
 """
 
 from __future__ import annotations
@@ -17,6 +15,7 @@ from __future__ import annotations
 import html
 import shutil
 import argparse
+import datetime as dt
 import webbrowser
 from pathlib import Path
 
@@ -31,33 +30,41 @@ DOCS = ROOT / "docs"
 ASSETS = ROOT / "assets"
 PHOTOS = ROOT / "photos"
 
-MODE_LABEL = {"train": "Train", "bus": "Bus", "ferry": "Ferry", "flight": "Flight",
-              "car": "Car", "bike": "Bike", "walk": "Walk"}
+MODE_LABEL = {"train": "train", "bus": "bus", "ferry": "ferry", "flight": "flight",
+              "car": "car", "bike": "bike", "walk": "walk"}
+MODE_DASH = {"train": "", "bus": "7 5", "ferry": "1.5 5", "flight": "2 7",
+             "car": "5 4", "bike": "3 4", "walk": "2 4"}
 
-PALETTE = {
+# "Field atlas" palette — paper, ink, oxblood, antique gold, a few muted tones.
+PAL = {
     "light": {
-        "bg": "#faf9f6", "card": "#ffffff", "ink": "#1d1c1a", "muted": "#726d64",
-        "line": "#e4e0d8", "accent": "#2f6f4f", "track": "#efece5",
-        "m-train": "#2f6f4f", "m-bus": "#c17d3c", "m-ferry": "#3c8ba0",
-        "m-flight": "#4f63a8", "m-car": "#9a5a4a", "m-bike": "#5f8a6a", "m-walk": "#8a8276",
-        "cat-lodging": "#3f6fa5", "cat-food": "#c17d3c", "cat-transport": "#2f6f4f",
-        "cat-shopping": "#8f5a9a", "cat-activities": "#c05a5a", "cat-gifts": "#3c8ba0",
-        "cat-misc": "#8a8276",
+        "paper": "#f3efe6", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
+        "accent": "#7c3b2c", "gold": "#9a7636", "faint": "#c9c1ac",
+        "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
+        "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
-        "bg": "#14140f", "card": "#1e1e18", "ink": "#ece7dc", "muted": "#9a9488",
-        "line": "#33322b", "accent": "#5faa80", "track": "#26261f",
-        "m-train": "#5faa80", "m-bus": "#e0a061", "m-ferry": "#5fb6cc",
-        "m-flight": "#8a9ae0", "m-car": "#d08a78", "m-bike": "#8fc09c", "m-walk": "#b6afa0",
-        "cat-lodging": "#78a6d8", "cat-food": "#e0a061", "cat-transport": "#5faa80",
-        "cat-shopping": "#c08fc6", "cat-activities": "#e08a8a", "cat-gifts": "#5fb6cc",
-        "cat-misc": "#b6afa0",
+        "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
+        "accent": "#cf7359", "gold": "#c8a55f", "faint": "#3d3a2f",
+        "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
+        "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
 }
+CAT_COLOR = {"lodging": "c0", "food": "c1", "transport": "c2", "shopping": "c3",
+             "activities": "c4", "gifts": "c5", "misc": "c6"}
 
 
 def esc(x) -> str:
     return html.escape(str(x), quote=True)
+
+
+def money(v) -> str:
+    v = float(v)
+    if v >= 10000:
+        return f"${v/1000:.0f}k"
+    if v >= 1000:
+        return f"${v/1000:.1f}k"
+    return f"${v:,.0f}"
 
 
 def fmt(n, nd=0) -> str:
@@ -66,45 +73,24 @@ def fmt(n, nd=0) -> str:
     return f"{n:,.{nd}f}" if nd else f"{round(n):,}"
 
 
-def cvar(prefix: str, key: str) -> str:
-    name = f"{prefix}-{key}"
-    return name if name in PALETTE["light"] else f"{prefix}-misc" if prefix == "cat" else "accent"
+def hm(hours: float) -> str:
+    h = int(hours)
+    m = round((hours - h) * 60)
+    return f"{h}h{m:02d}m" if m else f"{h}h"
 
 
 # --------------------------------------------------------------------------- #
-# generic horizontal bar chart
+# svg building blocks
 # --------------------------------------------------------------------------- #
-def bar_h(rows, *, unit="", vfmt=lambda v: fmt(v), width=640, row_h=30,
-          pad_l=140, title="") -> str:
-    rows = [r for r in rows if r[1] and r[1] == r[1]]
-    if not rows:
-        return ""
-    vmax = max(v for _, v, _ in rows) or 1
-    pad_t = 26 if title else 8
-    pad_r = 92
-    h = pad_t + len(rows) * row_h + 8
-    bar_w = width - pad_l - pad_r
-    out = [f'<svg viewBox="0 0 {width} {h}" width="100%" role="img" '
-           f'aria-label="{esc(title or "bar chart")}">']
-    if title:
-        out.append(f'<text x="0" y="15" class="ct">{esc(title)}</text>')
-    for i, (label, val, col) in enumerate(rows):
-        y = pad_t + i * row_h
-        w = max(2, bar_w * val / vmax)
-        out.append(
-            f'<text x="{pad_l-10}" y="{y+row_h/2+4}" class="cl" text-anchor="end">{esc(label)}</text>'
-            f'<rect x="{pad_l}" y="{y+4}" width="{bar_w}" height="{row_h-12}" rx="3" fill="var(--track)"/>'
-            f'<rect x="{pad_l}" y="{y+4}" width="{w:.1f}" height="{row_h-12}" rx="3" fill="var(--{col})"/>'
-            f'<text x="{pad_l+w+8:.1f}" y="{y+row_h/2+4}" class="cv">{esc(vfmt(val))}{esc(unit)}</text>'
-        )
-    out.append("</svg>")
-    return "".join(out)
+def _project(lats, lons, w, h, pad):
+    la0, la1 = min(lats) - 1, max(lats) + 1
+    lo0, lo1 = min(lons) - 1, max(lons) + 1
+    sx = lambda v: pad + (w - 2 * pad) * (v - lo0) / (lo1 - lo0 or 1)
+    sy = lambda v: pad + (h - 2 * pad) * (1 - (v - la0) / (la1 - la0 or 1))
+    return sx, sy
 
 
-# --------------------------------------------------------------------------- #
-# route map — equirectangular scatter of stops in order (home excluded)
-# --------------------------------------------------------------------------- #
-def route_svg(d: dict, width: int = 640, height: int = 460) -> str:
+def route_trace(d: dict, w: int = 900, h: int = 560) -> str:
     s = d["stops"]
     if s.empty:
         return ""
@@ -112,361 +98,478 @@ def route_svg(d: dict, width: int = 640, height: int = 460) -> str:
     s = s.sort_values(["trip", "stop_number"])
     if s.empty:
         return ""
-    pad = 30
-    la, lo = s["lat"].to_numpy(), s["lon"].to_numpy()
-    la0, la1 = la.min() - 1.5, la.max() + 1.5
-    lo0, lo1 = lo.min() - 1.5, lo.max() + 1.5
-    sx = lambda v: pad + (width - 2 * pad) * (v - lo0) / (lo1 - lo0 or 1)
-    sy = lambda v: pad + (height - 2 * pad) * (1 - (v - la0) / (la1 - la0 or 1))
-    recs = s.to_dict("records")
-    pts = [(sx(r["lon"]), sy(r["lat"])) for r in recs]
+    sx, sy = _project(s["lat"].tolist(), s["lon"].tolist(), w, h, 46)
+    trip_ink = {t: ("accent" if i == 0 else "gold") for i, t in enumerate(d["trips"].index)}
 
-    segs = []
-    for i in range(len(recs) - 1):
-        if recs[i]["trip"] != recs[i + 1]["trip"]:
-            continue
-        (x1, y1), (x2, y2) = pts[i], pts[i + 1]
-        segs.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
-                    f'stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.65"/>')
-    dots, labelled = [], set()
-    for (x, y), r in zip(pts, recs):
-        slept = (r["nights"] or 0) > 0
-        rad = 4.5 if slept else 2.6
-        tip = f" — {int(r['nights'])} nights" if slept else " — day trip"
-        dots.append(
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{rad}" fill="var(--accent)" '
-            f'stroke="var(--card)" stroke-width="1.3">'
-            f'<title>{esc(r["city"])}, {esc(r["country"])}{tip}</title></circle>'
-        )
-        if slept and r["city"] not in labelled:
-            labelled.add(r["city"])
-            dots.append(f'<text x="{x+7:.1f}" y="{y+3:.1f}" class="cs">{esc(r["city"])}</text>')
-    return (f'<svg viewBox="0 0 {width} {height}" width="100%" role="img" '
-            f'aria-label="Route map">{"".join(segs)}{"".join(dots)}</svg>')
+    seg, ticks, labels = [], [], []
+    seen = set()
+    for tid, grp in s.groupby("trip"):
+        recs = grp.to_dict("records")
+        ink = trip_ink.get(tid, "accent")
+        for a, b in zip(recs, recs[1:]):
+            if a["city"] == b["city"]:
+                continue
+            x1, y1, x2, y2 = sx(a["lon"]), sy(a["lat"]), sx(b["lon"]), sy(b["lat"])
+            mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+            # bow the segment slightly for a drawn-by-hand feel
+            nx, ny = -(y2 - y1), (x2 - x1)
+            nl = (nx * nx + ny * ny) ** 0.5 or 1
+            k = min(26, ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5 * 0.12)
+            cx, cy = mx + nx / nl * k, my + ny / nl * k
+            dash = MODE_DASH.get(b["transport"], "")
+            op = 0.5 if b["transport"] == "flight" else 0.85
+            seg.append(f'<path d="M{x1:.1f} {y1:.1f} Q{cx:.1f} {cy:.1f} {x2:.1f} {y2:.1f}" '
+                       f'fill="none" stroke="var(--{ink})" stroke-width="1.4" '
+                       f'stroke-dasharray="{dash}" opacity="{op}"/>')
+        for r in recs:
+            x, y = sx(r["lon"]), sy(r["lat"])
+            slept = (r["nights"] or 0) > 0
+            ticks.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{2.6 if slept else 1.4}" '
+                         f'fill="var(--{ink})"><title>{esc(r["city"])} · '
+                         f'{int(r["nights"]) if slept else 0} nights</title></circle>')
+            if slept and r["city"] not in seen:
+                seen.add(r["city"])
+                anchor = "end" if x < w / 2 else "start"
+                dx = -5 if anchor == "end" else 5
+                labels.append(f'<text x="{x+dx:.1f}" y="{y+3:.1f}" text-anchor="{anchor}" '
+                              f'class="tr-city">{esc(r["city"])}</text>')
+
+    # annotate the longest ride
+    ts = A.train_stats(d)
+    note = ""
+    lg = ts.get("longest")
+    if lg:
+        row = s[(s["city"] == lg["to"])]
+        if not row.empty:
+            r = row.iloc[0]
+            x, y = sx(r["lon"]), sy(r["lat"])
+            note = (f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{x-70:.1f}" y2="{y+40:.1f}" '
+                    f'stroke="var(--dim)" stroke-width="0.8"/>'
+                    f'<text x="{x-74:.1f}" y="{y+44:.1f}" text-anchor="end" class="tr-note">'
+                    f'{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])} · {hm(lg["hr"])}</text>')
+
+    return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="Route trace">'
+            f'<rect x="0.5" y="0.5" width="{w-1}" height="{h-1}" fill="none" '
+            f'stroke="var(--rule)" stroke-width="1"/>'
+            f'{"".join(seg)}{"".join(ticks)}{"".join(labels)}{note}</svg>')
 
 
-def costperday_svg(d: dict, width: int = 420, height: int = 230) -> str:
-    sp, trips = A.spend_summary(d), d["trips"]
-    rows = [(trips.loc[t, "name"], sp["cost_per_day"].get(t, 0.0), sp["complete"].get(t, False))
-            for t in trips.index if sp["by_trip"].get(t, 0) > 0]
-    if not rows:
-        return ""
-    vmax = max(r[1] for r in rows) * 1.3 or 1
-    gap = (width - 80) / len(rows)
-    bw = gap * 0.5
-    base = height - 40
-    out = [f'<svg viewBox="0 0 {width} {height}" width="100%" role="img" aria-label="Cost per day">']
-    for i, (name, v, complete) in enumerate(rows):
-        x = 50 + gap * i + (gap - bw) / 2
-        bh = (base - 20) * v / vmax
-        out.append(
-            f'<rect x="{x:.1f}" y="{base-bh:.1f}" width="{bw:.1f}" height="{bh:.1f}" rx="4" fill="var(--accent)"/>'
-            f'<text x="{x+bw/2:.1f}" y="{base-bh-8:.1f}" class="cv" text-anchor="middle">${v:,.0f}{"" if complete else "*"}</text>'
-            f'<text x="{x+bw/2:.1f}" y="{base+18:.1f}" class="cl" text-anchor="middle">{esc(name)}</text>'
-        )
-    out.append(f'<line x1="40" y1="{base}" x2="{width-20}" y2="{base}" stroke="var(--line)"/></svg>')
+def _month_ticks(span, sx, y):
+    d0, d1 = span
+    out = []
+    cur = dt.date(d0.year, d0.month, 1)
+    while cur <= d1:
+        if cur >= d0:
+            x = sx(cur)
+            out.append(f'<line x1="{x:.1f}" y1="{y-6:.1f}" x2="{x:.1f}" y2="{y:.1f}" '
+                       f'stroke="var(--rule)"/>'
+                       f'<text x="{x+3:.1f}" y="{y-9:.1f}" class="ax">{cur:%b}</text>')
+        m = cur.month % 12 + 1
+        cur = dt.date(cur.year + (cur.month == 12), m, 1)
+    return "".join(out)
+
+
+def day_strip(span, columns, *, w=900, h=150, pad_l=8, annos=None, baseline_label="") -> str:
+    """columns: list of (date, [(value, colorvar, opacity), ...]) stacked bottom-up."""
+    d0, d1 = span
+    ndays = (d1 - d0).days + 1
+    plot_h = h - 34
+    base_y = plot_h + 6
+    sx = lambda day: pad_l + (w - pad_l - 8) * ((day - d0).days) / max(1, ndays - 1)
+    cw = max(1.4, (w - pad_l - 8) / ndays * 0.7)
+    vmax = max((sum(v for v, _, _ in stack) for _, stack in columns), default=1) or 1
+    bars = []
+    for day, stack in columns:
+        x = sx(day) - cw / 2
+        yb = base_y
+        for val, col, op in stack:
+            bh = (plot_h) * val / vmax
+            yb -= bh
+            bars.append(f'<rect x="{x:.1f}" y="{yb:.1f}" width="{cw:.1f}" height="{bh:.2f}" '
+                        f'fill="var(--{col})" opacity="{op}"/>')
+    ann = []
+    for day, text in (annos or []):
+        x = sx(day)
+        ann.append(f'<line x1="{x:.1f}" y1="6" x2="{x:.1f}" y2="{base_y:.1f}" '
+                   f'stroke="var(--ink)" stroke-width="0.5" stroke-dasharray="1 3"/>'
+                   f'<text x="{x+3:.1f}" y="14" class="ax-note">{esc(text)}</text>')
+    lbl = (f'<text x="{pad_l}" y="{h-6}" class="ax">{esc(baseline_label)}</text>'
+           if baseline_label else "")
+    return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="daily strip">'
+            f'{"".join(bars)}'
+            f'<line x1="{pad_l}" y1="{base_y:.1f}" x2="{w-8}" y2="{base_y:.1f}" stroke="var(--rule)"/>'
+            f'{_month_ticks(span, sx, base_y)}{"".join(ann)}{lbl}</svg>')
+
+
+def band(rows, *, w=900, h=30) -> str:
+    """rows: [(label, value, colorvar, opacity)] -> one proportional bar."""
+    rows = [r for r in rows if r[1] and r[1] == r[1]]
+    tot = sum(v for _, v, _, _ in rows) or 1
+    x = 0
+    out = [f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="proportional band">']
+    for label, val, col, op in rows:
+        seg = w * val / tot
+        out.append(f'<rect x="{x:.1f}" y="0" width="{max(0,seg-1.4):.1f}" height="{h}" '
+                   f'fill="var(--{col})" opacity="{op}"><title>{esc(label)}: {esc(money(val))}'
+                   f' ({val/tot*100:.0f}%)</title></rect>')
+        x += seg
+    out.append("</svg>")
     return "".join(out)
 
 
 # --------------------------------------------------------------------------- #
-# sections
+# page movements
 # --------------------------------------------------------------------------- #
-def stat_tiles(d: dict) -> str:
+def masthead(d: dict) -> str:
+    ov = A.overview(d)
+    yr = f"{ov['first_day']:%Y}–{ov['last_day']:%y}"
+    return f"""
+<header>
+  <p class="dateline">A gap year &middot; Europe &middot; {yr}</p>
+  <h1>Two months, then three,<br><em>around a continent</em></h1>
+  <p class="dek">{ov['n_countries']} countries, {ov['n_cities']} beds, and a great
+  deal of it seen from a train window. What the receipts and the rail pass remember.</p>
+</header>"""
+
+
+def ledger(d: dict) -> str:
     ov, sp, ts = A.overview(d), A.spend_summary(d), A.train_stats(d)
-    tiles = [
-        (fmt(ov["n_countries"]), "countries"),
-        (fmt(ov["n_cities"]), "cities slept in"),
-        (fmt(ov["nights_logged"]), "nights"),
+    sl = A.sleeps(d)
+    top_ctry = sl.groupby("country")["nights"].sum().idxmax() if not sl.empty else ""
+    perday = sp["total"] / d["trips"].loc["trip2", "days"] if sp["total"] else 0
+    items = [
+        (fmt(ov["trip_days"]), "days away", "across two trips"),
+        (fmt(ov["n_countries"]), "countries", f"most nights in {top_ctry}"),
+        (fmt(ts["rail_legs"]), "trains boarded", f"{fmt(ts['rail_km'])} km of track"),
+        (f"{ts['rail_hours']:.0f}", "hours in a seat", f"{ts['full_days_equiv']:.1f} full days"),
+        (money(sp["total"]), "spent" + (" *" if sp["any_partial"] else ""),
+         f"{money(perday)}/day on the road"),
+        (fmt(ov["nights_logged"]), "nights logged", "hostels, mostly"),
     ]
-    if ts.get("has_data"):
-        approx = "" if not ts.get("estimated", True) else "~"
-        tiles.append((f"{approx}{fmt(ts['rail_hours'])} h", "on trains"))
-        tiles.append((fmt(ts["rail_legs"]), "trains" if not ts.get("estimated", True) else "train legs"))
-    if sp["total"] > 0:
-        tiles.append((f"${fmt(sp['total'])}", "logged spend" + (" *" if sp["any_partial"] else "")))
-    cells = "".join(f'<div class="tile"><div class="tn">{v}</div><div class="tl">{esc(l)}</div></div>'
-                    for v, l in tiles)
-    return f'<div class="tiles">{cells}</div>'
+    cells = "".join(f'<div class="lg"><div class="lg-n">{v}</div>'
+                    f'<div class="lg-l">{esc(l)}</div>'
+                    f'<div class="lg-a">{esc(a)}</div></div>' for v, l, a in items)
+    return f'<section class="ledger">{cells}</section>'
 
 
-def trains_section(d: dict) -> str:
-    ts = A.train_stats(d)
-    if not ts.get("has_data"):
-        return ""
-    mb = A.mode_breakdown(d)
-    rows = [(MODE_LABEL.get(m, m.title()), r["hours"], cvar("m", m))
-            for m, r in mb.iterrows() if r["hours"] > 0]
-    chart = bar_h(rows, unit=" h", vfmt=lambda v: fmt(v, 1), title="Hours by transport mode")
-    real = not ts.get("estimated", True)
-    approx = "" if real else "~"
-    lg = ts.get("longest")
-    if lg:
-        km = f' ({fmt(lg["km"])} km)' if lg.get("km") else ""
-        longest = (f'<li>Longest ride <b>{esc(lg["from"])} → {esc(lg["to"])}</b> '
-                   f'{approx}{lg["hr"]:.1f} h{km}</li>')
-    else:
-        longest = ""
-    sub = (f"that's <b>{ts['full_days_equiv']:.1f} full days</b> sitting on a train — "
-           f"straight from the Eurail app's trip stats"
-           if real else
-           f"roughly <b>{ts['full_days_equiv']:.1f} full days</b> on a train — "
-           f"estimated from the distance of each route, not a stopwatch")
-    return f"""
-<section>
-  <h2>🚆 Time on trains</h2>
-  <div class="hero">
-    <div class="hero-n">{approx}{fmt(ts['rail_hours'])}<span>hours</span></div>
-    <div class="hero-sub">{sub}</div>
-  </div>
-  <ul class="facts">
-    <li><b>{ts['rail_legs']}</b> {"separate trains" if real else "train legs"}</li>
-    <li><b>{fmt(ts['rail_km'])}</b> km by rail</li>
-    <li><b>{ts['rail_hour_share']*100:.0f}%</b> of all travel time</li>
-    <li><b>{ts['countries_by_train']}</b> countries by rail</li>
-    {longest}
-  </ul>
-  {chart}
-</section>"""
-
-
-def mode_section(d: dict) -> str:
-    mb = A.mode_breakdown(d)
-    if mb.empty:
-        return ""
-    body = "".join(
-        f"<tr><td>{esc(MODE_LABEL.get(m, m.title()))}</td>"
-        f"<td class='r'>{int(r['legs'])}</td>"
-        f"<td class='r'>{'' if not r['estimated'] else '~'}{fmt(r['hours'],1)}</td>"
-        f"<td class='r'>{fmt(r['km'])}</td></tr>"
-        for m, r in mb.iterrows()
-    )
-    any_est = mb["estimated"].any()
-    note = ("<p class=\"note\">Train row is from the Eurail app. Other modes: hours and "
-            "distances estimated from great-circle route length.</p>" if any_est else "")
-    return f"""
-<section>
-  <h2>Every leg, by mode</h2>
-  <table>
-    <thead><tr><th>Mode</th><th class="r">Legs</th><th class="r">Hours</th>
-    <th class="r">km</th></tr></thead>
-    <tbody>{body}</tbody>
-  </table>
-  {note}
-</section>"""
-
-
-def spend_section(d: dict) -> str:
-    sp = A.spend_summary(d)
-    if d["expenses"].empty:
-        return ""
-    cat_chart = bar_h([(c.title(), v, cvar("cat", c)) for c, v in sp["by_category"].items()],
-                      vfmt=lambda v: f"${fmt(v)}", title="Spend by category")
-    ctry_chart = bar_h([(c, v, "m-train") for c, v in sp["by_country"].head(12).items()],
-                       vfmt=lambda v: f"${fmt(v)}", title="Spend by country (top 12)")
-    facts = []
-    if sp.get("priciest_day"):
-        facts.append(f"<li>Priciest day <b>${fmt(sp['priciest_day'][1])}</b> "
-                     f"({sp['priciest_day'][0]:%d %b})</li>")
-    if sp.get("cheapest_day"):
-        facts.append(f"<li>Cheapest day <b>${fmt(sp['cheapest_day'][1])}</b> "
-                     f"({sp['cheapest_day'][0]:%d %b})</li>")
-    if sp.get("mean_day"):
-        facts.append(f"<li>Average <b>${fmt(sp['mean_day'])}</b> / day spent</li>")
-    facts.append(f"<li><b>{sp['tgtg_count']}</b> Too Good To Go bags</li>")
-    note = ('<p class="note">* Summer 2025 expenses are only partly logged — that trip and the '
-            'combined total are a floor, not a final number.</p>' if sp["any_partial"] else "")
-    return f"""
-<section>
-  <h2>Money</h2>
-  <div class="grid2"><div>{cat_chart}</div><div>{ctry_chart}</div></div>
-  <div class="grid2">
-    <div><h3>Cost per day</h3>{costperday_svg(d)}</div>
-    <div><h3>Odds &amp; ends</h3><ul class="facts">{"".join(facts)}</ul></div>
-  </div>
-  {note}
-</section>"""
-
-
-def route_section(d: dict) -> str:
-    svg = route_svg(d)
+def trace_movement(d: dict) -> str:
+    svg = route_trace(d)
     if not svg:
         return ""
     dt_ = A.day_trips(d)
-    extra = ""
-    if not dt_.empty:
-        names = ", ".join(sorted(dt_["city"].unique()))
-        extra = f'<p class="note">Day trips (no overnight): {esc(names)}.</p>'
+    extra = (f' Off the line, no bed: {esc(", ".join(sorted(dt_["city"].unique())))}.'
+             if not dt_.empty else "")
     return f"""
-<section>
-  <h2>The route</h2>
-  {svg}
-  <p class="note">Every stop in order. Big dots = slept there; small dots = passed through.
-  The two trips aren't joined.</p>
-  {extra}
+<section class="movement">
+  <p class="tag">The line</p>
+  <figure class="trace">{svg}</figure>
+  <p class="caption">Every stop, joined in the order they happened &mdash; solid for rail,
+  dashed for road, dotted for sea, hairline for the few flights. The two trips never touch.{extra}</p>
 </section>"""
 
 
-def stops_section(d: dict) -> str:
+def trains_movement(d: dict) -> str:
+    ts = A.train_stats(d)
+    if not ts.get("has_data"):
+        return ""
+    span = A.active_span(d)
+    tl = A.transit_by_day(d)
+    cols = []
+    if span and not tl.empty:
+        for day, r in tl.iterrows():
+            stack = []
+            tr = float(r.get("train", 0))
+            if tr > 0:
+                stack.append((tr, "accent", 0.9))
+            other = float(sum(v for m, v in r.items() if m != "train"))
+            if other > 0:
+                stack.append((other, "ink", 0.28))
+            if stack:
+                cols.append((day, stack))
+    annos = []
+    for o in d.get("rail", {}).values():
+        top = sorted(o.get("notable", []), key=lambda j: -j["hours"])[:3]
+        for j in top:
+            annos.append((pd.to_datetime(j["date"]).date(),
+                          f'{j["from"]}→{j["to"]} {hm(j["hours"])}'))
+    strip = day_strip(span, cols, annos=annos,
+                      baseline_label="hours in transit, by day") if cols else ""
+    lg = ts.get("longest")
+    longest = (f' The single worst sit was <b>{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])}</b>, '
+               f'{hm(lg["hr"])} down the Dalmatian coast.') if lg else ""
+    ov = [f'{ts["rail_legs"]} trains', f'{fmt(ts["rail_km"])} km',
+          f'{ts["countries_by_train"]} countries', f'{ts["rail_hour_share"]*100:.0f}% of all transit']
+    if d.get("rail"):
+        onn = sum(o.get("overnight", 0) for o in d["rail"].values())
+        if onn:
+            ov.append(f'{onn} overnight')
+    return f"""
+<section class="movement">
+  <p class="tag">Time on rails</p>
+  <p class="statement"><b>{hm(ts['rail_hours'])}.</b> Four days and change with a pass in my
+  pocket, watching the map redraw itself through glass.{longest}</p>
+  <figure class="strip">{strip}</figure>
+  <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in ov)}</p>
+</section>"""
+
+
+def money_movement(d: dict) -> str:
+    sp = A.spend_summary(d)
+    if d["expenses"].empty:
+        return ""
+    cats = list(sp["by_category"].items())
+    cat_band = band([(c, v, CAT_COLOR.get(c, "c6"), 0.9) for c, v in cats])
+    cat_key = " &nbsp; ".join(
+        f'<span class="k"><i style="background:var(--{CAT_COLOR.get(c,"c6")})"></i>'
+        f'{esc(c)} {esc(money(v))}</span>' for c, v in cats)
+
+    ctry = sp["by_country"].head(9)
+    rest = sp["by_country"].iloc[9:].sum()
+    crows = [(c, v, "accent", op) for (c, v), op in
+             zip(ctry.items(), np.linspace(0.95, 0.4, len(ctry)))]
+    if rest > 0:
+        crows.append(("elsewhere", rest, "ink", 0.22))
+    ctry_band = band(crows)
+    ctry_key = " &nbsp; ".join(f'<span class="k">{esc(c)} {esc(money(v))}</span>'
+                               for c, v in list(ctry.items())[:6])
+
+    span = A.active_span(d)
+    sbd = A.spend_by_day(d)
+    cols, annos = [], []
+    if span and not sbd.empty:
+        cnames = list(sp["by_country"].head(7).index)
+        cmap = {c: f"c{i}" for i, c in enumerate(cnames)}
+        for day, r in sbd.iterrows():
+            if r["total"] and r["total"] > 0:
+                col = cmap.get(r.get("country", ""), "c6")
+                cols.append((day, [(float(r["total"]), col, 0.85)]))
+        if sp.get("priciest_day"):
+            annos.append((sp["priciest_day"][0], f'${sp["priciest_day"][1]:.0f}'))
+    strip = day_strip(span, cols, annos=annos, h=136,
+                      baseline_label="spend per day, tinted by country") if cols else ""
+
+    top2 = cats[:2]
+    lead = (f"{money(sum(v for _, v in top2))}" if top2 else money(sp["total"]))
+    lead_txt = " and ".join(c for c, _ in top2) if top2 else "everything"
+    perday = sp["total"] / d["trips"].loc["trip2", "days"]
+    facts = [f'{money(perday)}/day', f'{sp["tgtg_count"]} Too Good To Go bags']
+    if sp.get("priciest_day"):
+        facts.append(f'dearest day {money(sp["priciest_day"][1])} ({sp["priciest_day"][0]:%d %b})')
+    if sp.get("cheapest_day"):
+        facts.append(f'leanest {money(sp["cheapest_day"][1])} ({sp["cheapest_day"][0]:%d %b})')
+    star = ('<p class="caption">* Summer 2025 isn\'t fully logged yet, so the total is a floor.</p>'
+            if sp["any_partial"] else "")
+    return f"""
+<section class="movement">
+  <p class="tag">Where it went</p>
+  <p class="statement"><b>{esc(money(sp['total']))}</b> over the spring trip &mdash; {esc(lead)}
+  of it {esc(lead_txt)} alone.</p>
+  <figure class="bandfig">{cat_band}<div class="key">{cat_key}</div></figure>
+  <figure class="bandfig">{ctry_band}<div class="key">{ctry_key} &nbsp; &hellip;</div></figure>
+  <figure class="strip">{strip}</figure>
+  <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in facts)}</p>
+  {star}
+</section>"""
+
+
+def countries_movement(d: dict) -> str:
+    sl = A.sleeps(d)
+    if sl.empty:
+        return ""
+    by = sl.groupby("country")["nights"].sum().sort_values(ascending=False)
+    rows = [(c, v, "gold" if t1 else "accent", op) for (c, v), op, t1 in
+            zip(by.items(), np.linspace(0.9, 0.4, len(by)), [False] * len(by))]
+    b = band(rows, h=34)
+    key = " &nbsp; ".join(f'<span class="k">{esc(c)} <b>{int(v)}</b></span>' for c, v in by.items())
+    top = by.index[0]
+    return f"""
+<section class="movement">
+  <p class="tag">Ground held</p>
+  <figure class="bandfig">{b}<div class="key">{key}</div></figure>
+  <p class="caption">{int(by.sum())} nights in {len(by)} countries; the most of them
+  &mdash; {int(by.iloc[0])} &mdash; in {esc(top)}.</p>
+</section>"""
+
+
+def itinerary_movement(d: dict) -> str:
     sl = A.sleeps(d)
     if sl.empty:
         return ""
     names = {t: r["name"] for t, r in d["trips"].iterrows()}
-    body = "".join(
-        f"<tr><td>{esc(r['city'])}</td><td>{esc(r['country'])}</td>"
-        f"<td>{esc(names.get(r['trip'], r['trip']))}</td>"
-        f"<td class='r'>{r['arrival_date']:%d %b %Y}</td>"
-        f"<td class='r'>{int(r['nights'])}</td>"
-        f"<td>{esc(MODE_LABEL.get(r['transport'], r['transport'] or '—'))}</td></tr>"
-        for _, r in sl.sort_values(["trip", "arrival_date"]).iterrows()
-    )
-    return f"""
-<section>
-  <h2>Every place I slept ({len(sl)})</h2>
-  <div class="tablewrap"><table>
-    <thead><tr><th>City</th><th>Country</th><th>Trip</th><th class="r">Arrived</th>
-    <th class="r">Nights</th><th>Arrived by</th></tr></thead>
-    <tbody>{body}</tbody>
-  </table></div>
-</section>"""
+    blocks = []
+    for tid, grp in sl.groupby("trip"):
+        rows = "".join(
+            f'<li><span class="c">{esc(r["city"])}</span>'
+            f'<span class="co">{esc(r["country"])}</span>'
+            f'<span class="nn">{int(r["nights"])}&#8202;n</span></li>'
+            for _, r in grp.sort_values("arrival_date").iterrows())
+        blocks.append(f'<div class="itin-trip"><p class="tag">{esc(names.get(tid, tid))}</p>'
+                      f'<ol class="itin">{rows}</ol></div>')
+    return f'<section class="movement"><p class="tag">Every bed</p>{"".join(blocks)}</section>'
 
 
-def gallery_section(d: dict) -> str:
+def gallery_movement(d: dict) -> str:
     cap = PHOTOS / "captions.yml"
     entries = yaml.safe_load(cap.read_text(encoding="utf-8")) if cap.is_file() else None
     entries = [e for e in (entries or []) if isinstance(e, dict) and e.get("file")
                and (PHOTOS / e["file"]).is_file()]
     if not entries:
-        return """
-<section>
-  <h2>Photos</h2>
-  <p class="note">No photos yet. Drop web-sized JPGs into <code>photos/</code>, list them in
-  <code>photos/captions.yml</code>, and re-run the build.</p>
-</section>"""
+        return ""
     cells = "".join(
-        f'<figure><img loading="lazy" src="photos/{esc(e["file"])}" alt="{esc(e.get("caption",""))}">'
+        f'<figure class="ph ph{i%3}"><img loading="lazy" src="photos/{esc(e["file"])}" '
+        f'alt="{esc(e.get("caption",""))}">'
         f'<figcaption>{esc(e.get("caption",""))}'
-        f'{" · " + esc(e["city"]) if e.get("city") else ""}</figcaption></figure>'
-        for e in entries)
-    return f'<section><h2>Photos ({len(entries)})</h2><div class="gallery">{cells}</div></section>'
+        f'{" &mdash; " + esc(e["city"]) if e.get("city") else ""}</figcaption></figure>'
+        for i, e in enumerate(entries))
+    return f'<section class="movement"><p class="tag">Seen</p><div class="mosaic">{cells}</div></section>'
 
 
-# --------------------------------------------------------------------------- #
-# page
+def colophon(d: dict) -> str:
+    return (f'<footer class="colophon">Rail figures from the Interrail app &middot; '
+            f'other distances estimated &middot; {d["generated"]:%d %b %Y}</footer>')
+
+
 # --------------------------------------------------------------------------- #
 def _css() -> str:
-    def block(theme, sel):
-        return sel + "{" + ";".join(f"--{k}:{v}" for k, v in PALETTE[theme].items()) + "}"
+    def vars_(theme):
+        return ";".join(f"--{k}:{v}" for k, v in PAL[theme].items())
     return f"""
-{block('light', ':root')}
-@media (prefers-color-scheme: dark) {{ {block('dark', ':root')} }}
+:root{{{vars_('light')};
+  --serif:"Fraunces","Iowan Old Style",Georgia,serif;
+  --sans:"Inter",system-ui,-apple-system,sans-serif;
+  --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,Menlo,monospace}}
+@media (prefers-color-scheme:dark){{:root:not([data-theme=light]){{{vars_('dark')}}}}}
+:root[data-theme=dark]{{{vars_('dark')}}}
 *{{box-sizing:border-box}}
-body{{margin:0;background:var(--bg);color:var(--ink);
-  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}}
-.wrap{{max-width:860px;margin:0 auto;padding:40px 20px 80px}}
-header h1{{font-size:27px;margin:0 0 4px}}
-header p{{color:var(--muted);margin:0 0 8px}}
-section{{margin:44px 0;padding-top:8px;border-top:1px solid var(--line)}}
-h2{{font-size:20px;margin:20px 0 14px}}
-h3{{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 8px}}
-.tiles{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:20px}}
-.tile{{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}}
-.tn{{font-size:21px;font-weight:650}}
-.tl{{color:var(--muted);font-size:12.5px;margin-top:2px}}
-.hero{{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin:8px 0 14px}}
-.hero-n{{font-size:50px;font-weight:700;line-height:1;color:var(--accent)}}
-.hero-n span{{font-size:18px;font-weight:500;color:var(--muted);margin-left:8px}}
-.hero-sub{{color:var(--muted);margin-top:8px;max-width:52ch}}
-ul.facts{{list-style:none;padding:0;margin:0 0 16px;display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px 18px}}
-ul.facts li{{padding:4px 0;border-bottom:1px dotted var(--line)}}
-table{{border-collapse:collapse;width:100%;font-size:13.5px}}
-th,td{{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}}
-th{{color:var(--muted);font-weight:600}}
-td.r,th.r{{text-align:right;font-variant-numeric:tabular-nums}}
-.tablewrap{{overflow-x:auto;max-height:520px;overflow-y:auto}}
-.grid2{{display:grid;grid-template-columns:1fr 1fr;gap:24px}}
-@media (max-width:640px){{.grid2{{grid-template-columns:1fr}}}}
-.gallery{{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}}
-figure{{margin:0}} figure img{{width:100%;border-radius:8px;display:block;background:var(--track)}}
-figcaption{{color:var(--muted);font-size:12.5px;margin-top:5px}}
-.note{{color:var(--muted);font-size:12.5px}}
-.ct{{fill:var(--muted);font-size:12px;font-weight:600}}
-.cl{{fill:var(--ink);font-size:12px}}
-.cs{{fill:var(--muted);font-size:10.5px}}
-.cv{{fill:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}}
-footer{{color:var(--muted);font-size:12px;margin-top:60px}}
+body{{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}}
+.page{{max-width:940px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(20px,5vw,52px) 120px}}
+em{{font-style:italic}}
+b{{font-weight:500}}
+.dateline,.tag,.micro,.ax,.ax-note,.tr-city,.tr-note,.key,.lg-l,.colophon{{
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em}}
+header{{margin-bottom:clamp(40px,8vw,88px)}}
+.dateline{{font-size:11px;color:var(--dim);margin:0 0 22px}}
+h1{{font-family:var(--serif);font-weight:400;font-optical-sizing:auto;
+  font-size:clamp(38px,7.4vw,72px);line-height:1.03;letter-spacing:-.015em;margin:0 0 24px}}
+h1 em{{color:var(--accent)}}
+.dek{{font-family:var(--serif);font-size:clamp(17px,2.3vw,21px);line-height:1.5;
+  color:var(--dim);max-width:44ch;margin:0}}
+.ledger{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:0 34px;margin:0 0 clamp(50px,9vw,96px)}}
+.lg{{border-top:1.5px solid var(--ink);padding:14px 0 20px}}
+.lg-n{{font-family:var(--serif);font-size:clamp(28px,4.4vw,44px);line-height:1;letter-spacing:-.02em}}
+.lg-l{{font-size:10.5px;color:var(--dim);margin-top:9px}}
+.lg-a{{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--dim);margin-top:4px}}
+.movement{{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}}
+.tag{{font-size:10.5px;color:var(--accent);margin:0 0 20px}}
+.statement{{font-family:var(--serif);font-size:clamp(20px,3vw,28px);line-height:1.4;
+  font-weight:400;max-width:32ch;margin:0 0 30px}}
+.statement b{{color:var(--accent);font-weight:500}}
+.caption{{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--dim);
+  max-width:60ch;margin:18px 0 0}}
+.micro{{font-size:11px;color:var(--dim);margin:20px 0 0;line-height:2}}
+figure{{margin:0}}
+.trace{{margin:8px 0}}
+.trace svg{{display:block}}
+.strip{{margin:26px 0 4px}}
+.bandfig{{margin:0 0 26px}}
+.bandfig svg{{display:block;border-radius:2px}}
+.key{{font-size:10px;color:var(--dim);margin-top:11px;line-height:2.1}}
+.key .k{{white-space:nowrap;margin-right:2px}}
+.key i{{display:inline-block;width:8px;height:8px;margin-right:5px;vertical-align:baseline}}
+.key b{{color:var(--ink)}}
+.ax{{font-size:9px;fill:var(--dim);letter-spacing:.1em}}
+.ax-note{{font-size:9px;fill:var(--ink);letter-spacing:.06em}}
+.tr-city{{font-size:9px;fill:var(--dim);letter-spacing:.08em}}
+.tr-note{{font-size:9.5px;fill:var(--ink);letter-spacing:.05em}}
+.itin-trip{{margin-bottom:34px}}
+.itin{{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}}
+.itin li{{break-inside:avoid;display:flex;align-items:baseline;gap:8px;padding:6px 0;
+  border-bottom:1px dotted var(--rule)}}
+.itin .c{{font-family:var(--serif);font-size:15px;font-variant:all-small-caps;letter-spacing:.06em;
+  flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.itin .co{{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--dim)}}
+.itin .nn{{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em}}
+.mosaic{{columns:3;column-gap:14px}}
+@media(max-width:680px){{.mosaic{{columns:2}}.itin{{columns:1}}}}
+.mosaic .ph{{break-inside:avoid;margin:0 0 14px}}
+.mosaic img{{width:100%;display:block;border-radius:2px}}
+.mosaic figcaption{{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--dim);margin-top:5px}}
+.colophon{{font-size:9.5px;color:var(--dim);margin-top:110px;padding-top:20px;
+  border-top:1px solid var(--rule)}}
 a{{color:var(--accent)}}
 """
 
 
 def build_html(d: dict) -> str:
-    ov = A.overview(d)
-    gen = d["generated"].strftime("%d %b %Y")
-    body = "".join([trains_section(d), mode_section(d), route_section(d),
-                    spend_section(d), stops_section(d), gallery_section(d)])
+    body = "".join([
+        masthead(d), ledger(d), trace_movement(d), trains_movement(d),
+        money_movement(d), countries_movement(d), itinerary_movement(d),
+        gallery_movement(d), colophon(d),
+    ])
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>A gap year around Europe, in numbers</title>
+<title>Two months, then three, around a continent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500&family=Spline+Sans+Mono:wght@400;500&display=swap">
 <style>{_css()}</style>
-</head><body><div class="wrap">
-<header>
-  <h1>A gap year around Europe, in numbers</h1>
-  <p>Two backpacking trips — {ov['first_day']:%b %Y} and {ov['last_day']:%b %Y}.
-     {ov['n_countries']} countries, {ov['n_cities']} cities, a great deal of rail.</p>
-</header>
-{stat_tiles(d)}
+</head><body><main class="page">
 {body}
-<footer>Built from flat files in
-<a href="https://github.com/jimmysieja/eubackpacking">jimmysieja/eubackpacking</a>.
-Generated {gen}. Trip-1 data still being entered.</footer>
-</div></body></html>"""
+</main></body></html>"""
 
 
 # --------------------------------------------------------------------------- #
-# README assets
+# README assets (kept simple, one per theme)
 # --------------------------------------------------------------------------- #
-def _standalone(inner_svg: str, theme: str) -> str:
-    p = PALETTE[theme]
-    vars_css = ";".join(f"--{k}:{v}" for k, v in p.items())
-    style = (f'<style>svg{{background:{p["card"]};border-radius:10px}}'
-             f':root{{{vars_css}}} text{{font-family:-apple-system,Segoe UI,Roboto,sans-serif}}'
-             f'.ct{{fill:{p["muted"]};font-size:12px;font-weight:600}}'
-             f'.cl{{fill:{p["ink"]};font-size:12px}} .cs{{fill:{p["muted"]};font-size:10.5px}}'
-             f'.cv{{fill:{p["muted"]};font-size:11.5px}}</style>')
-    return inner_svg.replace(">", ">" + style, 1)
+def _standalone(svg: str, theme: str) -> str:
+    p = PAL[theme]
+    css = ";".join(f"--{k}:{v}" for k, v in p.items())
+    style = (f'<style>svg{{background:{p["paper"]}}}:root{{{css}}}'
+             f'text{{font-family:"Spline Sans Mono",ui-monospace,monospace}}'
+             f'.ax{{fill:{p["dim"]};font-size:9px}} .ax-note{{fill:{p["ink"]};font-size:9px}}'
+             f'.tr-city{{fill:{p["dim"]};font-size:9px}} .tr-note{{fill:{p["ink"]};font-size:9.5px}}</style>')
+    return svg.replace(">", ">" + style, 1)
 
 
 def _chart_set(d: dict) -> dict:
-    mb, sp = A.mode_breakdown(d), A.spend_summary(d)
     charts = {}
-    if not mb.empty:
-        charts["trains"] = bar_h(
-            [(MODE_LABEL.get(m, m.title()), r["hours"], cvar("m", m))
-             for m, r in mb.iterrows() if r["hours"] > 0],
-            unit=" h", vfmt=lambda v: fmt(v, 1), title="Estimated hours by transport mode")
+    tr = route_trace(d, 900, 520)
+    if tr:
+        charts["route"] = tr
+    span = A.active_span(d)
+    tl = A.transit_by_day(d)
+    if span and not tl.empty:
+        cols = []
+        for day, r in tl.iterrows():
+            tr_h = float(r.get("train", 0)); ot = float(sum(v for m, v in r.items() if m != "train"))
+            st = []
+            if tr_h > 0: st.append((tr_h, "accent", 0.9))
+            if ot > 0: st.append((ot, "ink", 0.28))
+            if st: cols.append((day, st))
+        annos = []
+        for o in d.get("rail", {}).values():
+            for j in sorted(o.get("notable", []), key=lambda x: -x["hours"])[:3]:
+                annos.append((pd.to_datetime(j["date"]).date(), f'{j["from"]}→{j["to"]}'))
+        charts["trains"] = day_strip(span, cols, annos=annos, baseline_label="hours in transit / day")
+    sp = A.spend_summary(d)
     if not d["expenses"].empty:
-        charts["spend-category"] = bar_h(
-            [(c.title(), v, cvar("cat", c)) for c, v in sp["by_category"].items()],
-            vfmt=lambda v: f"${fmt(v)}", title="Spend by category")
-        charts["spend-country"] = bar_h(
-            [(c, v, "m-train") for c, v in sp["by_country"].head(12).items()],
-            vfmt=lambda v: f"${fmt(v)}", title="Spend by country (top 12)")
-    route = route_svg(d)
-    if route:
-        charts["route"] = route
+        charts["spend"] = band([(c, v, CAT_COLOR.get(c, "c6"), 0.9)
+                                for c, v in sp["by_category"].items()], h=34)
     return charts
 
 
 def export_assets(d: dict, out: Path = ASSETS) -> list[str]:
     out.mkdir(exist_ok=True)
-    written = []
+    w = []
     for name, svg in _chart_set(d).items():
         for theme in ("light", "dark"):
             (out / f"{name}-{theme}.svg").write_text(_standalone(svg, theme), encoding="utf-8")
-            written.append(f"{name}-{theme}.svg")
-    return written
+            w.append(f"{name}-{theme}.svg")
+    return w
 
 
 def write_docs(d: dict) -> None:
@@ -486,9 +589,8 @@ def write_docs(d: dict) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-open", action="store_true")
-    ap.add_argument("--assets", action="store_true", help="also rewrite assets/*.svg")
+    ap.add_argument("--assets", action="store_true")
     args = ap.parse_args()
-
     d = A.load_all()
     write_docs(d)
     print(f"wrote {DOCS/'index.html'}")
