@@ -179,8 +179,9 @@ def stat_tiles(d: dict) -> str:
         (fmt(ov["nights_logged"]), "nights"),
     ]
     if ts.get("has_data"):
-        tiles.append((f"~{fmt(ts['rail_hours'])} h", "on trains"))
-        tiles.append((fmt(ts["rail_legs"]), "train journeys"))
+        approx = "" if not ts.get("estimated", True) else "~"
+        tiles.append((f"{approx}{fmt(ts['rail_hours'])} h", "on trains"))
+        tiles.append((fmt(ts["rail_legs"]), "trains" if not ts.get("estimated", True) else "train legs"))
     if sp["total"] > 0:
         tiles.append((f"${fmt(sp['total'])}", "logged spend" + (" *" if sp["any_partial"] else "")))
     cells = "".join(f'<div class="tile"><div class="tn">{v}</div><div class="tl">{esc(l)}</div></div>'
@@ -195,24 +196,33 @@ def trains_section(d: dict) -> str:
     mb = A.mode_breakdown(d)
     rows = [(MODE_LABEL.get(m, m.title()), r["hours"], cvar("m", m))
             for m, r in mb.iterrows() if r["hours"] > 0]
-    chart = bar_h(rows, unit=" h", vfmt=lambda v: fmt(v, 1), title="Estimated hours by mode")
+    chart = bar_h(rows, unit=" h", vfmt=lambda v: fmt(v, 1), title="Hours by transport mode")
+    real = not ts.get("estimated", True)
+    approx = "" if real else "~"
     lg = ts.get("longest")
-    longest = (f'<li>Longest leg <b>{esc(lg["from"])} → {esc(lg["to"])}</b> '
-               f'~{lg["hr"]:.1f} h ({fmt(lg["km"])} km)</li>') if lg else ""
+    if lg:
+        km = f' ({fmt(lg["km"])} km)' if lg.get("km") else ""
+        longest = (f'<li>Longest ride <b>{esc(lg["from"])} → {esc(lg["to"])}</b> '
+                   f'{approx}{lg["hr"]:.1f} h{km}</li>')
+    else:
+        longest = ""
+    sub = (f"that's <b>{ts['full_days_equiv']:.1f} full days</b> sitting on a train — "
+           f"straight from the Eurail app's trip stats"
+           if real else
+           f"roughly <b>{ts['full_days_equiv']:.1f} full days</b> on a train — "
+           f"estimated from the distance of each route, not a stopwatch")
     return f"""
 <section>
   <h2>🚆 Time on trains</h2>
   <div class="hero">
-    <div class="hero-n">~{fmt(ts['rail_hours'])}<span>hours</span></div>
-    <div class="hero-sub">roughly <b>{ts['full_days_equiv']:.1f} full days</b> on a train —
-      estimated from the distance of each route, not a stopwatch</div>
+    <div class="hero-n">{approx}{fmt(ts['rail_hours'])}<span>hours</span></div>
+    <div class="hero-sub">{sub}</div>
   </div>
   <ul class="facts">
-    <li><b>{ts['rail_legs']}</b> train journeys</li>
+    <li><b>{ts['rail_legs']}</b> {"separate trains" if real else "train legs"}</li>
     <li><b>{fmt(ts['rail_km'])}</b> km by rail</li>
     <li><b>{ts['rail_hour_share']*100:.0f}%</b> of all travel time</li>
-    <li>Trains on <b>{ts['rail_days']}</b> days</li>
-    <li><b>{ts['countries_by_train']}</b> countries entered by train</li>
+    <li><b>{ts['countries_by_train']}</b> countries by rail</li>
     {longest}
   </ul>
   {chart}
@@ -225,19 +235,23 @@ def mode_section(d: dict) -> str:
         return ""
     body = "".join(
         f"<tr><td>{esc(MODE_LABEL.get(m, m.title()))}</td>"
-        f"<td class='r'>{int(r['legs'])}</td><td class='r'>~{fmt(r['hours'],1)}</td>"
-        f"<td class='r'>{fmt(r['km'])}</td><td class='r'>{int(r['days'])}</td></tr>"
+        f"<td class='r'>{int(r['legs'])}</td>"
+        f"<td class='r'>{'' if not r['estimated'] else '~'}{fmt(r['hours'],1)}</td>"
+        f"<td class='r'>{fmt(r['km'])}</td></tr>"
         for m, r in mb.iterrows()
     )
+    any_est = mb["estimated"].any()
+    note = ("<p class=\"note\">Train row is from the Eurail app. Other modes: hours and "
+            "distances estimated from great-circle route length.</p>" if any_est else "")
     return f"""
 <section>
   <h2>Every leg, by mode</h2>
   <table>
-    <thead><tr><th>Mode</th><th class="r">Legs</th><th class="r">~Hours</th>
-    <th class="r">km</th><th class="r">Days</th></tr></thead>
+    <thead><tr><th>Mode</th><th class="r">Legs</th><th class="r">Hours</th>
+    <th class="r">km</th></tr></thead>
     <tbody>{body}</tbody>
   </table>
-  <p class="note">Hours and distances are estimated from great-circle route length.</p>
+  {note}
 </section>"""
 
 

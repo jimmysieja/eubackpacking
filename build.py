@@ -45,7 +45,9 @@ def stats_markdown(d: dict) -> str:
     L.append(f"<sub>{ov['first_day']:%b %Y} – {ov['last_day']:%b %Y} &nbsp;·&nbsp; "
              f"{ov['n_trips']} trips &nbsp;·&nbsp; generated {d['generated']:%d %b %Y}</sub>")
     L.append("")
-    L.append("| Countries | Cities slept in | Nights | Train journeys | Spend logged |")
+    real = not ts.get("estimated", True)
+    approx = "" if real else "~"
+    L.append(f"| Countries | Cities slept in | Nights | {'Trains' if real else 'Train legs'} | Spend logged |")
     L.append("|:-:|:-:|:-:|:-:|:-:|")
     L.append(f"| **{ov['n_countries']}** | **{ov['n_cities']}** | **{ov['nights_logged']}** "
              f"| **{ts.get('rail_legs', 0)}** | **${sp['total']:,.0f}**{star} |")
@@ -54,30 +56,37 @@ def stats_markdown(d: dict) -> str:
     if ts.get("has_data"):
         L.append("## 🚆 Time on trains")
         L.append("")
-        L.append(f"About **{ts['rail_hours']:,.0f} hours** on trains — roughly "
-                 f"**{ts['full_days_equiv']:.1f} full days** — over **{ts['rail_legs']}** journeys "
-                 f"and **{ts['rail_km']:,.0f} km**, entering **{ts['countries_by_train']}** countries "
-                 f"by rail. That's {ts['rail_hour_share']*100:.0f}% of all travel time.")
+        L.append(f"{approx}**{ts['rail_hours']:,.0f} hours** on trains — about "
+                 f"**{ts['full_days_equiv']:.1f} full days** — over **{ts['rail_legs']}** "
+                 f"{'trains' if real else 'legs'} and **{ts['rail_km']:,.0f} km**, across "
+                 f"**{ts['countries_by_train']}** countries. That's "
+                 f"{ts['rail_hour_share']*100:.0f}% of all travel time.")
         if "longest" in ts:
             lg = ts["longest"]
+            km = f" ({lg['km']:,.0f} km)" if lg.get("km") else ""
             L.append("")
-            L.append(f"Longest leg: **{lg['from']} → {lg['to']}**, ~{lg['hr']:.1f} h "
-                     f"({lg['km']:,.0f} km).")
+            L.append(f"Longest ride: **{lg['from']} → {lg['to']}**, {approx}{lg['hr']:.1f} h{km}.")
         L.append("")
-        L.append("<sub>Durations are estimated from route distance — there are no stopwatch "
-                 "numbers in the data.</sub>")
+        L.append("<sub>" + ("Train figures come straight from the Eurail Rail Planner app."
+                 if real else "Durations estimated from route distance — no stopwatch numbers "
+                 "in the data.") + "</sub>")
         L.append("")
-        L.append(_picture("trains", "Estimated hours by transport mode"))
+        L.append(_picture("trains", "Hours by transport mode"))
         L.append("")
 
     if not mb.empty:
         L.append("## Every leg, by mode")
         L.append("")
-        L.append("| Mode | Legs | ~Hours | km |")
+        L.append("| Mode | Legs | Hours | km |")
         L.append("|:--|--:|--:|--:|")
         for m, r in mb.iterrows():
+            pfx = "" if not r["estimated"] else "~"
             L.append(f"| {D.MODE_LABEL.get(m, m.title())} | {int(r['legs'])} "
-                     f"| {r['hours']:,.1f} | {r['km']:,.0f} |")
+                     f"| {pfx}{r['hours']:,.1f} | {r['km']:,.0f} |")
+        if mb["estimated"].any():
+            L.append("")
+            L.append("<sub>Train row from the Eurail app; other modes estimated from route "
+                     "distance.</sub>")
         L.append("")
 
     if not d["expenses"].empty:

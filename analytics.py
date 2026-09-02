@@ -164,6 +164,15 @@ def load_expenses(trips: pd.DataFrame | None = None) -> pd.DataFrame:
     return df.sort_values("date").reset_index(drop=True)
 
 
+def load_rail_overrides() -> dict:
+    """Real per-trip rail totals from data/rail_<trip>.yml (Eurail app), if any."""
+    out = {}
+    for p in sorted(DATA.glob("rail_*.yml")):
+        tid = p.stem.split("_", 1)[1]
+        out[tid] = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    return out
+
+
 def load_all() -> dict:
     trips = load_trips()
     stops = load_stops(trips)
@@ -173,6 +182,7 @@ def load_all() -> dict:
         "legs": load_legs(stops),
         "expenses": load_expenses(trips),
         "fx": load_fx(),
+        "rail": load_rail_overrides(),
         "generated": dt.datetime.now(dt.timezone.utc),
     }
 
@@ -251,25 +261,46 @@ def spend_summary(d: dict) -> dict:
 
 
 def train_stats(d: dict) -> dict:
+    """Rail summary. Uses the real Eurail-app totals in d['rail'] when present,
+    otherwise falls back to the distance-based estimate from the legs."""
     legs = d["legs"]
-    res = {"has_data": not legs.empty, "estimated": True}
-    if legs.empty:
+    rail_ovr = d.get("rail", {})
+    res = {"has_data": (not legs.empty) or bool(rail_ovr)}
+
+    if rail_ovr:
+        res["estimated"] = False
+        res["rail_legs"] = int(sum(o.get("trains", 0) for o in rail_ovr.values()))
+        res["rail_hours"] = float(sum(o.get("hours", 0) for o in rail_ovr.values()))
+        res["rail_km"] = float(sum(o.get("distance_km", 0) for o in rail_ovr.values()))
+        res["countries_by_train"] = max((o.get("countries", 0) for o in rail_ovr.values()), default=0)
+        lg = next((o["longest"] for o in rail_ovr.values() if o.get("longest")), None)
+        if lg:
+            res["longest"] = {"from": lg["from"], "to": lg["to"], "hr": float(lg["hours"]),
+                              "km": lg.get("km"), "date": lg.get("date")}
+    elif not legs.empty:
+        res["estimated"] = True
+        rail = legs[legs["mode"].isin(RAIL_MODES)]
+        res["rail_legs"] = int(len(rail))
+        res["rail_hours"] = float(rail["est_hr"].sum(skipna=True))
+        res["rail_km"] = float(rail["km"].sum(skipna=True))
+        crossed = rail[rail["from_country"] != rail["to_country"]]
+        res["countries_by_train"] = int(crossed["to_country"].nunique())
+        if not rail["est_hr"].dropna().empty:
+            lg = rail.loc[rail["est_hr"].idxmax()]
+            res["longest"] = {"from": lg["from"], "to": lg["to"], "hr": float(lg["est_hr"]),
+                              "km": float(lg["km"]), "date": lg["date"].date().isoformat()}
+    else:
         return res
-    rail = legs[legs["mode"].isin(RAIL_MODES)]
-    res["rail_legs"] = int(len(rail))
-    res["rail_hours"] = float(rail["est_hr"].sum(skipna=True))
-    res["rail_km"] = float(rail["km"].sum(skipna=True))
-    res["rail_days"] = int(rail["date"].dt.date.nunique())
+
+    if not legs.empty:
+        rail = legs[legs["mode"].isin(RAIL_MODES)]
+        res["rail_days"] = int(rail["date"].dt.date.nunique())
     res["full_days_equiv"] = res["rail_hours"] / 24.0
-    total_hours = float(legs["est_hr"].sum(skipna=True))
-    res["rail_hour_share"] = res["rail_hours"] / total_hours if total_hours else 0.0
-    crossed = rail[rail["from_country"] != rail["to_country"]]
-    res["countries_by_train"] = int(crossed["to_country"].nunique())
-    if not rail["est_hr"].dropna().empty:
-        lg = rail.loc[rail["est_hr"].idxmax()]
-        res["avg_leg_hr"] = float(rail["est_hr"].mean(skipna=True))
-        res["longest"] = {"from": lg["from"], "to": lg["to"], "hr": float(lg["est_hr"]),
-                          "km": float(lg["km"]), "date": lg["date"].date().isoformat()}
+    other = 0.0
+    if not legs.empty:
+        other = float(legs[~legs["mode"].isin(RAIL_MODES)]["est_hr"].sum(skipna=True))
+    denom = res["rail_hours"] + other
+    res["rail_hour_share"] = res["rail_hours"] / denom if denom else 0.0
     return res
 
 
@@ -283,6 +314,12 @@ def mode_breakdown(d: dict) -> pd.DataFrame:
         km=("km", lambda s: s.sum(skipna=True)),
         days=("date", lambda s: s.dt.date.nunique()),
     )
+    g["estimated"] = True
+    # swap in the real Eurail rail totals for the train row
+    ts = train_stats(d)
+    if not ts.get("estimated", True) and "train" in g.index:
+        g.loc["train", ["legs", "hours", "km", "estimated"]] = [
+            ts["rail_legs"], ts["rail_hours"], ts["rail_km"], False]
     order = [m for m in MODE_ORDER if m in g.index] + [m for m in g.index if m not in MODE_ORDER]
     return g.reindex(order)
 
@@ -331,18 +368,22 @@ def build_report(d: dict) -> str:
         L.append(f"  Too Good To Go bags: {sp['tgtg_count']}")
     L.append("")
 
-    L.append("Trains  (durations ESTIMATED from route distance)")
+    src = "from the Eurail app" if not ts.get("estimated", True) else "ESTIMATED from route distance"
+    L.append(f"Trains  ({src})")
     L.append("-" * 44)
     if ts.get("has_data"):
-        L.append(f"  ~{ts['rail_hours']:.0f} h on trains ({ts['full_days_equiv']:.1f} full days) "
-                 f"over {ts['rail_legs']} legs")
-        L.append(f"  {ts['rail_km']:,.0f} km by rail · {ts['rail_hour_share']*100:.0f}% of travel "
-                 f"time · trains on {ts['rail_days']} days · {ts['countries_by_train']} countries "
-                 f"entered by train")
+        pfx = "" if not ts.get("estimated", True) else "~"
+        L.append(f"  {pfx}{ts['rail_hours']:.0f} h on trains ({ts['full_days_equiv']:.1f} full days) "
+                 f"over {ts['rail_legs']} {'trains' if not ts.get('estimated', True) else 'legs'}")
+        line = (f"  {ts['rail_km']:,.0f} km by rail · {ts['rail_hour_share']*100:.0f}% of travel "
+                f"time · {ts['countries_by_train']} countries by rail")
+        if "rail_days" in ts:
+            line += f" · trains on {ts['rail_days']} days"
+        L.append(line)
         if "longest" in ts:
             lg = ts["longest"]
-            L.append(f"  longest leg  {lg['from']} → {lg['to']}  ~{lg['hr']:.1f} h "
-                     f"({lg['km']:,.0f} km, {lg['date']})")
+            km = f", {lg['km']:,.0f} km" if lg.get("km") else ""
+            L.append(f"  longest ride  {lg['from']} → {lg['to']}  {lg['hr']:.1f} h ({lg['date']}{km})")
     L.append("")
 
     mb = mode_breakdown(d)

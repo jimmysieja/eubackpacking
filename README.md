@@ -10,32 +10,34 @@ and how much of it was spent sitting on trains.
 
 <sub>Jun 2025 – May 2026 &nbsp;·&nbsp; 2 trips &nbsp;·&nbsp; generated 02 Sep 2026</sub>
 
-| Countries | Cities slept in | Nights | Train journeys | Spend logged |
+| Countries | Cities slept in | Nights | Trains | Spend logged |
 |:-:|:-:|:-:|:-:|:-:|
-| **16** | **26** | **89** | **38** | **$5,848** |
+| **16** | **26** | **89** | **48** | **$5,848** |
 
 ## 🚆 Time on trains
 
-About **93 hours** on trains — roughly **3.9 full days** — over **38** journeys and **5,865 km**, entering **13** countries by rail. That's 55% of all travel time.
+**102 hours** on trains — about **4.2 full days** — over **48** trains and **7,099 km**, across **12** countries. That's 57% of all travel time.
 
-Longest leg: **Copenhagen → Stockholm**, ~7.4 h (522 km).
+Longest ride: **Ljubljana → Split**, 13.6 h.
 
-<sub>Durations are estimated from route distance — there are no stopwatch numbers in the data.</sub>
+<sub>Train figures come straight from the Eurail Rail Planner app.</sub>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/trains-dark.svg">
-  <img alt="Estimated hours by transport mode" src="assets/trains-light.svg" width="100%">
+  <img alt="Hours by transport mode" src="assets/trains-light.svg" width="100%">
 </picture>
 
 ## Every leg, by mode
 
-| Mode | Legs | ~Hours | km |
+| Mode | Legs | Hours | km |
 |:--|--:|--:|--:|
-| Train | 38 | 93.4 | 5,865 |
-| Bus | 12 | 20.6 | 901 |
-| Ferry | 3 | 17.2 | 456 |
-| Flight | 5 | 35.5 | 16,597 |
-| Car | 3 | 2.9 | 171 |
+| Train | 48 | 101.9 | 7,099 |
+| Bus | 12 | ~20.6 | 901 |
+| Ferry | 3 | ~17.2 | 456 |
+| Flight | 5 | ~35.5 | 16,597 |
+| Car | 3 | ~2.9 | 171 |
+
+<sub>Train row from the Eurail app; other modes estimated from route distance.</sub>
 
 ## Money
 

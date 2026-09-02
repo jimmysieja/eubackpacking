@@ -1,0 +1,17 @@
+# Real rail stats, straight from the Eurail / Interrail Rail Planner app
+# (My Trip → Statistics), spring 2026. These are NOT estimated — the app tracks
+# journeys actually taken. It showed 48 of 62 saved journeys completed; only the
+# completed ones are counted here.
+#
+# When present, the dashboard uses these for the "Time on trains" section and the
+# train row of the mode table instead of the distance-based estimate.
+source: Eurail Rail Planner app — Statistics screen
+trains: 48
+distance_km: 7099
+hours: 101.87            # 4 days, 5 hours, 52 minutes
+countries: 12
+longest:
+  from: Ljubljana
+  to: Split
+  date: 2026-04-26
+  hours: 13.62           # 13 h 37 m, one change
