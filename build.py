@@ -45,34 +45,38 @@ def stats_markdown(d: dict) -> str:
     L.append(f"<sub>{ov['first_day']:%b %Y} – {ov['last_day']:%b %Y} &nbsp;·&nbsp; "
              f"{ov['n_trips']} trips &nbsp;·&nbsp; generated {d['generated']:%d %b %Y}</sub>")
     L.append("")
-    L.append("| Countries | Cities | Days on the road | Nights logged | Spend logged |")
+    L.append("| Countries | Cities slept in | Nights | Train journeys | Spend logged |")
     L.append("|:-:|:-:|:-:|:-:|:-:|")
-    L.append(f"| **{ov['n_countries']}** | **{ov['n_cities']}** | **{ov['trip_days']}** "
-             f"| **{ov['nights_logged']}** | **${sp['total']:,.0f}**{star} |")
+    L.append(f"| **{ov['n_countries']}** | **{ov['n_cities']}** | **{ov['nights_logged']}** "
+             f"| **{ts.get('rail_legs', 0)}** | **${sp['total']:,.0f}**{star} |")
     L.append("")
 
     if ts.get("has_data"):
         L.append("## 🚆 Time on trains")
         L.append("")
-        L.append(f"**{ts['rail_hours']:,.0f} hours** on intercity trains — about "
-                 f"**{ts['full_days_equiv']:.1f} full days** — over **{ts['rail_journeys']}** journeys "
-                 f"and **{ts['rail_km']:,.0f} km**. That's {ts['rail_hour_share']*100:.0f}% of all "
-                 f"logged travel time.")
+        L.append(f"About **{ts['rail_hours']:,.0f} hours** on trains — roughly "
+                 f"**{ts['full_days_equiv']:.1f} full days** — over **{ts['rail_legs']}** journeys "
+                 f"and **{ts['rail_km']:,.0f} km**, entering **{ts['countries_by_train']}** countries "
+                 f"by rail. That's {ts['rail_hour_share']*100:.0f}% of all travel time.")
         if "longest" in ts:
             lg = ts["longest"]
             L.append("")
-            L.append(f"Longest single ride: **{lg['from']} → {lg['to']}**, {lg['hr']:.1f} h.")
+            L.append(f"Longest leg: **{lg['from']} → {lg['to']}**, ~{lg['hr']:.1f} h "
+                     f"({lg['km']:,.0f} km).")
         L.append("")
-        L.append(_picture("trains", "Hours by transport mode"))
+        L.append("<sub>Durations are estimated from route distance — there are no stopwatch "
+                 "numbers in the data.</sub>")
+        L.append("")
+        L.append(_picture("trains", "Estimated hours by transport mode"))
         L.append("")
 
     if not mb.empty:
-        L.append("## Transport by mode")
+        L.append("## Every leg, by mode")
         L.append("")
-        L.append("| Mode | Journeys | Hours | km |")
+        L.append("| Mode | Legs | ~Hours | km |")
         L.append("|:--|--:|--:|--:|")
         for m, r in mb.iterrows():
-            L.append(f"| {D.MODE_LABEL.get(m, m.title())} | {int(r['journeys'])} "
+            L.append(f"| {D.MODE_LABEL.get(m, m.title())} | {int(r['legs'])} "
                      f"| {r['hours']:,.1f} | {r['km']:,.0f} |")
         L.append("")
 
@@ -80,8 +84,12 @@ def stats_markdown(d: dict) -> str:
         L.append("## Money")
         L.append("")
         for tid, row in d["trips"].iterrows():
+            total = sp["by_trip"].get(tid, 0)
+            if total <= 0:
+                L.append(f"- **{row['name']}**: expenses not entered yet")
+                continue
             tag = "" if sp["complete"].get(tid) else " — *partial, still logging*"
-            L.append(f"- **{row['name']}**: ${sp['by_trip'].get(tid, 0):,.0f} "
+            L.append(f"- **{row['name']}**: ${total:,.0f} "
                      f"(${sp['cost_per_day'].get(tid, 0):,.0f}/day){tag}")
         L.append("")
         L.append(_picture("spend-category", "Spend by category"))

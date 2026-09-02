@@ -1,0 +1,65 @@
+stop_number,city,country,transport,arrival_date,departure_date
+0,"Huntsville, AL",USA,,,
+1,"Nashville, TN",USA,Voiture,2026-02-23,2026-02-23
+2,Paris,France,Avion,2026-02-24,2026-03-10
+3,London,United Kingdom,Train,2026-03-10,2026-03-17
+4,Oxford,United Kingdom,Train,2026-03-17,2026-03-17
+5,Liverpool,United Kingdom,Train,2026-03-17,2026-03-20
+6,Manchester,United Kingdom,Train,2026-03-20,2026-03-22
+7,Chinley,United Kingdom,Train,2026-03-20,2026-03-20
+8,Manchester,United Kingdom,Train,2026-03-20,2026-03-22
+9,Betws-y-Coed,United Kingdom,Train,2026-03-22,2026-03-23
+10,Abergavenny,United Kingdom,Train,2026-03-23,2026-03-25
+11,Holyhead,United Kingdom,Train,2026-03-25,2026-03-25
+12,Dublin,Ireland,Bateau,2026-03-25,2026-03-25
+13,Galway,Ireland,Train,2026-03-25,2026-03-25
+14,Clifden,Ireland,Bus,2026-03-26,2026-03-28
+15,Galway,Ireland,Bus,2026-03-28,2026-03-28
+16,Dublin,Ireland,Bus,2026-03-28,2026-03-28
+17,Howth,Ireland,Train,2026-03-28,2026-03-28
+18,Dublin,Ireland,Train,2026-03-28,2026-03-30
+19,Belfast,United Kingdom,Train,2026-03-30,2026-03-31
+20,Paris,France,Avion,2026-03-31,2026-04-06
+21,Lille,France,Train,2026-04-06,2026-04-06
+22,Tournai,Belgium,Train,2026-04-06,2026-04-06
+23,Brussels,Belgium,Train,2026-04-06,2026-04-06
+24,Cologne,Germany,Train,2026-04-06,2026-04-06
+25,Hamburg,Germany,Train,2026-04-07,2026-04-07
+26,Copenhagen,Denmark,Train,2026-04-07,2026-04-10
+27,Stockholm,Sweden,Train,2026-04-10,2026-04-13
+28,Turku,Finland,Bateau,2026-04-13,2026-04-13
+29,Helsinki,Finland,Train,2026-04-13,2026-04-16
+30,Tallinn,Estonia,Bateau,2026-04-16,2026-04-17
+31,Riga,Latvia,Train,2026-04-17,2026-04-19
+32,Vilnius,Lithuania,Train,2026-04-19,2026-04-20
+33,Mockava,Lithuania,Train,2026-04-20,2026-04-20
+34,Warsaw,Poland,Train,2026-04-20,2026-04-20
+35,Kraków,Poland,Train,2026-04-20,2026-04-20
+36,Ostrava,Czechia,Train,2026-04-21,2026-04-21
+37,Brno,Czechia,Train,2026-04-21,2026-04-21
+38,Vienna,Austria,Train,2026-04-21,2026-04-21
+39,Bratislava,Slovakia,Train,2026-04-21,2026-04-23
+40,Vienna,Austria,Train,2026-04-23,2026-04-24
+41,Bled,Slovenia,Train,2026-04-24,2026-04-25
+42,Ljubljana,Slovenia,Train,2026-04-25,2026-04-26
+43,Zagreb,Croatia,Train,2026-04-26,2026-04-26
+44,Split,Croatia,Train,2026-04-26,2026-04-30
+45,Krka National Park,Croatia,Bus,2026-04-29,2026-04-29
+46,Split,Croatia,Bus,2026-04-30,2026-04-30
+47,Mostar,Bosnia and Herzegovina,Bus,2026-04-30,2026-05-01
+48,Sarajevo,Bosnia and Herzegovina,Train,2026-05-01,2026-05-02
+49,Pluzine,Montenegro,Voiture,2026-05-02,2026-05-02
+50,Niksic,Montenegro,Voiture,2026-05-02,2026-05-02
+51,Žabljak,Montenegro,Bus,2026-05-02,2026-05-05
+52,Podgorica,Montenegro,Bus,2026-05-05,2026-05-07
+53,Virpazar,Montenegro,Train,2026-05-06,2026-05-06
+54,Podgorica,Montenegro,Train,2026-05-06,2026-05-07
+55,Shkodër,Albania,Bus,2026-05-07,2026-05-09
+56,Theth,Albania,Bus,2026-05-08,2026-05-08
+57,Shkodër,Albania,Voiture,2026-05-08,2026-05-08
+58,Tirana,Albania,Bus,2026-05-09,2026-05-10
+59,Beauvais,France,Avion,2026-05-10,2026-05-10
+60,Paris,France,Bus,2026-05-10,2026-05-26
+61,London,United Kingdom,Avion,2026-05-26,2026-05-26
+62,"Nashville, TN",USA,Avion,2026-05-26,2026-05-26
+63,"Huntsville, AL",USA,,,

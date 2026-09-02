@@ -1,14 +1,1 @@
-date,trip,country,city,category,description,amount_usd
-2025-06-16,trip1,Portugal,Lisbon,lodging,Hostel dorm 4 nights,132.00
-2025-06-16,trip1,Portugal,Lisbon,food,Groceries + pasteis,24.10
-2025-06-18,trip1,Portugal,Lisbon,activities,Tram 28 + Belem day,11.50
-2025-06-20,trip1,Portugal,Porto,transport,Alfa Pendular Lisbon to Porto,34.00
-2025-06-24,trip1,Spain,Madrid,transport,Night bus Porto to Madrid,41.00
-2025-06-28,trip1,Spain,Barcelona,transport,AVE Madrid to Barcelona,48.00
-2025-07-03,trip1,France,Marseille,transport,TER + Ouigo Barcelona to Marseille,39.00
-2025-07-09,trip1,Italy,Milan,transport,TGV Nice to Milan,36.00
-2025-07-15,trip1,Slovenia,Ljubljana,transport,Bus Venice to Ljubljana,22.00
-2025-07-26,trip1,Bosnia and Herzegovina,Sarajevo,transport,Bus Split to Sarajevo,19.00
-2025-08-03,trip1,Hungary,Budapest,transport,Bus Belgrade to Budapest,25.00
-2025-08-08,trip1,Austria,Vienna,transport,RJ Budapest to Vienna,23.00
-2025-08-12,trip1,Czechia,Prague,transport,RJ Vienna to Prague,18.00
+date,trip,city,country,currency,amount,amount_usd,category,description

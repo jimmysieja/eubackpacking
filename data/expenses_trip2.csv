@@ -1,28 +1,419 @@
-date,trip,country,city,category,description,amount_usd
-2026-03-02,trip2,France,Paris,transport,Airport RER B to city,12.80
-2026-03-02,trip2,France,Paris,lodging,Hostel dorm 6 nights,246.00
-2026-03-03,trip2,France,Paris,food,Groceries + bakery,31.40
-2026-03-04,trip2,France,Paris,activities,Louvre ticket,18.90
-2026-03-05,trip2,France,Paris,food,Dinner with hostel crew,27.10
-2026-03-06,trip2,France,Paris,transport,Metro carnet,17.35
-2026-03-08,trip2,France,Paris,transport,Thalys Paris to Amsterdam,79.00
-2026-03-08,trip2,Netherlands,Amsterdam,lodging,Hostel dorm 5 nights,205.00
-2026-03-09,trip2,Netherlands,Amsterdam,food,Groceries,28.60
-2026-03-10,trip2,Netherlands,Amsterdam,activities,Van Gogh Museum,22.40
-2026-03-13,trip2,Belgium,Brussels,transport,IC train Amsterdam to Brussels,29.00
-2026-03-13,trip2,Belgium,Brussels,lodging,Hostel dorm 3 nights,132.00
-2026-03-16,trip2,Germany,Cologne,transport,ICE Brussels to Cologne,42.00
-2026-03-19,trip2,Germany,Berlin,transport,ICE Cologne to Berlin,55.00
-2026-03-19,trip2,Germany,Berlin,lodging,Airbnb private room 7 nights,336.00
-2026-03-21,trip2,Germany,Berlin,activities,Reichstag dome + walking tour,15.00
-2026-03-26,trip2,Germany,Munich,transport,ICE Berlin to Munich,68.00
-2026-04-03,trip2,Switzerland,Zurich,transport,EC Innsbruck to Zurich,53.00
-2026-04-07,trip2,Switzerland,Interlaken,activities,Jungfraujoch rail excursion,119.00
-2026-04-15,trip2,Italy,Turin,transport,TGV Lucerne to Turin,41.00
-2026-04-23,trip2,Italy,Rome,transport,Frecciarossa Florence to Rome,29.90
-2026-04-23,trip2,Italy,Rome,lodging,Hostel dorm 6 nights,240.00
-2026-04-24,trip2,Italy,Rome,activities,Colosseum + Forum,24.00
-2026-05-02,trip2,France,Lyon,transport,TGV Bologna to Lyon,64.00
-2026-05-10,trip2,Spain,San Sebastian,transport,Bus Bordeaux to San Sebastian,18.00
-2026-05-23,trip2,Portugal,Lisbon,transport,IC Porto to Lisbon,27.00
-2026-05-30,trip2,Portugal,Lisbon,transport,Flight Lisbon to home,214.00
+date,trip,city,country,currency,amount,amount_usd,category,description
+2026-02-24,trip2,Paris,France,EUR,14.0,15.12,transport,Metro from CDG
+2026-02-24,trip2,Paris,France,EUR,12.0,12.96,transport,Day pass metro
+2026-02-24,trip2,Paris,France,USD,15.0,15.0,food,food/groceries w Ralph
+2026-02-26,trip2,Paris,France,EUR,4.0,4.32,food,TGTG
+2026-02-26,trip2,Paris,France,EUR,2.55,2.75,transport,metro
+2026-02-27,trip2,Paris,France,EUR,5.0,5.4,food,TGTG
+2026-02-27,trip2,Paris,France,EUR,25.8,27.86,shopping,moisturizer & cleanser
+2026-02-28,trip2,Paris,France,EUR,42.0,45.36,food,groceries (including protein powder)
+2026-03-01,trip2,Paris,France,EUR,5.5,5.94,transport,metro x2
+2026-03-01,trip2,Paris,France,EUR,17.0,18.36,food,pancakes
+2026-03-01,trip2,Paris,France,EUR,4.0,4.32,food,TGTG
+2026-03-02,trip2,Paris,France,EUR,32.4,34.99,transport,week metro pass Paris
+2026-03-02,trip2,Paris,France,EUR,50.0,54.0,shopping,Zara trousers
+2026-03-02,trip2,Paris,France,EUR,20.0,21.6,shopping,Uniqlo airism
+2026-03-02,trip2,Paris,France,EUR,4.0,4.32,food,TGTG
+2026-03-03,trip2,Paris,France,EUR,25.0,27.0,shopping,guerrisol tote bag
+2026-03-03,trip2,Paris,France,EUR,4.0,4.32,food,TGTG
+2026-03-04,trip2,Paris,France,EUR,11.56,12.48,food,groceries
+2026-03-04,trip2,Paris,France,USD,175.0,175.0,activities,PSG tickets x2
+2026-03-05,trip2,Paris,France,EUR,5.0,5.4,food,TGTG
+2026-03-05,trip2,Paris,France,EUR,10.0,10.8,shopping,new sunnies
+2026-03-07,trip2,Paris,France,EUR,5.0,5.4,food,TGTG
+2026-03-07,trip2,Paris,France,EUR,1.0,1.08,food,ham butter sandwich Franprix
+2026-03-09,trip2,Paris,France,EUR,5.0,5.4,food,TGTG
+2026-03-09,trip2,Paris,France,EUR,39.0,42.12,transport,seat reservation Paris -> London
+2026-03-09,trip2,Paris,France,EUR,5.1,5.51,transport,2x metro
+2026-03-10,trip2,London,United Kingdom,EUR,2.55,2.75,transport,metro
+2026-03-10,trip2,London,United Kingdom,EUR,15.0,16.2,lodging,hostel London
+2026-03-10,trip2,London,United Kingdom,GBP,3.1,3.94,transport,metro
+2026-03-10,trip2,London,United Kingdom,GBP,10.55,13.4,food,pizza and cider @hostel bar
+2026-03-11,trip2,London,United Kingdom,GBP,3.4,4.32,food,TGTG
+2026-03-11,trip2,London,United Kingdom,GBP,4.0,5.08,food,ice cream @ borough market
+2026-03-11,trip2,London,United Kingdom,GBP,9.0,11.43,gifts,hot sauce dad gift
+2026-03-11,trip2,London,United Kingdom,GBP,50.0,63.5,shopping,Zara jacket
+2026-03-11,trip2,London,United Kingdom,GBP,10.0,12.7,shopping,lock and tape
+2026-03-11,trip2,London,United Kingdom,GBP,4.65,5.91,food,tesco water and choc protein milk
+2026-03-11,trip2,London,United Kingdom,GBP,3.7,4.7,food,cider @pub for PSGCHE
+2026-03-11,trip2,London,United Kingdom,EUR,15.0,16.2,lodging,hostel London
+2026-03-12,trip2,London,United Kingdom,GBP,5.0,6.35,activities,footy match
+2026-03-12,trip2,London,United Kingdom,GBP,8.9,11.3,transport,metro total
+2026-03-12,trip2,London,United Kingdom,GBP,6.0,7.62,food,TGTG
+2026-03-12,trip2,London,United Kingdom,GBP,15.0,19.05,shopping,UK charging plug
+2026-03-12,trip2,London,United Kingdom,GBP,19.5,24.77,food,pub crawl
+2026-03-12,trip2,London,United Kingdom,GBP,15.5,19.68,food,alcohol
+2026-03-12,trip2,London,United Kingdom,EUR,15.0,16.2,lodging,hostel London
+2026-03-13,trip2,London,United Kingdom,GBP,3.95,5.02,food,sainsbury meal deal
+2026-03-13,trip2,London,United Kingdom,GBP,10.38,13.18,food,spoons fish & chips & Guinness
+2026-03-13,trip2,London,United Kingdom,GBP,4.0,5.08,food,TGTG
+2026-03-13,trip2,London,United Kingdom,GBP,8.0,10.16,food,wine
+2026-03-13,trip2,London,United Kingdom,GBP,5.0,6.35,activities,club entry
+2026-03-13,trip2,London,United Kingdom,GBP,18.0,22.86,food,alcohol
+2026-03-13,trip2,London,United Kingdom,GBP,6.5,8.26,transport,public transpo
+2026-03-13,trip2,London,United Kingdom,EUR,30.0,32.4,lodging,hostel London
+2026-03-14,trip2,London,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-14,trip2,London,United Kingdom,GBP,3.5,4.45,transport,useless bike pass
+2026-03-14,trip2,London,United Kingdom,GBP,4.85,6.16,food,meal deal + donuts
+2026-03-14,trip2,London,United Kingdom,GBP,14.0,17.78,food,wine + buzzzzzzball
+2026-03-14,trip2,London,United Kingdom,GBP,6.0,7.62,food,pitcher w Pauline
+2026-03-14,trip2,London,United Kingdom,GBP,9.5,12.06,transport,public transpo
+2026-03-14,trip2,London,United Kingdom,EUR,30.0,32.4,lodging,hostel London
+2026-03-15,trip2,London,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-15,trip2,London,United Kingdom,GBP,21.64,27.48,food,McDonald's (Leora & Audra)
+2026-03-15,trip2,London,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-15,trip2,London,United Kingdom,EUR,30.0,32.4,lodging,hostel London
+2026-03-16,trip2,London,United Kingdom,GBP,4.2,5.33,food,TGTG
+2026-03-16,trip2,London,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-16,trip2,London,United Kingdom,GBP,12.8,16.26,transport,public transpo
+2026-03-16,trip2,London,United Kingdom,EUR,30.0,32.4,lodging,hostel London
+2026-03-17,trip2,Liverpool,United Kingdom,GBP,4.0,5.08,misc,postcard
+2026-03-17,trip2,Liverpool,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-17,trip2,Liverpool,United Kingdom,GBP,3.0,3.81,transport,metro
+2026-03-17,trip2,Liverpool,United Kingdom,GBP,1.85,2.35,food,choc chip brioche bread x8
+2026-03-17,trip2,Liverpool,United Kingdom,GBP,2.0,2.54,transport,bus
+2026-03-17,trip2,Liverpool,United Kingdom,GBP,6.5,8.26,food,pizza
+2026-03-17,trip2,Liverpool,United Kingdom,EUR,21.0,22.68,lodging,hostel Liverpool
+2026-03-18,trip2,Liverpool,United Kingdom,GBP,102.25,129.86,shopping,LFC merch
+2026-03-18,trip2,Liverpool,United Kingdom,GBP,4.61,5.85,food,"yoghurt, proshake, 2x donut,sw lidl"
+2026-03-18,trip2,Liverpool,United Kingdom,GBP,4.0,5.08,food,aldi
+2026-03-18,trip2,Liverpool,United Kingdom,GBP,5.4,6.86,food,cider one
+2026-03-18,trip2,Liverpool,United Kingdom,GBP,5.7,7.24,food,cider two
+2026-03-18,trip2,Liverpool,United Kingdom,EUR,21.0,22.68,lodging,hostel Liverpool
+2026-03-19,trip2,Liverpool,United Kingdom,GBP,20.0,25.4,activities,Anfield tour
+2026-03-19,trip2,Liverpool,United Kingdom,GBP,2.0,2.54,transport,bus
+2026-03-19,trip2,Liverpool,United Kingdom,GBP,2.86,3.63,food,lidl
+2026-03-19,trip2,Liverpool,United Kingdom,GBP,3.5,4.45,food,ice cream
+2026-03-19,trip2,Liverpool,United Kingdom,GBP,5.49,6.97,food,lidl
+2026-03-19,trip2,Liverpool,United Kingdom,GBP,2.0,2.54,transport,bus
+2026-03-19,trip2,Liverpool,United Kingdom,EUR,21.0,22.68,lodging,hostel Liverpool
+2026-03-20,trip2,Manchester,United Kingdom,GBP,2.0,2.54,transport,bus
+2026-03-20,trip2,Manchester,United Kingdom,GBP,5.9,7.49,food,lidl
+2026-03-20,trip2,Manchester,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-20,trip2,Manchester,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-21,trip2,Manchester,United Kingdom,GBP,4.25,5.4,food,tesco meal deal
+2026-03-21,trip2,Manchester,United Kingdom,GBP,30.0,38.1,activities,2x national football museum tix +RJ
+2026-03-21,trip2,Manchester,United Kingdom,GBP,11.0,13.97,gifts,ManU gifts
+2026-03-21,trip2,Manchester,United Kingdom,GBP,12.0,15.24,food,ice cream +RJ
+2026-03-21,trip2,Manchester,United Kingdom,GBP,26.25,33.34,shopping,sss & moisturizer
+2026-03-21,trip2,Manchester,United Kingdom,GBP,2.5,3.17,food,ice cream again lol
+2026-03-22,trip2,Betws-y-Coed,United Kingdom,GBP,3.95,5.02,food,meal deal
+2026-03-22,trip2,Betws-y-Coed,United Kingdom,GBP,2.27,2.88,food,pastries lidl
+2026-03-22,trip2,Betws-y-Coed,United Kingdom,GBP,2.0,2.54,misc,postcard
+2026-03-22,trip2,Betws-y-Coed,United Kingdom,GBP,3.55,4.51,food,lidl
+2026-03-22,trip2,Betws-y-Coed,United Kingdom,GBP,7.7,9.78,food,Indian restaurant
+2026-03-22,trip2,Betws-y-Coed,United Kingdom,EUR,35.0,37.8,lodging,hostel Betws y coed
+2026-03-23,trip2,Abergavenny,United Kingdom,GBP,12.89,16.37,food,spar grocery
+2026-03-23,trip2,Abergavenny,United Kingdom,GBP,4.0,5.08,transport,bus to Pen y pass
+2026-03-23,trip2,Abergavenny,United Kingdom,GBP,7.8,9.91,activities,ice cream + patch yr wyddfa
+2026-03-23,trip2,Abergavenny,United Kingdom,GBP,4.0,5.08,transport,bus back
+2026-03-23,trip2,Abergavenny,United Kingdom,GBP,6.97,8.85,food,lidl
+2026-03-23,trip2,Abergavenny,United Kingdom,GBP,8.4,10.67,food,pub beer + Ashton's
+2026-03-23,trip2,Abergavenny,United Kingdom,GBP,1.65,2.1,food,ice cream
+2026-03-24,trip2,Abergavenny,United Kingdom,GBP,10.45,13.27,food,lidl
+2026-03-24,trip2,Abergavenny,United Kingdom,GBP,14.5,18.41,food,me + ash + tash meal deal +choc
+2026-03-25,trip2,Galway,Ireland,GBP,42.0,53.34,transport,ferry Holyhead -> Dublin
+2026-03-25,trip2,Galway,Ireland,EUR,4.5,4.86,transport,bus to heuston
+2026-03-25,trip2,Galway,Ireland,EUR,12.74,13.76,food,lidl
+2026-03-25,trip2,Galway,Ireland,EUR,10.0,10.8,shopping,earbud adapter
+2026-03-25,trip2,Galway,Ireland,EUR,22.0,23.76,lodging,hostel Galway
+2026-03-26,trip2,Clifden,Ireland,EUR,7.84,8.47,food,lidl
+2026-03-26,trip2,Clifden,Ireland,EUR,28.0,30.24,transport,bus to letterfrack
+2026-03-26,trip2,Clifden,Ireland,EUR,10.0,10.8,misc,postcards plus Leora
+2026-03-26,trip2,Clifden,Ireland,EUR,13.0,14.04,food,2x cider
+2026-03-26,trip2,Clifden,Ireland,EUR,20.0,21.6,transport,'Uber' back (shoutout Dan & Anya)
+2026-03-26,trip2,Clifden,Ireland,EUR,12.8,13.82,food,2x cider @pub
+2026-03-26,trip2,Clifden,Ireland,,,,lodging,Hostel Clifden
+2026-03-27,trip2,Clifden,Ireland,EUR,2.0,2.16,misc,postcards
+2026-03-27,trip2,Clifden,Ireland,EUR,20.0,21.6,food,lidl
+2026-03-27,trip2,Clifden,Ireland,USD,96.0,96.0,lodging,hotel Clifden
+2026-03-28,trip2,Dublin,Ireland,EUR,6.5,7.02,food,ice cream Dublin
+2026-03-28,trip2,Dublin,Ireland,EUR,13.5,14.58,food,bambino's meal deal
+2026-03-28,trip2,Dublin,Ireland,EUR,6.0,6.48,shopping,playing cards
+2026-03-28,trip2,Dublin,Ireland,EUR,2.89,3.12,food,grapes
+2026-03-28,trip2,Dublin,Ireland,USD,208.0,208.0,lodging,hotel Dublin
+2026-03-29,trip2,Dublin,Ireland,EUR,8.07,8.72,food,lidl
+2026-03-29,trip2,Dublin,Ireland,EUR,8.9,9.61,food,McDonald's
+2026-03-29,trip2,Dublin,Ireland,EUR,25.0,27.0,lodging,hostel Dublin
+2026-03-30,trip2,Belfast,United Kingdom,EUR,7.54,8.14,food,lidl
+2026-03-30,trip2,Belfast,United Kingdom,EUR,20.0,21.6,lodging,hostel Belfast
+2026-03-31,trip2,Belfast,United Kingdom,GBP,4.25,5.4,food,tesco meal deal
+2026-03-31,trip2,Belfast,United Kingdom,GBP,3.29,4.18,food,pancakes
+2026-03-31,trip2,Belfast,United Kingdom,GBP,9.0,11.43,transport,bus to airport
+2026-03-31,trip2,Belfast,United Kingdom,GBP,12.5,15.88,shopping,guiness towel
+2026-03-31,trip2,Paris,France,USD,146.0,146.0,transport,flight Belfast -> Paris
+2026-03-31,trip2,Paris,France,EUR,16.0,17.28,transport,train to Ralph's
+2026-03-31,trip2,Paris,France,EUR,8.27,8.93,food,groceries carrefour
+2026-04-01,trip2,Paris,France,EUR,1.3,1.4,food,baguette tradition
+2026-04-01,trip2,Paris,France,EUR,5.1,5.51,transport,metro x2
+2026-04-02,trip2,Paris,France,EUR,16.24,17.54,food,groceries + éclair chocolat
+2026-04-02,trip2,Paris,France,EUR,4.0,4.32,food,TGTG
+2026-04-02,trip2,Paris,France,EUR,10.0,10.8,shopping,Barca shirt
+2026-04-02,trip2,Paris,France,EUR,5.1,5.51,transport,metro x2
+2026-04-03,trip2,Paris,France,EUR,30.0,32.4,shopping,2x bracelet & 1x dragonfly charm :)
+2026-04-03,trip2,Paris,France,EUR,50.0,54.0,shopping,Zara wool sweater
+2026-04-03,trip2,Paris,France,EUR,6.2,6.7,food,matcha @Torré café
+2026-04-03,trip2,Paris,France,EUR,20.0,21.6,shopping,Bugatti longcoat @five vintage
+2026-04-03,trip2,Paris,France,EUR,5.0,5.4,food,TGTG
+2026-04-03,trip2,Paris,France,EUR,5.1,5.51,transport,metro x2
+2026-04-04,trip2,Paris,France,EUR,5.1,5.51,transport,metro x2
+2026-04-05,trip2,Paris,France,EUR,2.7,2.92,food,pain au suisse & mini choc beignet
+2026-04-05,trip2,Paris,France,EUR,7.65,8.26,transport,métro x3
+2026-04-05,trip2,Paris,France,EUR,4.0,4.32,food,TGTG
+2026-04-06,trip2,Paris,France,EUR,5.89,6.36,food,"baguette, cheese, choc eclairs x2"
+2026-04-06,trip2,Paris,France,EUR,2.94,3.18,food,Intermarché cookies yogurt
+2026-04-06,trip2,Paris,France,EUR,8.73,9.43,food,REWE sandwich & fooddrink
+2026-04-07,trip2,Copenhagen,Denmark,EUR,4.73,5.11,shopping,soap + water
+2026-04-07,trip2,Copenhagen,Denmark,EUR,7.78,8.4,food,McDonald's 👅
+2026-04-07,trip2,Copenhagen,Denmark,DKK,29.0,4.21,food,TGTG
+2026-04-07,trip2,Copenhagen,Denmark,DKK,40.63,5.89,food,wine
+2026-04-07,trip2,Copenhagen,Denmark,DKK,144.0,20.88,food,2x guiness
+2026-04-07,trip2,Copenhagen,Denmark,DKK,15.0,2.17,food,McDonald's w Noor
+2026-04-07,trip2,Copenhagen,Denmark,DKK,19.0,2.75,transport,metro
+2026-04-07,trip2,Copenhagen,Denmark,EUR,18.0,19.44,lodging,hostel Copenhagen
+2026-04-08,trip2,Copenhagen,Denmark,DKK,60.0,8.7,activities,Danish Architecture Center tix
+2026-04-08,trip2,Copenhagen,Denmark,DKK,40.0,5.8,shopping,DAC chair art piece
+2026-04-08,trip2,Copenhagen,Denmark,DKK,59.22,8.59,food,ice cream
+2026-04-08,trip2,Copenhagen,Denmark,DKK,54.9,7.96,food,grocery
+2026-04-08,trip2,Copenhagen,Denmark,DKK,89.0,12.9,shopping,minifigure Lego
+2026-04-08,trip2,Copenhagen,Denmark,DKK,29.0,4.21,food,TGTG
+2026-04-08,trip2,Copenhagen,Denmark,DKK,20.95,3.04,food,panini
+2026-04-08,trip2,Copenhagen,Denmark,EUR,18.0,19.44,lodging,hostel Copenhagen
+2026-04-09,trip2,Copenhagen,Denmark,DKK,100.0,14.5,misc,locker rental
+2026-04-09,trip2,Copenhagen,Denmark,DKK,129.0,18.7,transport,bike for a day
+2026-04-09,trip2,Copenhagen,Denmark,DKK,140.0,20.3,activities,contemporary museum
+2026-04-09,trip2,Copenhagen,Denmark,DKK,79.0,11.46,food,Joe & juice sandwich
+2026-04-09,trip2,Copenhagen,Denmark,DKK,30.0,4.35,food,espresso
+2026-04-09,trip2,Copenhagen,Denmark,DKK,90.0,13.05,activities,design museum
+2026-04-09,trip2,Copenhagen,Denmark,DKK,10.15,1.47,food,spinach twist
+2026-04-09,trip2,Copenhagen,Denmark,DKK,450.0,65.25,shopping,jeans weekday
+2026-04-09,trip2,Copenhagen,Denmark,DKK,129.0,18.7,shopping,socks Uniqlo
+2026-04-09,trip2,Copenhagen,Denmark,DKK,25.73,3.73,misc,postcard
+2026-04-09,trip2,Copenhagen,Denmark,DKK,93.46,13.55,food,pizza
+2026-04-09,trip2,Copenhagen,Denmark,EUR,20.0,21.6,lodging,hostel Copenhagen
+2026-04-10,trip2,Stockholm,Sweden,DKK,57.4,8.32,food,Lidl
+2026-04-10,trip2,Stockholm,Sweden,DKK,98.39,14.27,food,Poulette
+2026-04-10,trip2,Stockholm,Sweden,DKK,50.65,7.34,food,tuc and dates
+2026-04-10,trip2,Stockholm,Sweden,EUR,23.0,24.84,lodging,hostel Stockholm
+2026-04-11,trip2,Stockholm,Sweden,SEK,300.0,28.5,shopping,vest + tie
+2026-04-11,trip2,Stockholm,Sweden,SEK,99.0,9.4,shopping,bag
+2026-04-11,trip2,Stockholm,Sweden,SEK,57.14,5.43,food,lidl
+2026-04-11,trip2,Stockholm,Sweden,SEK,118.0,11.21,shopping,trousers + thermal
+2026-04-11,trip2,Stockholm,Sweden,SEK,79.0,7.5,food,beer @pub Liverpool game
+2026-04-11,trip2,Stockholm,Sweden,SEK,129.0,12.26,food,tacos w Youssef
+2026-04-11,trip2,Stockholm,Sweden,SEK,86.0,8.17,transport,metro x2
+2026-04-11,trip2,Stockholm,Sweden,EUR,23.0,24.84,lodging,hostel Stockholm
+2026-04-12,trip2,Stockholm,Sweden,SEK,76.84,7.3,food,lidl
+2026-04-12,trip2,Stockholm,Sweden,SEK,92.81,8.82,food,lidl
+2026-04-12,trip2,Stockholm,Sweden,SEK,109.0,10.36,food,max burgers
+2026-04-12,trip2,Stockholm,Sweden,EUR,23.0,24.84,lodging,hostel Stockholm
+2026-04-13,trip2,Helsinki,Finland,SEK,43.0,4.08,transport,bus
+2026-04-13,trip2,Helsinki,Finland,USD,25.87,25.87,transport,ferry Stockholm -> Turku
+2026-04-13,trip2,Helsinki,Finland,EUR,4.13,4.46,food,lidl
+2026-04-13,trip2,Helsinki,Finland,EUR,21.0,22.68,lodging,hostel Helsinki
+2026-04-14,trip2,Helsinki,Finland,EUR,8.71,9.41,food,lidl
+2026-04-14,trip2,Helsinki,Finland,EUR,5.0,5.4,shopping,UFF green sweater
+2026-04-14,trip2,Helsinki,Finland,EUR,6.73,7.27,food,lidl
+2026-04-14,trip2,Helsinki,Finland,EUR,21.0,22.68,lodging,hostel Helsinki
+2026-04-15,trip2,Helsinki,Finland,EUR,4.12,4.45,food,lidl
+2026-04-15,trip2,Helsinki,Finland,EUR,6.72,7.26,food,lidl
+2026-04-15,trip2,Helsinki,Finland,EUR,21.0,22.68,lodging,hostel Helsinki
+2026-04-16,trip2,Tallinn,Estonia,USD,29.31,29.31,transport,ferry Helsinki -> Tallinn
+2026-04-16,trip2,Tallinn,Estonia,EUR,54.35,58.7,misc,Omniva shipping package to RJ
+2026-04-16,trip2,Tallinn,Estonia,EUR,12.13,13.1,food,Selver ABC grocery
+2026-04-16,trip2,Tallinn,Estonia,EUR,5.0,5.4,food,ice cream La Muu Kohvik
+2026-04-16,trip2,Tallinn,Estonia,EUR,18.0,19.44,shopping,gold necklace
+2026-04-16,trip2,Tallinn,Estonia,EUR,0.24,0.26,food,lidl pastry
+2026-04-16,trip2,Tallinn,Estonia,EUR,14.5,15.66,lodging,hostel Tallinn
+2026-04-17,trip2,Riga,Latvia,EUR,4.78,5.16,food,Selver ABC
+2026-04-17,trip2,Riga,Latvia,EUR,5.25,5.67,food,lidl
+2026-04-17,trip2,Riga,Latvia,EUR,20.0,21.6,lodging,hostel Riga
+2026-04-18,trip2,Riga,Latvia,EUR,4.0,4.32,food,Latvian pastry
+2026-04-18,trip2,Riga,Latvia,EUR,1.0,1.08,food,strawberries
+2026-04-18,trip2,Riga,Latvia,EUR,5.0,5.4,food,beet soup
+2026-04-18,trip2,Riga,Latvia,EUR,1.0,1.08,shopping,humana
+2026-04-18,trip2,Riga,Latvia,EUR,3.0,3.24,food,ice cream
+2026-04-18,trip2,Riga,Latvia,EUR,0.7,0.76,shopping,stickers
+2026-04-18,trip2,Riga,Latvia,EUR,1.83,1.98,shopping,hand sanitizer
+2026-04-18,trip2,Riga,Latvia,EUR,8.53,9.21,food,Rimi wine + pastries
+2026-04-18,trip2,Riga,Latvia,EUR,5.6,6.05,food,LIDO
+2026-04-18,trip2,Riga,Latvia,EUR,19.0,20.52,lodging,hostel Riga
+2026-04-19,trip2,Vilnius,Lithuania,EUR,5.9,6.37,gifts,Flow chocolate Zach gift
+2026-04-19,trip2,Vilnius,Lithuania,EUR,6.0,6.48,food,Hesburger
+2026-04-19,trip2,Vilnius,Lithuania,EUR,7.44,8.04,food,Rimi
+2026-04-19,trip2,Vilnius,Lithuania,EUR,26.0,28.08,shopping,SONY wired earbuds
+2026-04-19,trip2,Vilnius,Lithuania,EUR,5.0,5.4,transport,train seat rezzo
+2026-04-19,trip2,Vilnius,Lithuania,EUR,20.0,21.6,lodging,hostel Vilnius
+2026-04-20,trip2,Vilnius,Lithuania,EUR,7.0,7.56,transport,train seat rezzos
+2026-04-20,trip2,Vilnius,Lithuania,EUR,6.55,7.07,food,lidl
+2026-04-20,trip2,Kraków,Poland,PLN,29.48,7.37,food,zabka
+2026-04-20,trip2,Kraków,Poland,PLN,7.49,1.87,food,Burger King
+2026-04-20,trip2,Kraków,Poland,PLN,13.0,3.25,food,big water :( Krakow Glowny
+2026-04-21,trip2,Bratislava,Slovakia,EUR,2.29,2.47,food,interspar sandwich
+2026-04-21,trip2,Bratislava,Slovakia,EUR,5.98,6.46,food,lidl
+2026-04-21,trip2,Bratislava,Slovakia,EUR,19.0,20.52,lodging,hostel Bratislava
+2026-04-22,trip2,Bratislava,Slovakia,EUR,8.57,9.26,food,lidl
+2026-04-22,trip2,Bratislava,Slovakia,EUR,0.6,0.65,misc,postcard
+2026-04-22,trip2,Bratislava,Slovakia,EUR,5.0,5.4,food,ice cream
+2026-04-22,trip2,Bratislava,Slovakia,EUR,6.8,7.34,food,guiness MCI BUR
+2026-04-22,trip2,Bratislava,Slovakia,EUR,19.0,20.52,lodging,hostel Bratislava
+2026-04-23,trip2,Vienna,Austria,EUR,3.96,4.28,food,tesco
+2026-04-23,trip2,Vienna,Austria,EUR,10.25,11.07,transport,24hr metro Vienna
+2026-04-23,trip2,Vienna,Austria,EUR,5.54,5.98,food,lidl
+2026-04-23,trip2,Vienna,Austria,EUR,4.2,4.54,food,ice cream
+2026-04-23,trip2,Vienna,Austria,EUR,3.0,3.24,food,cheap Austrian wine
+2026-04-23,trip2,Vienna,Austria,EUR,2.0,2.16,misc,postcard
+2026-04-23,trip2,Vienna,Austria,EUR,22.0,23.76,lodging,hostel Vienna
+2026-04-24,trip2,Bled,Slovenia,EUR,7.44,8.04,food,PENNY
+2026-04-24,trip2,Bled,Slovenia,EUR,7.77,8.39,food,lidl
+2026-04-24,trip2,Bled,Slovenia,EUR,2.0,2.16,food,ice cream
+2026-04-24,trip2,Bled,Slovenia,EUR,21.0,22.68,lodging,hostel Bled
+2026-04-25,trip2,Ljubljana,Slovenia,EUR,8.4,9.07,food,Mercator
+2026-04-25,trip2,Ljubljana,Slovenia,EUR,7.0,7.56,food,"drink and cake cafe (I paid full bill with CC, they paid back in cash)"
+2026-04-25,trip2,Ljubljana,Slovenia,EUR,15.0,16.2,activities,toboggan
+2026-04-25,trip2,Ljubljana,Slovenia,EUR,6.38,6.89,food,Mercator + postcard
+2026-04-25,trip2,Ljubljana,Slovenia,EUR,23.0,24.84,lodging,hostel Ljubljana
+2026-04-26,trip2,Split,Croatia,EUR,7.32,7.91,food,SPAR
+2026-04-26,trip2,Split,Croatia,EUR,1.06,1.14,transport,seat rezzo Zagreb -> split
+2026-04-26,trip2,Split,Croatia,EUR,7.0,7.56,food,sandwich and pastries train station
+2026-04-26,trip2,Split,Croatia,EUR,20.0,21.6,lodging,hostel Split
+2026-04-27,trip2,Split,Croatia,EUR,8.13,8.78,food,lidl
+2026-04-27,trip2,Split,Croatia,EUR,3.57,3.86,food,eggs and mushrooms
+2026-04-27,trip2,Split,Croatia,EUR,20.0,21.6,lodging,hostel split
+2026-04-28,trip2,Split,Croatia,EUR,2.1,2.27,food,2x choc croissant
+2026-04-28,trip2,Split,Croatia,EUR,3.0,3.24,food,strawberries
+2026-04-28,trip2,Split,Croatia,EUR,20.0,21.6,shopping,Edgar shirt
+2026-04-28,trip2,Split,Croatia,EUR,20.0,21.6,shopping,bracelet
+2026-04-28,trip2,Split,Croatia,EUR,5.0,5.4,gifts,honey mom gift
+2026-04-28,trip2,Split,Croatia,EUR,5.5,5.94,food,ice cream
+2026-04-28,trip2,Split,Croatia,EUR,3.0,3.24,food,pizza slice
+2026-04-28,trip2,Split,Croatia,EUR,8.9,9.61,food,groceries for dinner & wine
+2026-04-28,trip2,Split,Croatia,EUR,11.0,11.88,food,amoretto sour cream:(
+2026-04-28,trip2,Split,Croatia,EUR,1.0,1.08,food,1:30am choc pastry
+2026-04-28,trip2,Split,Croatia,EUR,20.0,21.6,lodging,hostel split
+2026-04-29,trip2,Split,Croatia,EUR,12.41,13.4,food,groceries
+2026-04-29,trip2,Split,Croatia,EUR,45.0,48.6,activities,Krka park exhibition
+2026-04-29,trip2,Split,Croatia,EUR,6.61,7.14,food,SPAR
+2026-04-29,trip2,Split,Croatia,EUR,2.8,3.02,food,ice cream
+2026-04-29,trip2,Split,Croatia,EUR,10.85,11.72,food,beeeeeers
+2026-04-29,trip2,Split,Croatia,EUR,20.0,21.6,lodging,hostel Split
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,USD,34.51,34.51,transport,bus Split -> Mostar
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,10.0,10.8,shopping,bracelet
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,20.0,21.6,gifts,Annie gift embroidered plate thing
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,2.5,2.7,misc,postcard
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,1.15,1.24,shopping,belt thrifted
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,8.5,9.18,food,Dalmatian street food
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,9.5,10.26,food,mortabella sandwich
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,1.0,1.08,food,pastry
+2026-04-30,trip2,Mostar,Bosnia and Herzegovina,EUR,4.35,4.7,food,grocery
+2026-05-01,trip2,Sarajevo,Bosnia and Herzegovina,EUR,2.0,2.16,activities,walking tour tip Sarajevo
+2026-05-01,trip2,Sarajevo,Bosnia and Herzegovina,BAM,6.0,3.31,food,pringles
+2026-05-01,trip2,Sarajevo,Bosnia and Herzegovina,BAM,18.35,10.13,food,groceries
+2026-05-01,trip2,Sarajevo,Bosnia and Herzegovina,EUR,14.0,15.12,lodging,hostel Sarajevo
+2026-05-02,trip2,Žabljak,Montenegro,EUR,16.7,18.04,food,lunch La Parisienne Niksic
+2026-05-02,trip2,Žabljak,Montenegro,EUR,2.4,2.59,food,choc latte
+2026-05-02,trip2,Sarajevo,Bosnia and Herzegovina,EUR,14.0,15.12,lodging,hostel Sarajevo (left early tho)
+2026-05-02,trip2,Žabljak,Montenegro,EUR,6.0,6.48,transport,bus Niksic -> Zabljak
+2026-05-02,trip2,Žabljak,Montenegro,EUR,15.0,16.2,lodging,hostel Zabljak
+2026-05-03,trip2,Žabljak,Montenegro,EUR,9.5,10.26,food,bakery
+2026-05-03,trip2,Žabljak,Montenegro,EUR,5.0,5.4,activities,ntl park entry fee
+2026-05-03,trip2,Žabljak,Montenegro,EUR,16.5,17.82,food,dinner podgora
+2026-05-03,trip2,Žabljak,Montenegro,EUR,15.0,16.2,lodging,hostel Zabljak
+2026-05-04,trip2,Žabljak,Montenegro,EUR,5.0,5.4,activities,ntl park entry fee
+2026-05-04,trip2,Žabljak,Montenegro,EUR,4.4,4.75,food,bakery
+2026-05-04,trip2,Žabljak,Montenegro,EUR,7.58,8.19,food,supermarket
+2026-05-04,trip2,Žabljak,Montenegro,EUR,15.0,16.2,transport,bike rental
+2026-05-04,trip2,Žabljak,Montenegro,EUR,1.5,1.62,food,ice cream
+2026-05-04,trip2,Žabljak,Montenegro,EUR,3.84,4.15,food,grocery snacks
+2026-05-04,trip2,Žabljak,Montenegro,EUR,15.0,16.2,lodging,hostel Zabljak
+2026-05-05,trip2,Podgorica,Montenegro,EUR,2.5,2.7,food,eurokrem pancake/crepe
+2026-05-05,trip2,Podgorica,Montenegro,EUR,3.3,3.56,food,burek & pastry
+2026-05-05,trip2,Podgorica,Montenegro,EUR,10.0,10.8,transport,bus Zabljak -> Podgorica
+2026-05-05,trip2,Podgorica,Montenegro,EUR,8.29,8.95,food,grocery VOLI
+2026-05-05,trip2,Podgorica,Montenegro,EUR,16.0,17.28,lodging,hostel Podgorica
+2026-05-06,trip2,Podgorica,Montenegro,EUR,4.18,4.51,food,grocery VOLI
+2026-05-06,trip2,Podgorica,Montenegro,EUR,22.15,23.92,activities,boat tour virpazar
+2026-05-06,trip2,Podgorica,Montenegro,EUR,5.0,5.4,misc,Felix misc exp
+2026-05-06,trip2,Podgorica,Montenegro,EUR,16.0,17.28,lodging,hostel Podgorica
+2026-05-07,trip2,Shkodër,Albania,EUR,6.95,7.51,food,grocery
+2026-05-07,trip2,Shkodër,Albania,EUR,16.2,17.5,transport,bus Podgorica -> shkoder
+2026-05-07,trip2,Shkodër,Albania,EUR,3.5,3.78,food,hummus plate
+2026-05-07,trip2,Shkodër,Albania,LEK,600.0,6.42,transport,bike rental
+2026-05-07,trip2,Shkodër,Albania,LEK,300.0,3.21,shopping,playing cards
+2026-05-07,trip2,Shkodër,Albania,LEK,300.0,3.21,misc,ATM withdrawal fee
+2026-05-07,trip2,Shkodër,Albania,EUR,14.0,15.12,lodging,hostel Shkoder
+2026-05-08,trip2,Shkodër,Albania,LEK,1200.0,12.84,transport,bus to Theth
+2026-05-08,trip2,Shkodër,Albania,LEK,150.0,1.6,food,pastry + burek
+2026-05-08,trip2,Shkodër,Albania,LEK,473.0,5.06,food,market
+2026-05-08,trip2,Shkodër,Albania,LEK,250.0,2.67,food,Tost sandy
+2026-05-08,trip2,Shkodër,Albania,LEK,150.0,1.6,food,pistachio pastry
+2026-05-08,trip2,Shkodër,Albania,LEK,240.0,2.57,food,ice cream
+2026-05-08,trip2,Shkodër,Albania,LEK,850.0,9.09,food,pizza + shawarma
+2026-05-08,trip2,Shkodër,Albania,EUR,14.0,15.12,lodging,hostel shkoder
+2026-05-09,trip2,Tirana,Albania,LEK,170.0,1.82,food,cookie
+2026-05-09,trip2,Tirana,Albania,LEK,500.0,5.35,transport,bus Shkodër -> Tirana
+2026-05-09,trip2,Tirana,Albania,LEK,40.0,0.43,transport,bus to center
+2026-05-09,trip2,Tirana,Albania,LEK,290.0,3.1,food,shawarma
+2026-05-09,trip2,Tirana,Albania,LEK,375.0,4.01,food,fruitjuiceandmore
+2026-05-09,trip2,Tirana,Albania,LEK,590.0,6.31,misc,2x postcards
+2026-05-09,trip2,Tirana,Albania,LEK,798.0,8.54,food,grocery
+2026-05-09,trip2,Tirana,Albania,LEK,300.0,3.21,food,byrek + donut
+2026-05-09,trip2,Tirana,Albania,EUR,11.0,11.88,lodging,hostel Tirana
+2026-05-10,trip2,Tirana,Albania,LEK,400.0,4.28,transport,bus to Tirana airport
+2026-05-10,trip2,Paris,France,USD,150.93,150.93,transport,flight Tirana -> Paris Beauvais
+2026-05-10,trip2,Paris,France,EUR,17.9,19.33,transport,bus Beauvais -> Paris
+2026-05-10,trip2,Paris,France,EUR,2.55,2.75,transport,métro
+2026-05-10,trip2,Paris,France,EUR,5.8,6.26,food,pastries boulangerie
+2026-05-10,trip2,Paris,France,EUR,10.2,11.02,transport,métro x4
+2026-05-11,trip2,Paris,France,EUR,5.0,5.4,shopping,Lucas shirt
+2026-05-11,trip2,Paris,France,EUR,2.5,2.7,food,feuilleté chocolat
+2026-05-12,trip2,Paris,France,EUR,9.4,10.15,food,me + Dorothy pastries
+2026-05-12,trip2,Paris,France,EUR,4.0,4.32,food,TGTG
+2026-05-13,trip2,Paris,France,EUR,5.0,5.4,transport,velib bike
+2026-05-13,trip2,Paris,France,EUR,50.0,54.0,shopping,Uniqlo pants
+2026-05-13,trip2,Paris,France,EUR,12.0,12.96,food,TGTG
+2026-05-14,trip2,Paris,France,EUR,0.0,0.0,food,TGTG (refunded :( )
+2026-05-14,trip2,Paris,France,EUR,5.1,5.51,transport,2x metro
+2026-05-15,trip2,Paris,France,EUR,12.12,13.09,food,groceries carrefour
+2026-05-15,trip2,Paris,France,EUR,7.88,8.51,food,groceries G20
+2026-05-16,trip2,Paris,France,EUR,4.7,5.08,food,boulangerie
+2026-05-16,trip2,Paris,France,EUR,5.1,5.51,transport,2x metro
+2026-05-16,trip2,Paris,France,EUR,29.0,31.32,food,Japanese dinner
+2026-05-16,trip2,Paris,France,EUR,11.4,12.31,food,ice cream
+2026-05-17,trip2,Paris,France,EUR,2.55,2.75,transport,metro
+2026-05-17,trip2,Paris,France,EUR,2.0,2.16,food,crepe w Adelyn
+2026-05-17,trip2,Paris,France,EUR,11.9,12.85,gifts,Chocolate for Katherine
+2026-05-17,trip2,Paris,France,EUR,12.0,12.96,activities,grand palais Klint exhibit
+2026-05-17,trip2,Paris,France,EUR,10.2,11.02,shopping,jaune color history book
+2026-05-17,trip2,Paris,France,EUR,5.1,5.51,transport,2x metro
+2026-05-17,trip2,Paris,France,EUR,3.9,4.21,food,tradition & 2x pain au chocolat
+2026-05-18,trip2,Paris,France,EUR,32.4,34.99,transport,métro weekly pass
+2026-05-18,trip2,Paris,France,EUR,5.1,5.51,transport,Dorothy metro x2
+2026-05-18,trip2,Paris,France,EUR,3.36,3.63,food,cheap wine
+2026-05-18,trip2,Paris,France,EUR,18.0,19.44,food,2x Guinness for ARSBUR (successful g split)
+2026-05-19,trip2,Paris,France,EUR,26.95,29.11,shopping,green avocado hat
+2026-05-19,trip2,Paris,France,EUR,171.0,184.68,shopping,(not including tax refund) 2x glasses
+2026-05-19,trip2,Paris,France,EUR,3.0,3.24,food,2x pain au chocolat
+2026-05-19,trip2,Paris,France,EUR,2.3,2.48,food,chaussons aux pommes
+2026-05-20,trip2,Paris,France,EUR,10.2,11.02,transport,4x metro for Dorothy
+2026-05-21,trip2,Paris,France,EUR,6.2,6.7,food,boulangerie
+2026-05-21,trip2,Paris,France,EUR,35.0,37.8,activities,Versailles
+2026-05-21,trip2,Paris,France,EUR,5.0,5.4,food,TGTG
+2026-05-21,trip2,Paris,France,EUR,6.79,7.33,food,picnic food
+2026-05-22,trip2,Paris,France,EUR,10.2,11.02,transport,4x metro for Dorothy
+2026-05-22,trip2,Paris,France,EUR,4.0,4.32,food,cafe noisette w Adelyn
+2026-05-22,trip2,Paris,France,EUR,7.73,8.35,food,picnic food/wine
+2026-05-23,trip2,Paris,France,EUR,12.7,13.72,food,ice cream w Ralph
+2026-05-24,trip2,Paris,France,EUR,10.0,10.8,shopping,dragonfly ring
+2026-05-24,trip2,Paris,France,EUR,8.0,8.64,gifts,3x flowery garment gifts
+2026-05-24,trip2,Paris,France,EUR,20.0,21.6,shopping,leather loafers
+2026-05-24,trip2,Paris,France,EUR,3.0,3.24,food,2x pain au chocolats
+2026-05-24,trip2,Paris,France,EUR,5.0,5.4,food,cider for last prem games
+2026-05-24,trip2,Paris,France,EUR,6.0,6.48,food,TGTG
+2026-05-25,trip2,Paris,France,EUR,9.44,10.2,food,grocery
+2026-05-25,trip2,Paris,France,EUR,13.0,14.04,food,ice cream w Adelyn
+2026-05-25,trip2,Paris,France,EUR,9.0,9.72,food,2x crepe
+2026-05-26,trip2,Paris,France,USD,41.0,41.0,transport,flight extension
+2026-05-26,trip2,Paris,France,EUR,14.0,15.12,transport,RER B airport
+2026-05-26,trip2,Paris,France,EUR,11.35,12.26,transport,Paul's at airport
+2026-05-26,trip2,London,United Kingdom,GBP,6.99,8.88,food,meal deal Heathrow

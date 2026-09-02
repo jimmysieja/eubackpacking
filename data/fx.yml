@@ -1,0 +1,11 @@
+# Currency -> USD conversion. Approximate spring-2026 averages; edit if you have
+# the real card-statement rates. Amounts in the expense files are converted to
+# USD with these before anything is summed.
+USD: 1.00
+EUR: 1.08
+GBP: 1.27
+DKK: 0.145   # Danish krone
+SEK: 0.095   # Swedish krona
+PLN: 0.25    # Polish zloty
+BAM: 0.552   # Bosnia convertible mark (pegged to EUR)
+LEK: 0.0107  # Albanian lek

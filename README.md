@@ -10,33 +10,37 @@ and how much of it was spent sitting on trains.
 
 <sub>Jun 2025 – May 2026 &nbsp;·&nbsp; 2 trips &nbsp;·&nbsp; generated 02 Sep 2026</sub>
 
-| Countries | Cities | Days on the road | Nights logged | Spend logged |
+| Countries | Cities slept in | Nights | Train journeys | Spend logged |
 |:-:|:-:|:-:|:-:|:-:|
-| **15** | **34** | **151** | **149** | **$2,668** \* |
+| **16** | **26** | **89** | **38** | **$5,848** |
 
 ## 🚆 Time on trains
 
-**86 hours** on intercity trains — about **3.6 full days** — over **26** journeys and **8,925 km**. That's 66% of all logged travel time.
+About **93 hours** on trains — roughly **3.9 full days** — over **38** journeys and **5,865 km**, entering **13** countries by rail. That's 55% of all travel time.
 
-Longest single ride: **Bilbao → Porto**, 7.5 h.
+Longest leg: **Copenhagen → Stockholm**, ~7.4 h (522 km).
+
+<sub>Durations are estimated from route distance — there are no stopwatch numbers in the data.</sub>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/trains-dark.svg">
-  <img alt="Hours by transport mode" src="assets/trains-light.svg" width="100%">
+  <img alt="Estimated hours by transport mode" src="assets/trains-light.svg" width="100%">
 </picture>
 
-## Transport by mode
+## Every leg, by mode
 
-| Mode | Journeys | Hours | km |
+| Mode | Legs | ~Hours | km |
 |:--|--:|--:|--:|
-| Train | 26 | 85.9 | 8,925 |
-| Bus | 8 | 44.0 | 2,535 |
-| Flight | 4 | 0.0 | 0 |
+| Train | 38 | 93.4 | 5,865 |
+| Bus | 12 | 20.6 | 901 |
+| Ferry | 3 | 17.2 | 456 |
+| Flight | 5 | 35.5 | 16,597 |
+| Car | 3 | 2.9 | 171 |
 
 ## Money
 
-- **Summer 2025**: $473 ($8/day) — *partial, still logging*
-- **Spring 2026**: $2,195 ($24/day)
+- **Summer 2025**: expenses not entered yet
+- **Spring 2026**: $5,848 ($64/day)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/spend-category-dark.svg">
@@ -50,42 +54,43 @@ Longest single ride: **Bilbao → Porto**, 7.5 h.
   <img alt="Route map of every city in visit order" src="assets/route-light.svg" width="100%">
 </picture>
 
-<sub>\* Summer 2025 expenses are only partly logged, so its spend and the combined total are a floor, not a final number.</sub>
-
 <!-- STATS:END -->
 
 ---
 
 ## How it works
 
-Everything lives as flat files in [`data/`](data/) and [`photos/`](photos/). One
-script turns them into the site — there is no database, no API, and nothing
-scheduled. When I add expenses or photos, I re-run the build and commit the
-output.
+Everything is a flat file in [`data/`](data/) and [`photos/`](photos/). One
+script turns them into the site — no database, no API, nothing scheduled. When I
+add expenses or photos I re-run the build and commit the output.
 
 | File | What it holds |
 |---|---|
-| `data/trips.yml` | The two trips: dates, and whether the expense list is complete |
-| `data/cities.yml` | Every place I slept: country, arrive/depart, coordinates, notes |
-| `data/expenses_trip1.csv` | Summer 2025 spend — **partial**, still being entered |
-| `data/expenses_trip2.csv` | Spring 2026 spend — fully itemised |
-| `data/transport_trip1.csv` | Every intercity journey: mode, date, from/to, duration, distance |
-| `data/transport_trip2.csv` | Same, for the second trip |
+| `data/trips.yml` | The two trips: dates, which files hold their data, `expenses_complete` flag |
+| `data/trip2_stops.csv` | Itinerary: `stop_number, city, country, transport, arrival_date, departure_date` |
+| `data/trip1_stops.csv` | Same shape — still being entered |
+| `data/coords.csv` | `city → lat, lon`, for the route map and distance estimates |
+| `data/expenses_trip2.csv` | Every line item: date, place, currency, USD, category, description |
+| `data/expenses_trip1.csv` | Same — partial |
+| `data/fx.yml` | Currency → USD rates (approximate period averages) |
+| `data/sources/` | The raw notes the CSVs were built from (kept for reference) |
 | `photos/` | Web-sized JPGs + `captions.yml` |
+
+**Transport time is estimated.** The stops file records the *mode* and *dates* of
+each journey but not its duration, so each leg is estimated from the
+great-circle distance between cities and a rough per-mode speed (`SPEED_KMH` in
+[`analytics.py`](analytics.py)). Everything derived from it is labelled
+"estimated".
 
 ```
 python -m pip install -r requirements.txt   # once
 python build.py                             # regenerate docs/ + assets/ + this README block
 ```
 
-`build.py` writes:
-
-- `docs/index.html` — the dashboard (GitHub Pages serves the `docs/` folder)
-- `docs/photos/` — copies of the photos
-- `assets/*.svg` — the light/dark charts embedded above
-- the `<!-- STATS -->` block in this file
-
-See [SETUP.md](SETUP.md) for first-time setup and how to publish with GitHub Pages.
+`build.py` writes `docs/index.html` (GitHub Pages serves the `docs/` folder),
+`docs/photos/`, `assets/*.svg` (the charts embedded above), and the
+`<!-- STATS -->` block in this file. See [SETUP.md](SETUP.md) for first-time
+setup and publishing.
 
 ## Scripts
 
@@ -94,7 +99,8 @@ See [SETUP.md](SETUP.md) for first-time setup and how to publish with GitHub Pag
 | `analytics.py` | Loads `data/`, computes every metric, prints a text report |
 | `dashboard.py` | Builds `docs/index.html` (and, with `--assets`, the README SVGs) |
 | `build.py` | Everything at once — the one command to run before committing |
+| `tools/parse_expenses.py` | Rebuilds an `expenses_*.csv` from a raw notes file in `data/sources/` |
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The code is MIT; the photos are just mine.
+MIT — see [LICENSE](LICENSE). Code is MIT; the photos are just mine.

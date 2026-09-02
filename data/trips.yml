@@ -1,17 +1,21 @@
 # The two backpacking trips. `expenses_complete` controls whether the site
 # presents that trip's spend as final or flags it as a partial figure.
+# `stops` points at the itinerary CSV (stop_number, city, country, transport,
+# arrival_date, departure_date).
 - id: trip1
   name: Summer 2025
-  start: 2025-06-16
-  end: 2025-08-15
-  expenses_complete: false      # ~half the receipts are logged so far
-  home_currency: USD
-  blurb: Two months, Iberia to the Balkans, mostly overnight trains and hostels.
+  start: 2025-06-01
+  end: 2025-07-31
+  stops: trip1_stops.csv
+  expenses: expenses_trip1.csv
+  expenses_complete: false      # roughly half logged so far
+  blurb: Two months. Itinerary and expenses still being entered.
 
 - id: trip2
   name: Spring 2026
-  start: 2026-03-02
-  end: 2026-05-30
-  expenses_complete: true       # fully itemised
-  home_currency: USD
-  blurb: Three months, Western Europe and the Alps, every euro accounted for.
+  start: 2026-02-24
+  end: 2026-05-26
+  stops: trip2_stops.csv
+  expenses: expenses_trip2.csv
+  expenses_complete: true        # fully itemised, every line from the notebook
+  blurb: Three months. Paris as a base, then a long rail loop clockwise around Europe.
