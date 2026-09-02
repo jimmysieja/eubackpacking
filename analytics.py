@@ -66,6 +66,21 @@ def load_fx() -> dict:
     return yaml.safe_load((DATA / "fx.yml").read_text(encoding="utf-8"))
 
 
+def load_annotations() -> dict:
+    """Optional per-stop call-outs from data/annotations.yml: {city: {label, kind}}."""
+    p = DATA / "annotations.yml"
+    if not p.is_file():
+        return {}
+    raw = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    out = {}
+    for city, v in raw.items():
+        if isinstance(v, str):
+            out[city] = {"label": v, "kind": "stop"}
+        elif isinstance(v, dict) and v.get("label"):
+            out[city] = {"label": v["label"], "kind": v.get("kind", "stop")}
+    return out
+
+
 def load_coords() -> pd.DataFrame:
     c = pd.read_csv(DATA / "coords.csv")
     c["lat"] = pd.to_numeric(c["lat"], errors="coerce")

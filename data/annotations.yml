@@ -1,0 +1,13 @@
+# Optional call-outs for specific stops. Key = city name exactly as it appears
+# in the stops CSV. Shows as an italic note in that city's panel on the map, and
+# (for slept/day-trip pins) replaces the plain label on the map itself.
+#
+# Short form:
+#   Krka National Park: day trip from Split
+#
+# Long form (kind is informational for now):
+#   Niksic:
+#     label: a hitched ride caught on the way south
+#     kind: leg
+#
+# (nothing here yet — add lines when you want them)

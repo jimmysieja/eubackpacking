@@ -58,6 +58,26 @@ date,trip,city,country,currency,amount,amount_usd,category,description
 Currency → USD rates. They're approximate period averages — replace with your
 real statement rates if you have them.
 
+### `annotations.yml` (optional)
+Call-outs for specific stops, keyed by city name. Shows as an italic note in that
+city's panel on the map, and replaces its plain map label:
+
+```yaml
+Krka National Park: day trip from Split
+Niksic:
+  label: a hitched ride caught on the way south
+```
+
+### `rail_<trip>.yml` (optional)
+Real rail totals from the Interrail / Eurail app's Statistics screen (trains, km,
+hours, countries) plus a `notable:` list of the long hauls. When present the page
+uses these instead of estimating rail time from distance. See `data/rail_trip2.yml`.
+
+### Colours
+The whole palette lives in one place: the `PAL` dict in `dashboard.py`. Edit it,
+run `python build.py`, and both the main page and the map pick up the change
+(`docs/map/palette.json` is regenerated from it).
+
 ### Rebuilding an expense file from raw notes
 If you'd rather paste a rough text log than hand-format a CSV, drop it in
 `data/sources/expenses_<trip>.txt` as date headers plus `- <amount> <description>`
@@ -73,8 +93,8 @@ source of truth and you can ignore the text file.
 
 ## 3. Photos
 
-Drop web-sized JPGs into `photos/` (long edge ≤ 2000px, quality ~80 — the build
-does **not** resize). List each in `photos/captions.yml`:
+Drop JPGs into `photos/` (originals ~2000px long edge are fine — the build makes
+web thumbnails itself). List each in `photos/captions.yml`:
 
 ```yaml
 - file: berlin-eastside.jpg
@@ -82,7 +102,8 @@ does **not** resize). List each in `photos/captions.yml`:
   city: Berlin
 ```
 
-Keep it under ~100 photos so the repo stays small.
+`city` must match the name in the stops CSV exactly — that's how the map hangs
+the photo on the right pin. Keep it under ~100 photos so the repo stays small.
 
 ## 4. Build
 

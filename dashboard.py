@@ -32,20 +32,31 @@ PHOTOS = ROOT / "photos"
 
 MODE_LABEL = {"train": "train", "bus": "bus", "ferry": "ferry", "flight": "flight",
               "car": "car", "bike": "bike", "walk": "walk"}
-MODE_DASH = {"train": "", "bus": "7 5", "ferry": "1.5 5", "flight": "2 7",
-             "car": "5 4", "bike": "3 4", "walk": "2 4"}
+# per-mode line style: (svg-dasharray, relative-weight, opacity, bow-factor)
+# kept deliberately distinct so the modes read apart at a glance.
+MODE_STYLE = {
+    "train":  ("",           1.9, 0.95, 0.10),
+    "bus":    ("9 6",        1.4, 0.85, 0.14),
+    "ferry":  ("0.1 6",      1.9, 0.80, 0.22),   # round-cap dots
+    "flight": ("1 10",       1.0, 0.45, 0.55),   # sparse + big arc
+    "car":    ("1 4 7 4",    1.3, 0.85, 0.10),   # dash-dot
+    "bike":   ("2 4",        1.2, 0.80, 0.10),
+    "walk":   ("0.1 5",      1.4, 0.70, 0.06),
+}
+MODE_DASH = {m: s[0] for m, s in MODE_STYLE.items()}
 
-# "Field atlas" palette — paper, ink, oxblood, antique gold, a few muted tones.
+# "Field atlas" palette. Single source of truth — the map page reads this too
+# (docs/map/palette.json). Change colours here, rerun build, both pages update.
 PAL = {
     "light": {
         "paper": "#f3efe6", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
-        "accent": "#7c3b2c", "gold": "#9a7636", "faint": "#c9c1ac",
+        "accent": "#7c3b2c", "gold": "#9a7636", "faint": "#c9c1ac", "far": "#e2dbc9",
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
         "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
-        "accent": "#cf7359", "gold": "#c8a55f", "faint": "#3d3a2f",
+        "accent": "#cf7359", "gold": "#c8a55f", "faint": "#3d3a2f", "far": "#2c281f",
         "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
@@ -109,17 +120,17 @@ def route_trace(d: dict, w: int = 900, h: int = 560) -> str:
         for a, b in zip(recs, recs[1:]):
             if a["city"] == b["city"]:
                 continue
+            mode = b["transport"] or "train"
+            dash, wt, op, bow = MODE_STYLE.get(mode, MODE_STYLE["train"])
             x1, y1, x2, y2 = sx(a["lon"]), sy(a["lat"]), sx(b["lon"]), sy(b["lat"])
             mx, my = (x1 + x2) / 2, (y1 + y2) / 2
-            # bow the segment slightly for a drawn-by-hand feel
             nx, ny = -(y2 - y1), (x2 - x1)
             nl = (nx * nx + ny * ny) ** 0.5 or 1
-            k = min(26, ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5 * 0.12)
+            k = min(60, ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5 * bow)
             cx, cy = mx + nx / nl * k, my + ny / nl * k
-            dash = MODE_DASH.get(b["transport"], "")
-            op = 0.5 if b["transport"] == "flight" else 0.85
+            cap = ' stroke-linecap="round"' if dash.startswith("0.1") else ""
             seg.append(f'<path d="M{x1:.1f} {y1:.1f} Q{cx:.1f} {cy:.1f} {x2:.1f} {y2:.1f}" '
-                       f'fill="none" stroke="var(--{ink})" stroke-width="1.4" '
+                       f'fill="none" stroke="var(--{ink})" stroke-width="{wt:.2f}"{cap} '
                        f'stroke-dasharray="{dash}" opacity="{op}"/>')
         for r in recs:
             x, y = sx(r["lon"]), sy(r["lat"])
@@ -605,15 +616,23 @@ def write_map_data(d: dict) -> None:
                        "nights": int(r["nights"] or 0), "slept": bool((r["nights"] or 0) > 0),
                        "arrive": r["arrival_date"].strftime("%d %b %Y")})
     photos = {}
+    have_thumb = (DOCS / "photos" / "thumb")
     for e in _photo_entries():
+        f = e["file"]
         photos.setdefault(e.get("city", ""), []).append(
-            {"src": f"../photos/{e['file']}", "thumb": f"../photos/thumb/{e['file']}",
+            {"src": f"../photos/{f}",
+             "thumb": f"../photos/thumb/{f}" if (have_thumb / f).exists() else f"../photos/{f}",
              "caption": e.get("caption", "")})
     (DOCS / "map").mkdir(parents=True, exist_ok=True)
     (DOCS / "map" / "data.json").write_text(
-        json.dumps({"trips": [{"id": t, "name": r["name"]} for t, r in d["trips"].iterrows()],
-                    "cities": cities, "legs": legs, "photos": photos},
+        json.dumps({"trips": [{"id": t, "name": r["name"], "ink": "gold" if i else "accent"}
+                              for i, (t, r) in enumerate(d["trips"].iterrows())],
+                    "cities": cities, "legs": legs, "photos": photos,
+                    "annotations": A.load_annotations(),
+                    "modeStyle": MODE_STYLE},
                    separators=(",", ":")), encoding="utf-8")
+    (DOCS / "map" / "palette.json").write_text(json.dumps(PAL, separators=(",", ":")),
+                                               encoding="utf-8")
 
 
 def _make_thumbs(imgs, dst, box=560):
