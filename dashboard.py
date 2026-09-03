@@ -626,6 +626,7 @@ def _stay_runs(spans):
 def write_map_data(d: dict) -> None:
     """docs/map/data.json — stops, legs and photos for the interactive map."""
     import json
+    annos = A.load_annotations()
     s = d["stops"]
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
     s = s.sort_values(["trip", "stop_number"])
@@ -658,6 +659,11 @@ def write_map_data(d: dict) -> None:
             a, b = max(_stay_runs([(rr["arrival_date"], rr["departure_date"]) for rr in rows]),
                        key=lambda ab: (ab[1] - ab[0]).days)
             entry["start"], entry["end"] = a.strftime("%Y-%m-%d"), b.strftime("%Y-%m-%d")
+        an = annos.get(city)
+        if an and an.get("kind") == "transit":
+            entry["transit"] = True
+            if an.get("window"):
+                entry["window"] = an["window"]
         cities.append(entry)
 
     photos = {}
@@ -673,7 +679,7 @@ def write_map_data(d: dict) -> None:
         json.dumps({"trips": [{"id": t, "name": r["name"], "ink": "gold" if i else "accent"}
                               for i, (t, r) in enumerate(d["trips"].iterrows())],
                     "cities": cities, "legs": legs, "photos": photos,
-                    "annotations": A.load_annotations(),
+                    "annotations": annos,
                     "modeStyle": MODE_STYLE},
                    separators=(",", ":")), encoding="utf-8")
     (DOCS / "map" / "palette.json").write_text(json.dumps(PAL, separators=(",", ":")),

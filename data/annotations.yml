@@ -5,9 +5,31 @@
 # Short form:
 #   Krka National Park: day trip from Split
 #
-# Long form (kind is informational for now):
+# Long form:
 #   Niksic:
 #     label: a hitched ride caught on the way south
 #     kind: leg
 #
-# (nothing here yet — add lines when you want them)
+# kind: transit  — a rail/ferry/air waypoint, not a day trip. The panel drops
+# the "day trip" line and the map hover reads "· passing through". Add
+#   window: "04:08 – 04:41"
+# once the time on the ground is known; it shows in place of the date range.
+
+Zagreb:
+  kind: transit
+  label: Quick 3 hour layover between Ljubljana and Split
+
+# Waypoints on train / ferry / air routes — time on the ground still to fill in.
+Holyhead: { kind: transit }
+Galway:   { kind: transit }
+Lille:    { kind: transit }
+Tournai:  { kind: transit }
+Brussels: { kind: transit }
+Hamburg:  { kind: transit }
+Turku:    { kind: transit }
+Mockava:  { kind: transit }
+Warsaw:   { kind: transit }
+Kraków:   { kind: transit }
+Ostrava:  { kind: transit }
+Brno:     { kind: transit }
+Beauvais: { kind: transit }

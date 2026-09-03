@@ -172,7 +172,7 @@
 - file: img_4471.jpg
   city: Copenhagen
   date: '2026-04-07'
-  caption: Another successful G split (50% success rate)
+  caption: Another successful G split (50% success rate), on my birthday nonetheless
 - file: img_4501.jpg
   city: Copenhagen
   date: '2026-04-08'
@@ -336,6 +336,10 @@
   city: Mostar
   date: '2026-05-01'
   caption: Homeless in Mostar so walk from random gas station where I was dropped off at 3:00am to an abandoned outside train station platform
+- file: img_5805.jpg
+  city: Mostar
+  date: '2026-05-01'
+  caption: Home for the night at an abandoned train station platform
 - file: img_5840.jpg
   city: Sarajevo
   date: '2026-05-01'
@@ -344,27 +348,23 @@
   city: Sarajevo
   date: '2026-05-01'
   caption: View from hostel street
-- file: img_5805.jpg
-  city: Mostar
-  date: '2026-05-01'
-  caption: Home for the night at an abandoned train station platform
 - file: img_5854.jpg
   city: Sarajevo
   date: '2026-05-02'
   caption: 5am start towards Plužine with Felix, courtesy of Emilie's car
-- file: img_5874.jpg
-  city: Pluzine
-  date: '2026-05-02'
-  caption: Please please please
-- file: 6d5eef40-69c1-487c-8135-6138688adfcc.jpg
-  city: Niksic
-  date: '2026-05-02'
-  caption: This big guy kept us company
-  featured: true
 - file: f6f0ad1c-5103-44cf-b6b0-0b80f47dd071.jpg
   city: Sarajevo
   date: '2026-05-02'
-  caption: Shoutout Emilie for the lift to Plužine
+  caption: Shoutout Emilie for the lift
+- file: img_5874.jpg
+  city: Plužine
+  date: '2026-05-02'
+  caption: Please please please
+- file: 6d5eef40-69c1-487c-8135-6138688adfcc.jpg
+  city: Plužine
+  date: '2026-05-02'
+  caption: This big guy kept us company
+  featured: true
 - file: img_5922.jpg
   city: Žabljak
   date: '2026-05-03'
@@ -421,6 +421,11 @@
   city: Podgorica
   date: '2026-05-05'
   caption: Somehow ended up at a Montenegrin basketball game. Am now the world's biggest KK Budućnost VOLI fan
+- file: bb08115d-86f3-4727-8192-ca67f6d7068f.jpg
+  city: Virpazar
+  date: '2026-05-06'
+  caption: Felix and I on tha boat
+  featured: true
 - file: 5f0a6068-0d8f-4f81-94e5-85e2dc537b67.jpg
   city: Virpazar
   date: '2026-05-06'
@@ -429,11 +434,6 @@
   city: Virpazar
   date: '2026-05-06'
   caption: I don't remember this
-- file: bb08115d-86f3-4727-8192-ca67f6d7068f.jpg
-  city: Virpazar
-  date: '2026-05-06'
-  caption: Felix and I on tha boat
-  featured: true
 - file: img_6354.jpg
   city: Shkodër
   date: '2026-05-07'
@@ -445,7 +445,7 @@
 - file: img_6368.jpg
   city: Shkodër
   date: '2026-05-07'
-  caption: Icecream w the aussi and brit
+  caption: Icecream w the aussi (Emerson)and brit (Emma)
 - file: img_6372.jpg
   city: Shkodër
   date: '2026-05-07'

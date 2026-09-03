@@ -152,9 +152,11 @@
       radius: c.slept ? 5.5 : 2.8, weight: 1.4,
       color: C.paper, fillColor: inkVar(c.trip), fillOpacity: 1
     }).addTo(map);
-    if (anno[c.city]) {
+    if (anno[c.city] && anno[c.city].label && anno[c.city].kind !== 'transit') {
       m.bindTooltip(anno[c.city].label, { permanent:true, direction:'right', offset:[7,0],
         className:'anno-label' });
+    } else if (c.transit) {
+      m.bindTooltip(`${c.city} · passing through`, { direction:'top' });
     } else if (c.slept && c.nights >= 2) {
       m.bindTooltip(c.city, { permanent:true, direction:'right', offset:[7,0], className:'city-label' });
     } else if (c.slept) {
@@ -250,11 +252,12 @@
     document.getElementById('p-city').textContent = `${c.city}, ${CC[c.country] || c.country}`;
     document.getElementById('p-sub').textContent =
       c.legs ? `${c.legs.length} stays`
-        : c.daytrip ? 'day trip'
-          : c.start ? fmtRange(c.start, c.end) : '';
+        : c.transit ? (c.window || '')
+          : c.daytrip ? 'day trip'
+            : c.start ? fmtRange(c.start, c.end) : '';
     const noteEl = document.getElementById('p-note');
-    if (anno[c.city]) { noteEl.textContent = anno[c.city].label; noteEl.hidden = false; }
-    else noteEl.hidden = true;
+    if (anno[c.city] && anno[c.city].label) { noteEl.textContent = anno[c.city].label; noteEl.hidden = false; }
+    else { noteEl.textContent = ''; noteEl.hidden = true; }
 
     const wrap = document.getElementById('p-photos');
     wrap.innerHTML = '';
@@ -283,9 +286,7 @@
       });
       const rest = pics.filter(p => !used.has(p));
       if (rest.length) renderDays(wrap, rest, c.city);
-    } else if (!pics.length) {
-      wrap.innerHTML = '<p class="empty">No photos from here yet.</p>';
-    } else {
+    } else if (pics.length) {
       renderDays(wrap, pics, c.city);
     }
     panel.classList.add('open');
