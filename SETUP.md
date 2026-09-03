@@ -93,17 +93,44 @@ source of truth and you can ignore the text file.
 
 ## 3. Photos
 
-Drop JPGs into `photos/` (originals ~2000px long edge are fine — the build makes
-web thumbnails itself). List each in `photos/captions.yml`:
+List each photo in `photos/captions.yml`:
 
 ```yaml
 - file: berlin-eastside.jpg
   caption: East Side Gallery on a grey morning.
   city: Berlin
+  date: '2026-03-01'
 ```
 
-`city` must match the name in the stops CSV exactly — that's how the map hangs
-the photo on the right pin. Keep it under ~100 photos so the repo stays small.
+`city` must match the name in the stops CSV exactly, diacritics included — that's
+how the map hangs the photo on the right pin. Keep it under ~150 photos so the
+repo stays small.
+
+### Where the originals live
+
+Full-res originals (~2000px long edge is plenty — the build makes the web sizes
+itself) are **not** committed. Keep them in a cloud-synced folder so every
+machine and a backup have them, e.g.:
+
+    C:\Users\you\OneDrive\eubackpacking-photos\
+
+Then point the build at that folder with an environment variable:
+
+```bash
+# Windows (PowerShell) — persists for future sessions:
+setx EUBP_PHOTO_SRC "C:\Users\you\OneDrive\eubackpacking-photos"
+# macOS / Linux — add to ~/.zshrc or ~/.bashrc:
+export EUBP_PHOTO_SRC="$HOME/OneDrive/eubackpacking-photos"
+```
+
+To **add** photos: drop the JPGs in that folder, add their rows to
+`captions.yml`, run `python build.py`, commit. To **remove** one, delete its row
+from `captions.yml` (and the original from the folder) and rebuild.
+
+If `EUBP_PHOTO_SRC` is unset the build looks in `photos/`, and if there are no
+originals there either it reuses the already-published copies in `docs/photos/`.
+So on a machine without the originals you can still edit captions/dates, run
+`python build.py`, and commit a correct `docs/` — you just can't add new photos.
 
 ## 4. Build
 

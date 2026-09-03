@@ -12,6 +12,7 @@ request. Also writes the light/dark ``assets/*.svg`` used on the repo page.
 
 from __future__ import annotations
 
+import os
 import html
 import shutil
 import argparse
@@ -28,7 +29,15 @@ import analytics as A
 ROOT = Path(__file__).parent
 DOCS = ROOT / "docs"
 ASSETS = ROOT / "assets"
-PHOTOS = ROOT / "photos"
+PHOTOS = ROOT / "photos"                 # captions.yml lives here and is committed
+
+# Full-res originals are gitignored and can live outside the repo (e.g. a
+# cloud-synced folder). Point EUBP_PHOTO_SRC at them per machine. Without it the
+# build looks in photos/, and failing that falls back to the already-published
+# copies in docs/photos/ — so caption/date edits still build on a clone that has
+# no originals at all.
+PHOTO_SRC = (Path(os.environ["EUBP_PHOTO_SRC"]).expanduser()
+             if os.environ.get("EUBP_PHOTO_SRC") else PHOTOS)
 
 MODE_LABEL = {"train": "train", "bus": "bus", "ferry": "ferry", "flight": "flight",
               "car": "car", "bike": "bike", "walk": "walk"}
@@ -586,8 +595,9 @@ def export_assets(d: dict, out: Path = ASSETS) -> list[str]:
 def _photo_entries():
     cap = PHOTOS / "captions.yml"
     raw = yaml.safe_load(cap.read_text(encoding="utf-8")) if cap.is_file() else None
+    pub = DOCS / "photos" / "thumb"
     return [e for e in (raw or []) if isinstance(e, dict) and e.get("file")
-            and (PHOTOS / e["file"]).is_file()]
+            and ((PHOTO_SRC / e["file"]).is_file() or (pub / e["file"]).is_file())]
 
 
 def write_map_data(d: dict) -> None:
@@ -662,15 +672,18 @@ def write_docs(d: dict) -> None:
     (DOCS / "index.html").write_text(build_html(d), encoding="utf-8")
     (DOCS / ".nojekyll").write_text("", encoding="utf-8")
     dst = DOCS / "photos"
-    imgs = [p for p in PHOTOS.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}]
+    listed = {e["file"] for e in _photo_entries()}
+    imgs = [p for p in PHOTO_SRC.glob("*")
+            if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"} and p.name in listed]
     if imgs:
-        # rebuild the published copies from the working images
+        # rebuild the published copies from the originals; anything no longer in
+        # captions.yml is dropped by the rmtree and simply not re-published.
         if dst.exists():
             shutil.rmtree(dst)
         if not _publish_photos(imgs, dst):
             print("  (Pillow not installed — no photos published)")
     elif dst.exists():
-        print("  (no images in photos/ — keeping the committed docs/photos/ as-is)")
+        print(f"  (no originals under {PHOTO_SRC} — keeping the committed docs/photos/ as-is)")
     write_map_data(d)
 
 

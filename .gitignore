@@ -18,8 +18,11 @@ scratch/
 # NOTE: docs/ and assets/ ARE committed on purpose.
 # docs/ is what GitHub Pages serves; assets/*.svg is embedded in the README.
 
-# working-size photos are regenerated into docs/photos/ from your local
-# picsforgit stash; only the served copies + captions.yml are committed.
+# Full-res originals stay out of git. Keep them in a cloud-synced folder and
+# point EUBP_PHOTO_SRC at it (see SETUP.md "Photos"); only the web-sized copies
+# under docs/photos/ and photos/captions.yml are committed. The build falls back
+# to those committed copies when no originals are present, so caption/date edits
+# still build on any clone.
 photos/*.jpg
 photos/*.jpeg
 photos/*.png
