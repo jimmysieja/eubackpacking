@@ -7,7 +7,7 @@ Spring 2026) told through the itinerary, the rail pass, and every receipt.
 
 <!-- STATS:START -->
 
-<sub>Jun 2025 – May 2026 &nbsp;·&nbsp; generated 02 Sep 2026</sub>
+<sub>Jun 2025 – May 2026 &nbsp;·&nbsp; generated 03 Sep 2026</sub>
 
 | Countries | Cities | Nights | Trains | Spent |
 |:-:|:-:|:-:|:-:|:-:|

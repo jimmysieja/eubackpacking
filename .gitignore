@@ -17,3 +17,10 @@ scratch/
 
 # NOTE: docs/ and assets/ ARE committed on purpose.
 # docs/ is what GitHub Pages serves; assets/*.svg is embedded in the README.
+
+# working-size photos are regenerated into docs/photos/ from your local
+# picsforgit stash; only the served copies + captions.yml are committed.
+photos/*.jpg
+photos/*.jpeg
+photos/*.png
+photos/*.webp

@@ -421,18 +421,16 @@ def itinerary_movement(d: dict) -> str:
 
 
 def gallery_movement(d: dict) -> str:
-    cap = PHOTOS / "captions.yml"
-    entries = yaml.safe_load(cap.read_text(encoding="utf-8")) if cap.is_file() else None
-    entries = [e for e in (entries or []) if isinstance(e, dict) and e.get("file")
-               and (PHOTOS / e["file"]).is_file()]
+    # the editorial page shows only the hand-picked few; the map holds them all.
+    entries = [e for e in _photo_entries() if e.get("featured")]
     if not entries:
         return ""
     cells = "".join(
-        f'<figure class="ph ph{i%3}"><img loading="lazy" src="photos/{esc(e["file"])}" '
-        f'alt="{esc(e.get("caption",""))}">'
+        f'<figure class="ph"><a href="photos/large/{esc(e["file"])}">'
+        f'<img loading="lazy" src="photos/thumb/{esc(e["file"])}" alt="{esc(e.get("caption",""))}"></a>'
         f'<figcaption>{esc(e.get("caption",""))}'
         f'{" &mdash; " + esc(e["city"]) if e.get("city") else ""}</figcaption></figure>'
-        for i, e in enumerate(entries))
+        for e in entries)
     return f'<section class="movement"><p class="tag">Seen</p><div class="mosaic">{cells}</div></section>'
 
 
@@ -616,12 +614,10 @@ def write_map_data(d: dict) -> None:
                        "nights": int(r["nights"] or 0), "slept": bool((r["nights"] or 0) > 0),
                        "arrive": r["arrival_date"].strftime("%d %b %Y")})
     photos = {}
-    have_thumb = (DOCS / "photos" / "thumb")
     for e in _photo_entries():
         f = e["file"]
         photos.setdefault(e.get("city", ""), []).append(
-            {"src": f"../photos/{f}",
-             "thumb": f"../photos/thumb/{f}" if (have_thumb / f).exists() else f"../photos/{f}",
+            {"src": f"../photos/large/{f}", "thumb": f"../photos/thumb/{f}",
              "caption": e.get("caption", "")})
     (DOCS / "map").mkdir(parents=True, exist_ok=True)
     (DOCS / "map" / "data.json").write_text(
@@ -635,20 +631,28 @@ def write_map_data(d: dict) -> None:
                                                encoding="utf-8")
 
 
-def _make_thumbs(imgs, dst, box=560):
+# published sizes: 'thumb' for the grid/pins, 'large' for the lightbox.
+# the full-res source in photos/ is never copied into docs/.
+PHOTO_SIZES = {"thumb": (560, 74), "large": (1400, 82)}
+
+
+def _publish_photos(imgs, dst):
     try:
-        from PIL import Image
+        from PIL import Image, ImageOps
     except ImportError:
         return False
-    tdir = dst / "thumb"
-    tdir.mkdir(exist_ok=True)
+    for name, (box, q) in PHOTO_SIZES.items():
+        (dst / name).mkdir(parents=True, exist_ok=True)
     for p in imgs:
         try:
-            im = Image.open(p)
-            im.thumbnail((box, box))
-            im.convert("RGB").save(tdir / p.name, "JPEG", quality=78)
+            base = ImageOps.exif_transpose(Image.open(p)).convert("RGB")
         except Exception as exc:  # noqa: BLE001
-            print(f"  thumb skipped {p.name}: {exc}")
+            print(f"  photo skipped {p.name}: {exc}")
+            continue
+        for name, (box, q) in PHOTO_SIZES.items():
+            im = base.copy()
+            im.thumbnail((box, box))
+            im.save(dst / name / f"{p.stem}.jpg", "JPEG", quality=q)
     return True
 
 
@@ -657,15 +661,15 @@ def write_docs(d: dict) -> None:
     (DOCS / "index.html").write_text(build_html(d), encoding="utf-8")
     (DOCS / ".nojekyll").write_text("", encoding="utf-8")
     dst = DOCS / "photos"
-    if dst.exists():
-        shutil.rmtree(dst)
     imgs = [p for p in PHOTOS.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}]
     if imgs:
-        dst.mkdir()
-        for p in imgs:
-            shutil.copy2(p, dst / p.name)
-        if not _make_thumbs(imgs, dst):
-            print("  (Pillow not installed — map will use full-size images)")
+        # rebuild the published copies from the working images
+        if dst.exists():
+            shutil.rmtree(dst)
+        if not _publish_photos(imgs, dst):
+            print("  (Pillow not installed — no photos published)")
+    elif dst.exists():
+        print("  (no images in photos/ — keeping the committed docs/photos/ as-is)")
     write_map_data(d)
 
 
