@@ -22,6 +22,10 @@
   city: London
   date: '2026-03-16'
   caption: Took a little walk around the London School of Economics campus
+- file: img_3588.jpg
+  city: London
+  date: '2026-03-16'
+  caption: I love Arsenal ! They're so entertaining to watch !
 - file: img_3610.jpg
   city: Oxford
   date: '2026-03-17'
@@ -71,6 +75,11 @@
   city: Manchester
   date: '2026-03-21'
   caption: 2010 World Cup vuvuzela at the National Football Museum
+- file: 09db6ea9-f8b5-4c6d-9f85-bea76a8d57cd.jpg
+  city: Manchester
+  date: '2026-03-21'
+  caption: Old Trafford tour, but the tour guide was just shitting on Liverpool the whole time
+  featured: true
 - file: img_3912.jpg
   city: Betws-y-Coed
   date: '2026-03-22'
@@ -91,6 +100,10 @@
   city: Abergavenny
   date: '2026-03-24'
   caption: Staying with friends in Abergavenny-- managed to fend off the cats from pissing on my bag
+- file: img_4007.jpg
+  city: Abergavenny
+  date: '2026-03-24'
+  caption: Welsh friends Ashton and Tash! Met in Barcelona summer 2025
 - file: img_4027.jpg
   city: Holyhead
   date: '2026-03-25'
@@ -237,6 +250,10 @@
   city: Kraków
   date: '2026-04-21'
   caption: No sleep mask, no problem (~24hr train journey from Vilnius to Bratislava)
+- file: img_5010.jpg
+  city: Ostrava
+  date: '2026-04-21'
+  caption: Munchin on some breakfast
 - file: img_5065.jpg
   city: Vienna
   date: '2026-04-23'
@@ -299,6 +316,10 @@
   city: Split
   date: '2026-04-29'
   caption: Luka and I have a stim off (2026 colorized)
+- file: img_5499.jpg
+  city: Krka National Park
+  date: '2026-04-29'
+  caption: Two thumbs down on the real
 - file: img_5753.jpg
   city: Split
   date: '2026-04-30'
@@ -323,6 +344,10 @@
   city: Sarajevo
   date: '2026-05-01'
   caption: View from hostel street
+- file: img_5805.jpg
+  city: Mostar
+  date: '2026-05-01'
+  caption: Home for the night at an abandoned train station platform
 - file: img_5854.jpg
   city: Sarajevo
   date: '2026-05-02'
@@ -331,6 +356,15 @@
   city: Pluzine
   date: '2026-05-02'
   caption: Please please please
+- file: 6d5eef40-69c1-487c-8135-6138688adfcc.jpg
+  city: Niksic
+  date: '2026-05-02'
+  caption: This big guy kept us company
+  featured: true
+- file: f6f0ad1c-5103-44cf-b6b0-0b80f47dd071.jpg
+  city: Sarajevo
+  date: '2026-05-02'
+  caption: Shoutout Emilie for the lift to Plužine
 - file: img_5922.jpg
   city: Žabljak
   date: '2026-05-03'
@@ -355,6 +389,11 @@
   city: Žabljak
   date: '2026-05-03'
   caption: No problem for Felix and I
+- file: zabljak-durmitor.jpg
+  city: Žabljak
+  date: '2026-05-03'
+  caption: The Durmitor massif at the bottom of our hike
+
 - file: img_6034.jpg
   city: Žabljak
   date: '2026-05-04'
@@ -369,6 +408,11 @@
   date: '2026-05-04'
   caption: Quick swim in the Black Lake, Durmitor National Park
   featured: true
+- file: ba19eef1-e2aa-477d-9c65-9cf6a0d3e61c.jpg
+  city: Žabljak
+  date: '2026-05-04'
+  caption: Biked ~26 miles across Durmitor National Park
+  featured: true
 - file: img_6270.jpg
   city: Žabljak
   date: '2026-05-05'
@@ -377,6 +421,19 @@
   city: Podgorica
   date: '2026-05-05'
   caption: Somehow ended up at a Montenegrin basketball game. Am now the world's biggest KK Budućnost VOLI fan
+- file: 5f0a6068-0d8f-4f81-94e5-85e2dc537b67.jpg
+  city: Virpazar
+  date: '2026-05-06'
+  caption: Was the only one from our (unlimited prosecco) boat tour to jump (flip) into Lake Skadar
+- file: 84ee3683-825b-4157-99f8-00f4f8b54046.jpg
+  city: Virpazar
+  date: '2026-05-06'
+  caption: I don't remember this
+- file: bb08115d-86f3-4727-8192-ca67f6d7068f.jpg
+  city: Virpazar
+  date: '2026-05-06'
+  caption: Felix and I on tha boat
+  featured: true
 - file: img_6354.jpg
   city: Shkodër
   date: '2026-05-07'
@@ -434,6 +491,10 @@
   city: Paris
   date: '2026-05-10'
   caption: Well done Dorothy
+- file: 28e388cb-6c76-4846-854c-0174034ecc31.jpg
+  city: Paris
+  date: '2026-05-10'
+  caption: Trocadero after Lulu's restaurant (& icecream ofc)
 - file: img_6566.jpg
   city: Paris
   date: '2026-05-12'
@@ -495,6 +556,10 @@
   city: Paris
   date: '2026-05-24'
   caption: Born to be Owen Wilson in "Cars", forced to be Owen Wilson in "Midnight in Paris"
+- file: img_7095.jpg
+  city: Paris
+  date: '2026-05-24'
+  caption: Fit check
 - file: img_7128.jpg
   city: Paris
   date: '2026-05-25'
@@ -503,67 +568,3 @@
   city: Paris
   date: '2026-05-25'
   caption: Double crêped up on the nostalgia walk before leaving the next day
-- file: 09db6ea9-f8b5-4c6d-9f85-bea76a8d57cd.jpg
-  city: Manchester
-  date: '2026-03-21'
-  caption: Old Trafford tour, but the tour guide was just shitting on Liverpool the whole time
-  featured: true
-- file: 28e388cb-6c76-4846-854c-0174034ecc31.jpg
-  city: Paris
-  date: '2026-05-10'
-  caption: Trocadero after Lulu's restaurant (& icecream ofc)
-- file: 5f0a6068-0d8f-4f81-94e5-85e2dc537b67.jpg
-  city: Virpazar
-  date: '2026-05-06'
-  caption: Was the only one from our (unlimited prosecco) boat tour to jump (flip) into Lake Skadar
-- file: 6d5eef40-69c1-487c-8135-6138688adfcc.jpg
-  city: Niksic
-  date: '2026-05-02'
-  caption: This big guy kept us company
-  featured: true
-- file: 84ee3683-825b-4157-99f8-00f4f8b54046.jpg
-  city: Virpazar
-  date: '2026-05-06'
-  caption: I don't remember this
-- file: ba19eef1-e2aa-477d-9c65-9cf6a0d3e61c.jpg
-  city: Žabljak
-  date: '2026-05-04'
-  caption: Biked ~26 miles across Durmitor National Park
-  featured: true
-- file: bb08115d-86f3-4727-8192-ca67f6d7068f.jpg
-  city: Virpazar
-  date: '2026-05-06'
-  caption: Felix and I on tha boat
-  featured: true
-- file: f6f0ad1c-5103-44cf-b6b0-0b80f47dd071.jpg
-  city: Sarajevo
-  date: '2026-05-02'
-  caption: Shoutout Emilie for the lift to Plužine
-- file: img_3588.jpg
-  city: London
-  date: '2026-03-16'
-  caption: I love Arsenal ! They're so entertaining to watch !
-- file: img_4007.jpg
-  city: Abergavenny
-  date: '2026-03-24'
-  caption: Welsh friends Ashton and Tash! Met in Barcelona summer 2025
-- file: img_5010.jpg
-  city: Ostrava
-  date: '2026-04-21'
-  caption: Munchin on some breakfast
-- file: img_5499.jpg
-  city: Krka National Park
-  date: '2026-04-29'
-  caption: Two thumbs down on the real
-- file: img_5805.jpg
-  city: Mostar
-  date: '2026-05-01'
-  caption: Home for the night at an abandoned train station platform
-- file: img_7095.jpg
-  city: Paris
-  date: '2026-05-24'
-  caption: Fit check
-- file: zabljak-durmitor.jpg
-  city: Žabljak
-  date: '2026-05-03'
-  caption: The Durmitor massif at the bottom of our hike
