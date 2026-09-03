@@ -15,6 +15,48 @@ longest:
   date: 2026-04-26
   hours: 13.62           # 13 h 37 m, one change
 
+# Ride time per journey, read off the Eurail app's journey list (yellow toggle =
+# actually taken). Shows on hover over that leg on the map. `from`/`to` are city
+# names from trip2_stops.csv; `hm` is the app's displayed duration (timezone
+# aware, so e.g. Paris–London reads 3h01). `via:` lists CamelCase intermediate
+# stops that ARE their own row in the CSV — every drawn sub-leg then carries the
+# whole-journey time and an "A → B" label on hover.
+journeys:
+  # Britain + Ireland
+  - { from: Paris,        to: London,       hm: "3h01" }
+  - { from: London,       to: Oxford,       hm: "1h22" }
+  - { from: Oxford,       to: Liverpool,    hm: "3h03" }   # via Birmingham New St
+  - { from: Liverpool,    to: Manchester,   hm: "0h46" }
+  - { from: Manchester,   to: Chinley,      hm: "0h34" }
+  - { from: Chinley,      to: Manchester,   hm: "0h38" }
+  - { from: Manchester,   to: Betws-y-Coed, hm: "2h47" }
+  - { from: Betws-y-Coed, to: Abergavenny,  hm: "5h34" }
+  - { from: Abergavenny,  to: Holyhead,     hm: "5h17" }   # 07:58 dep → 13:15 Holyhead ferry
+  - { from: Holyhead,     to: Dublin,       hm: "2h30" }   # Irish Sea ferry
+  - { from: Dublin,       to: Galway,       hm: "2h39" }
+  - { from: Dublin,       to: Howth,        hm: "0h25" }
+  - { from: Howth,        to: Dublin,       hm: "0h25" }
+  - { from: Dublin,       to: Belfast,      hm: "2h08" }
+  # Paris → the Nordics
+  - { from: Paris,      to: Cologne,    via: [Lille, Tournai, Brussels], hm: "11h39" }
+  - { from: Cologne,    to: Copenhagen, via: [Hamburg],                  hm: "11h50" }
+  - { from: Copenhagen, to: Stockholm,  hm: "6h15" }
+  - { from: Turku,      to: Helsinki,   hm: "2h13" }
+  # Baltics → central Europe
+  - { from: Tallinn,    to: Riga,       hm: "6h38" }
+  - { from: Riga,       to: Vilnius,    hm: "4h06" }
+  - { from: Vilnius,    to: Warsaw,     via: [Mockava],               hm: "7h39" }
+  - { from: Warsaw,     to: Kraków,     hm: "2h53" }
+  - { from: Kraków,     to: Bratislava, via: [Ostrava, Brno, Vienna], hm: "9h52" }   # overnight, dep 00:18
+  - { from: Bratislava, to: Vienna,     hm: "0h56" }
+  - { from: Vienna,     to: Bled,       hm: "6h12" }
+  - { from: Bled,       to: Ljubljana,  hm: "1h59" }
+  - { from: Ljubljana,  to: Split,      via: [Zagreb],                hm: "13h37" }
+  # Balkans
+  - { from: Mostar,     to: Sarajevo,   hm: "2h02" }
+  - { from: Podgorica,  to: Virpazar,   hm: "0h34" }
+  - { from: Virpazar,   to: Podgorica,  hm: "0h31" }
+
 # The long hauls, read off the app's journey list (yellow = actually ridden).
 # Used to shape the transit strip and pick out annotations; `from`/`to` match
 # the city names in trip2_stops.csv.

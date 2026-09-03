@@ -47,7 +47,7 @@ MODE_STYLE = {
     "train":  ("",           1.9, 0.95, 0.10),
     "bus":    ("9 6",        1.4, 0.85, 0.14),
     "ferry":  ("0.1 6",      1.9, 0.80, 0.22),   # round-cap dots
-    "flight": ("1 10",       1.0, 0.45, 0.55),   # sparse + big arc
+    "flight": ("2 7",        1.3, 0.62, 0.55),   # sparse + big arc
     "car":    ("1 4 7 4",    1.3, 0.85, 0.10),   # dash-dot
     "bike":   ("2 4",        1.2, 0.80, 0.10),
     "walk":   ("0.1 5",      1.4, 0.70, 0.06),
@@ -97,6 +97,18 @@ def hm(hours: float) -> str:
     h = int(hours)
     m = round((hours - h) * 60)
     return f"{h}h{m:02d}m" if m else f"{h}h"
+
+
+def layover_window(a, b) -> tuple[str, str]:
+    """(display window, time-on-the-ground) for a transit stop, from raw
+    arrive/leave timestamps. Same day -> '13:20 – 16:05, 26 Apr'; across
+    midnight -> '06 Apr 22:01 – 07 Apr 02:14'."""
+    a, b = pd.to_datetime(a), pd.to_datetime(b)
+    if a.date() == b.date():
+        win = f"{a:%H:%M} – {b:%H:%M}, {a:%d %b}"
+    else:
+        win = f"{a:%d %b %H:%M} – {b:%d %b %H:%M}"
+    return win, hm((b - a).total_seconds() / 3600).rstrip("m")
 
 
 # --------------------------------------------------------------------------- #
@@ -630,15 +642,35 @@ def write_map_data(d: dict) -> None:
     s = d["stops"]
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
     s = s.sort_values(["trip", "stop_number"])
+    # ride time per drawn leg, keyed by (from city, to city), from the `journeys:`
+    # list in data/rail_<trip>.yml. A journey with `via:` spreads its total time
+    # (and an "A → B" label) across every sub-leg it covers.
+    ride: dict = {}
+    for o in d.get("rail", {}).values():
+        for j in o.get("journeys", []):
+            if not (j.get("from") and j.get("to") and j.get("hm")):
+                continue
+            hm_s = str(j["hm"])
+            path = [j["from"], *(j.get("via") or []), j["to"]]
+            label = f'{j["from"]} → {j["to"]}' if j.get("via") else None
+            for p, q in zip(path, path[1:]):
+                ride[(p, q)] = (hm_s, label)
+
     legs, cities = [], []
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         for a, b in zip(recs, recs[1:]):
             if a["city"] == b["city"]:
                 continue
-            legs.append({"trip": tid, "mode": b["transport"] or "train",
-                         "a": [round(a["lat"], 4), round(a["lon"], 4)],
-                         "b": [round(b["lat"], 4), round(b["lon"], 4)]})
+            leg = {"trip": tid, "mode": b["transport"] or "train",
+                   "a": [round(a["lat"], 4), round(a["lon"], 4)],
+                   "b": [round(b["lat"], 4), round(b["lon"], 4)]}
+            info = ride.get((a["city"], b["city"]))
+            if info and leg["mode"] != "flight":   # journeys are rail/ferry, never the flight home
+                leg["dur"] = info[0]
+                if info[1]:
+                    leg["journey"] = info[1]
+            legs.append(leg)
 
     # one panel entry per (trip, city); its dated span is the longest continuous
     # run of that city's stop rows, unless CITY_LEGS spells out separate stints.
@@ -662,7 +694,10 @@ def write_map_data(d: dict) -> None:
         an = annos.get(city)
         if an and an.get("kind") == "transit":
             entry["transit"] = True
-            if an.get("window"):
+            lo = an.get("layover")
+            if lo and len(lo) == 2:
+                entry["window"], entry["ground"] = layover_window(lo[0], lo[1])
+            elif an.get("window"):
                 entry["window"] = an["window"]
         cities.append(entry)
 

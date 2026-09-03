@@ -11,23 +11,40 @@
 #     kind: leg
 #
 # kind: transit  — a rail/ferry/air waypoint, not a day trip. The panel drops
-# the "day trip" line and the map hover reads "· passing through". Add
-#   window: "04:08 – 04:41"
-# once the time on the ground is known; it shows in place of the date range.
+# the "day trip" line and the map hover reads "· passing through".
+#
+# Time on the ground for a transit stop — give the arrive / leave timestamps
+# straight off the Eurail app and the build formats the window + duration:
+#   Cologne:
+#     kind: transit
+#     layover: ["2026-04-06 22:00", "2026-04-07 02:00"]
+# -> panel + hover read "06 Apr 22:00 – 07 Apr 02:00 · 4h on the ground".
+# (`window: "22:00 – 02:00"` still works if you only have the clock times.)
 
 Zagreb:
   kind: transit
   label: Quick 3 hour layover between Ljubljana and Split
 
+# Layovers below are timed off the Eurail journey list (arrival of the inbound
+# journey → departure of the outbound one).
 Cologne:
   kind: transit
-  window: "22:00 – 02:00"        # birthday layover, waiting on the Hamburg train
+  layover: ["2026-04-06 22:15", "2026-04-07 02:09"]   # birthday layover, waiting on the Hamburg train
+Warsaw:
+  kind: transit
+  layover: ["2026-04-20 19:03", "2026-04-20 19:40"]   # off the Vilnius train, straight onto Kraków
+Kraków:
+  kind: transit
+  layover: ["2026-04-20 22:33", "2026-04-21 00:18"]   # midnight wait for the Bratislava sleeper
 
 # Stops on the hitched drive Sarajevo -> Žabljak.
 Plužine: { kind: transit }
 Niksic:  { kind: transit }
 
-# Waypoints on train / ferry / air routes — time on the ground still to fill in.
+# Waypoints with no separately-timed layover — they sit inside a single
+# multi-change journey the app never split (Lille/Tournai/Brussels within
+# Paris→Köln; Hamburg within Köln→Copenhagen; Mockava within Vilnius→Warszawa;
+# Ostrava/Brno within Kraków→Bratislava).
 Holyhead: { kind: transit }
 Galway:   { kind: transit }
 Lille:    { kind: transit }
@@ -36,8 +53,6 @@ Brussels: { kind: transit }
 Hamburg:  { kind: transit }
 Turku:    { kind: transit }
 Mockava:  { kind: transit }
-Warsaw:   { kind: transit }
-Kraków:   { kind: transit }
 Ostrava:  { kind: transit }
 Brno:     { kind: transit }
 Beauvais: { kind: transit }

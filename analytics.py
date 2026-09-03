@@ -76,10 +76,13 @@ def load_annotations() -> dict:
     for city, v in raw.items():
         if isinstance(v, str):
             out[city] = {"label": v, "kind": "stop"}
-        elif isinstance(v, dict) and (v.get("label") or v.get("kind") or v.get("window")):
+        elif isinstance(v, dict) and (v.get("label") or v.get("kind")
+                                      or v.get("window") or v.get("layover")):
             out[city] = {"label": v.get("label", ""), "kind": v.get("kind", "stop")}
             if v.get("window"):
                 out[city]["window"] = str(v["window"])
+            if v.get("layover"):
+                out[city]["layover"] = list(v["layover"])
     return out
 
 
