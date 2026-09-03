@@ -19,6 +19,14 @@ Zagreb:
   kind: transit
   label: Quick 3 hour layover between Ljubljana and Split
 
+Cologne:
+  kind: transit
+  window: "22:00 – 02:00"        # birthday layover, waiting on the Hamburg train
+
+# Stops on the hitched drive Sarajevo -> Žabljak.
+Pluzine: { kind: transit }
+Niksic:  { kind: transit }
+
 # Waypoints on train / ferry / air routes — time on the ground still to fill in.
 Holyhead: { kind: transit }
 Galway:   { kind: transit }
