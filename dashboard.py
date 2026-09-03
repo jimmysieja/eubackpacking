@@ -600,13 +600,36 @@ def _photo_entries():
             and ((PHOTO_SRC / e["file"]).is_file() or (pub / e["file"]).is_file())]
 
 
+# cities visited in distinct stints — the map panel gives each its own dated
+# header instead of one lumped range.
+CITY_LEGS = {
+    ("trip2", "Paris"): [
+        {"label": "Paris — 1st leg", "start": "2026-02-24", "end": "2026-03-10"},
+        {"label": "Paris — 2nd leg", "start": "2026-03-31", "end": "2026-04-06"},
+        {"label": "Paris — 3rd leg", "start": "2026-05-10", "end": "2026-05-26"},
+    ],
+}
+
+
+def _stay_runs(spans):
+    """Merge (arrival, departure) pairs into continuous runs. A gap of <= 1 day
+    (a same-day hop out and back) does not start a new run."""
+    out = []
+    for a, b in sorted(spans):
+        if out and (a - out[-1][1]).days <= 1:
+            out[-1][1] = max(out[-1][1], b)
+        else:
+            out.append([a, b])
+    return out
+
+
 def write_map_data(d: dict) -> None:
     """docs/map/data.json — stops, legs and photos for the interactive map."""
     import json
     s = d["stops"]
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
     s = s.sort_values(["trip", "stop_number"])
-    legs, cities, seen = [], [], set()
+    legs, cities = [], []
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         for a, b in zip(recs, recs[1:]):
@@ -615,21 +638,36 @@ def write_map_data(d: dict) -> None:
             legs.append({"trip": tid, "mode": b["transport"] or "train",
                          "a": [round(a["lat"], 4), round(a["lon"], 4)],
                          "b": [round(b["lat"], 4), round(b["lon"], 4)]})
+
+    # one panel entry per (trip, city); its dated span is the longest continuous
+    # run of that city's stop rows, unless CITY_LEGS spells out separate stints.
+    by_city: dict = {}
     for _, r in s.iterrows():
-        key = (r["trip"], r["city"])
-        if key in seen:
-            continue
-        seen.add(key)
-        cities.append({"city": r["city"], "country": r["country"], "trip": r["trip"],
-                       "lat": round(r["lat"], 4), "lon": round(r["lon"], 4),
-                       "nights": int(r["nights"] or 0), "slept": bool((r["nights"] or 0) > 0),
-                       "arrive": r["arrival_date"].strftime("%d %b %Y")})
+        by_city.setdefault((r["trip"], r["city"]), []).append(r)
+    for (tid, city), rows in by_city.items():
+        r0 = rows[0]
+        nights = max((0 if pd.isna(rr["nights"]) else int(rr["nights"])) for rr in rows)
+        entry = {"city": city, "country": r0["country"], "trip": tid,
+                 "lat": round(r0["lat"], 4), "lon": round(r0["lon"], 4),
+                 "nights": nights, "slept": nights > 0, "daytrip": nights == 0,
+                 "arrive": r0["arrival_date"].strftime("%d %b %Y")}
+        override = CITY_LEGS.get((tid, city))
+        if override:
+            entry["legs"] = override
+        else:
+            a, b = max(_stay_runs([(rr["arrival_date"], rr["departure_date"]) for rr in rows]),
+                       key=lambda ab: (ab[1] - ab[0]).days)
+            entry["start"], entry["end"] = a.strftime("%Y-%m-%d"), b.strftime("%Y-%m-%d")
+        cities.append(entry)
+
     photos = {}
     for e in _photo_entries():
         f = e["file"]
         photos.setdefault(e.get("city", ""), []).append(
             {"src": f"../photos/large/{f}", "thumb": f"../photos/thumb/{f}",
-             "caption": e.get("caption", "")})
+             "caption": e.get("caption", ""), "date": str(e.get("date", "") or "")})
+    for lst in photos.values():
+        lst.sort(key=lambda p: p["date"] or "9999-99-99")  # chronological; file order within a day
     (DOCS / "map").mkdir(parents=True, exist_ok=True)
     (DOCS / "map" / "data.json").write_text(
         json.dumps({"trips": [{"id": t, "name": r["name"], "ink": "gold" if i else "accent"}

@@ -59,6 +59,14 @@
   #panel img{width:100%;display:block;background:var(--rule);cursor:zoom-in}
   #panel figcaption{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--dim);margin-top:5px}
   #panel .empty{font-family:var(--serif);font-style:italic;color:var(--dim);font-size:14px}
+  #panel .leghead{font-family:var(--serif);font-size:16px;color:var(--ink);margin:26px 0 12px;
+    padding-bottom:5px;border-bottom:1px solid var(--rule)}
+  #panel .leghead:first-child{margin-top:2px}
+  #panel .leghead span{display:block;margin-top:3px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.06em;color:var(--dim)}
+  #panel .dayhead{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+    margin:18px 0 10px}
+  #panel .dayhead:first-child{margin-top:0}
 
   #lightbox{position:fixed;inset:0;z-index:2000;background:rgba(20,18,14,.92);display:none;
     align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
@@ -193,11 +201,57 @@
   document.querySelector('#panel .close').onclick = () => panel.classList.remove('open');
   lb.onclick = () => lb.classList.remove('open');
 
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const CC = { 'United Kingdom':'UK', 'United States':'USA',
+               'Bosnia and Herzegovina':'Bosnia & Herzegovina' };
+  const fmtDay = iso => {
+    const [y, m, d] = iso.split('-').map(Number);
+    return `${WD[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}, ${MON[m - 1]} ${d}`;
+  };
+  const fmtRange = (a, b) => a === b ? fmtDay(a) : `${fmtDay(a)} – ${fmtDay(b)}`;
+
+  function addFigure(wrap, p, fallbackAlt) {
+    const fig = document.createElement('figure');
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = 1; img.src = p.src; } };
+    img.src = p.thumb || p.src;
+    img.alt = p.caption || fallbackAlt;
+    img.onclick = () => { lbImg.src = p.src; lb.classList.add('open'); };
+    fig.appendChild(img);
+    if (p.caption) {
+      const cap = document.createElement('figcaption');
+      cap.textContent = p.caption;
+      fig.appendChild(cap);
+    }
+    wrap.appendChild(fig);
+  }
+
+  function renderDays(wrap, pics, fallbackAlt) {
+    const groups = new Map();
+    pics.forEach(p => {
+      const k = p.date || '';
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(p);
+    });
+    [...groups.keys()].sort((a, b) => (a || '9999').localeCompare(b || '9999')).forEach(k => {
+      if (k) {
+        const h = document.createElement('p');
+        h.className = 'dayhead';
+        h.textContent = fmtDay(k);
+        wrap.appendChild(h);
+      }
+      groups.get(k).forEach(p => addFigure(wrap, p, fallbackAlt));
+    });
+  }
+
   function openPanel(c) {
-    document.getElementById('p-city').textContent = c.city;
+    document.getElementById('p-city').textContent = `${c.city}, ${CC[c.country] || c.country}`;
     document.getElementById('p-sub').textContent =
-      `${c.country} · ${c.slept ? c.nights + ' night' + (c.nights === 1 ? '' : 's') : 'day trip'}`
-      + (c.arrive ? ` · arrived ${c.arrive}` : '');
+      c.legs ? `${c.legs.length} stays`
+        : c.daytrip ? 'day trip'
+          : c.start ? fmtRange(c.start, c.end) : '';
     const noteEl = document.getElementById('p-note');
     if (anno[c.city]) { noteEl.textContent = anno[c.city].label; noteEl.hidden = false; }
     else noteEl.hidden = true;
@@ -205,25 +259,34 @@
     const wrap = document.getElementById('p-photos');
     wrap.innerHTML = '';
     const pics = (data.photos && data.photos[c.city]) || [];
-    if (!pics.length) {
+
+    if (c.legs) {
+      const used = new Set();
+      c.legs.forEach(lg => {
+        const h = document.createElement('p');
+        h.className = 'leghead';
+        h.textContent = lg.label;
+        const dspan = document.createElement('span');
+        dspan.textContent = fmtRange(lg.start, lg.end);
+        h.appendChild(dspan);
+        wrap.appendChild(h);
+        const inLeg = pics.filter(p => p.date && p.date >= lg.start && p.date <= lg.end);
+        inLeg.forEach(p => used.add(p));
+        if (inLeg.length) {
+          renderDays(wrap, inLeg, c.city);
+        } else {
+          const e = document.createElement('p');
+          e.className = 'empty';
+          e.textContent = 'No photos from this leg yet.';
+          wrap.appendChild(e);
+        }
+      });
+      const rest = pics.filter(p => !used.has(p));
+      if (rest.length) renderDays(wrap, rest, c.city);
+    } else if (!pics.length) {
       wrap.innerHTML = '<p class="empty">No photos from here yet.</p>';
     } else {
-      pics.forEach(p => {
-        const fig = document.createElement('figure');
-        const img = document.createElement('img');
-        img.loading = 'lazy';
-        img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = 1; img.src = p.src; } };
-        img.src = p.thumb || p.src;
-        img.alt = p.caption || c.city;
-        img.onclick = () => { lbImg.src = p.src; lb.classList.add('open'); };
-        fig.appendChild(img);
-        if (p.caption) {
-          const cap = document.createElement('figcaption');
-          cap.textContent = p.caption;
-          fig.appendChild(cap);
-        }
-        wrap.appendChild(fig);
-      });
+      renderDays(wrap, pics, c.city);
     }
     panel.classList.add('open');
   }

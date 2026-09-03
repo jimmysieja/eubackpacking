@@ -208,7 +208,7 @@
 - file: img_4818.jpg
   city: Tallinn
   date: '2026-04-17'
-  caption: Estonian Bollard \#geoguessr
+  caption: 'Estonian Bollard #geoguessr'
 - file: img_4865.jpg
   city: Riga
   date: '2026-04-18'
@@ -342,7 +342,7 @@
 - file: img_5973.jpg
   city: Žabljak
   date: '2026-05-03'
-  caption: \"Don't forget to feed the dog\" - Camille
+  caption: '"Don''t forget to feed the dog" - Camille'
 - file: img_6003.jpg
   city: Žabljak
   date: '2026-05-03'
@@ -358,7 +358,7 @@
 - file: img_6034.jpg
   city: Žabljak
   date: '2026-05-04'
-  caption: \"Have you ever been to Europe's deepest canyon?\" Better. Pissed in it. Twice.
+  caption: '"Have you ever been to Europe''s deepest canyon?" Better. Pissed in it. Twice.'
   featured: true
 - file: img_6152.jpg
   city: Žabljak
