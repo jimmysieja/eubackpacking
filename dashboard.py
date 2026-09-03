@@ -237,9 +237,10 @@ def masthead(d: dict) -> str:
     return f"""
 <header>
   <p class="dateline">A gap year &middot; Europe &middot; {yr}</p>
-  <h1>Two months, then three,<br><em>around a continent</em></h1>
-  <p class="dek">{ov['n_countries']} countries, {ov['n_cities']} beds, and a great
-  deal of it seen from a train window. What the receipts and the rail pass remember.</p>
+  <h1>A gap year around Europe</h1>
+  <p class="dek">Two backpacking trips, Summer 2025 and Spring 2026 &mdash; the route,
+  the spending, and the time spent on trains. {ov['n_countries']} countries,
+  {ov['n_cities']} cities.</p>
 </header>"""
 
 
@@ -272,11 +273,11 @@ def trace_movement(d: dict) -> str:
              if not dt_.empty else "")
     return f"""
 <section class="movement">
-  <p class="tag">The line</p>
+  <p class="tag">Route</p>
   <figure class="trace">{svg}</figure>
-  <p class="caption">Every stop, joined in the order they happened &mdash; solid for rail,
-  dashed for road, dotted for sea, hairline for the few flights. The two trips never touch.{extra}
-  &nbsp;<a href="map/">Open the interactive map &rarr;</a></p>
+  <p class="caption">Every stop in order. Solid = rail, dashed = bus, dotted = ferry,
+  hairline = flight. The two trips aren't connected.{extra}
+  &nbsp;<a href="map/">Interactive map &rarr;</a></p>
 </section>"""
 
 
@@ -307,8 +308,8 @@ def trains_movement(d: dict) -> str:
     strip = day_strip(span, cols, annos=annos,
                       baseline_label="hours in transit, by day") if cols else ""
     lg = ts.get("longest")
-    longest = (f' The single worst sit was <b>{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])}</b>, '
-               f'{hm(lg["hr"])} down the Dalmatian coast.') if lg else ""
+    longest = (f' Longest single ride: <b>{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])}</b>, '
+               f'{hm(lg["hr"])}.') if lg else ""
     ov = [f'{ts["rail_legs"]} trains', f'{fmt(ts["rail_km"])} km',
           f'{ts["countries_by_train"]} countries', f'{ts["rail_hour_share"]*100:.0f}% of all transit']
     if d.get("rail"):
@@ -317,9 +318,9 @@ def trains_movement(d: dict) -> str:
             ov.append(f'{onn} overnight')
     return f"""
 <section class="movement">
-  <p class="tag">Time on rails</p>
-  <p class="statement"><b>{hm(ts['rail_hours'])}.</b> Four days and change with a pass in my
-  pocket, watching the map redraw itself through glass.{longest}</p>
+  <p class="tag">Trains</p>
+  <p class="statement"><b>{hm(ts['rail_hours'])} on trains</b> &mdash; about
+  {ts['full_days_equiv']:.1f} days.{longest}</p>
   <figure class="strip">{strip}</figure>
   <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in ov)}</p>
 </section>"""
@@ -366,16 +367,16 @@ def money_movement(d: dict) -> str:
     perday = sp["total"] / d["trips"].loc["trip2", "days"]
     facts = [f'{money(perday)}/day', f'{sp["tgtg_count"]} Too Good To Go bags']
     if sp.get("priciest_day"):
-        facts.append(f'dearest day {money(sp["priciest_day"][1])} ({sp["priciest_day"][0]:%d %b})')
+        facts.append(f'most expensive day {money(sp["priciest_day"][1])} ({sp["priciest_day"][0]:%d %b})')
     if sp.get("cheapest_day"):
-        facts.append(f'leanest {money(sp["cheapest_day"][1])} ({sp["cheapest_day"][0]:%d %b})')
+        facts.append(f'cheapest {money(sp["cheapest_day"][1])} ({sp["cheapest_day"][0]:%d %b})')
     star = ('<p class="caption">* Summer 2025 isn\'t fully logged yet, so the total is a floor.</p>'
             if sp["any_partial"] else "")
     return f"""
 <section class="movement">
-  <p class="tag">Where it went</p>
-  <p class="statement"><b>{esc(money(sp['total']))}</b> over the spring trip &mdash; {esc(lead)}
-  of it {esc(lead_txt)} alone.</p>
+  <p class="tag">Money</p>
+  <p class="statement"><b>{esc(money(sp['total']))}</b> on the Spring 2026 trip &mdash; {esc(lead)}
+  of it {esc(lead_txt)}.</p>
   <figure class="bandfig">{cat_band}<div class="key">{cat_key}</div></figure>
   <figure class="bandfig">{ctry_band}<div class="key">{ctry_key} &nbsp; &hellip;</div></figure>
   <figure class="strip">{strip}</figure>
@@ -396,10 +397,10 @@ def countries_movement(d: dict) -> str:
     top = by.index[0]
     return f"""
 <section class="movement">
-  <p class="tag">Ground held</p>
+  <p class="tag">Countries</p>
   <figure class="bandfig">{b}<div class="key">{key}</div></figure>
-  <p class="caption">{int(by.sum())} nights in {len(by)} countries; the most of them
-  &mdash; {int(by.iloc[0])} &mdash; in {esc(top)}.</p>
+  <p class="caption">{int(by.sum())} nights across {len(by)} countries. Most &mdash;
+  {int(by.iloc[0])} &mdash; in {esc(top)}.</p>
 </section>"""
 
 
@@ -417,7 +418,7 @@ def itinerary_movement(d: dict) -> str:
             for _, r in grp.sort_values("arrival_date").iterrows())
         blocks.append(f'<div class="itin-trip"><p class="tag">{esc(names.get(tid, tid))}</p>'
                       f'<ol class="itin">{rows}</ol></div>')
-    return f'<section class="movement"><p class="tag">Every bed</p>{"".join(blocks)}</section>'
+    return f'<section class="movement"><p class="tag">Stops</p>{"".join(blocks)}</section>'
 
 
 def gallery_movement(d: dict) -> str:
@@ -431,7 +432,7 @@ def gallery_movement(d: dict) -> str:
         f'<figcaption>{esc(e.get("caption",""))}'
         f'{" &mdash; " + esc(e["city"]) if e.get("city") else ""}</figcaption></figure>'
         for e in entries)
-    return f'<section class="movement"><p class="tag">Seen</p><div class="mosaic">{cells}</div></section>'
+    return f'<section class="movement"><p class="tag">Favorites</p><div class="mosaic">{cells}</div></section>'
 
 
 def colophon(d: dict) -> str:
@@ -522,7 +523,7 @@ def build_html(d: dict) -> str:
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Two months, then three, around a continent</title>
+<title>A gap year around Europe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500&family=Spline+Sans+Mono:wght@400;500&display=swap">
