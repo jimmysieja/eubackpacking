@@ -1,258 +1,262 @@
-# Auto-scaffolded, then edited. `city` + `date` are set for all; add `caption`
-# text to any you like (blank is fine). `featured: true` also puts it on the main page.
+# Auto-scaffolded, then described. city + date are set for all; caption is a
+# plain description for now - edit to taste. featured: true also puts it on
+# the main page.
 
 - file: img_3403.jpg
   city: London
   date: '2026-03-13'
-  caption: ''
+  caption: Jimmy on Westminster Bridge, Parliament and Big Ben behind.
 - file: img_3410.jpg
   city: London
   date: '2026-03-13'
-  caption: ''
+  caption: Wetherspoons fish, chips and mushy peas on a blue-willow plate.
 - file: img_3509.jpg
   city: London
   date: '2026-03-15'
-  caption: ''
+  caption: A settling pint of Guinness on a pub table.
 - file: img_4596.jpg
   city: London
   date: '2026-03-15'
-  caption: ''
+  caption: Looking over London from a high-rise window, two silhouettes.
 - file: img_4611.jpg
   city: London
   date: '2026-03-15'
-  caption: ''
+  caption: The City skyline through the glass, Jimmy and a friend looking out.
 - file: img_3601.jpg
   city: London
   date: '2026-03-16'
-  caption: ''
+  caption: The red LSE sign on a Houghton Street building.
 - file: img_3610.jpg
   city: Oxford
   date: '2026-03-17'
-  caption: ''
+  caption: Bare trees and low sun on a path through an Oxford meadow.
 - file: img_3624.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: ''
+  caption: Pointing up at the blue wall of Goodison Park, Everton's ground.
 - file: img_3630.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: ''
+  caption: Winter sun over Stanley Park, a stadium stand beyond the grass.
 - file: img_3634.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: ''
+  caption: Anfield's main stand seen across Stanley Park.
 - file: img_3642.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: ''
+  caption: The You'll Never Walk Alone mural on a wall by Anfield.
 - file: img_3676.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: ''
+  caption: Match night at Anfield, red scarf on, the ground lit behind.
+  featured: true
 - file: img_3687.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: ''
+  caption: Watching the match in a Liverpool pub, pints in hand.
 - file: img_3689.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: ''
+  caption: The Trent Alexander-Arnold 66 mural on a gable end near Anfield.
 - file: img_3700.jpg
   city: Liverpool
   date: '2026-03-19'
-  caption: ''
+  caption: Inside Anfield on the stadium tour, LFC picked out in the seats.
 - file: img_3702.jpg
   city: Liverpool
   date: '2026-03-19'
-  caption: ''
+  caption: Anfield's empty stands from the stadium tour.
 - file: img_3726.jpg
   city: Liverpool
   date: '2026-03-19'
-  caption: ''
+  caption: Posing with a cardboard Liverpool player in the press room.
 - file: img_3816.jpg
   city: Chinley
   date: '2026-03-20'
-  caption: ''
+  caption: Thumbs up on a Peak District hilltop above Chinley.
 - file: img_3863.jpg
   city: Manchester
   date: '2026-03-21'
-  caption: ''
+  caption: Tesco meal-deal sandwiches on the grass.
 - file: img_3865.jpg
   city: Manchester
   date: '2026-03-21'
-  caption: ''
+  caption: A 2010 World Cup vuvuzela in a case at the National Football Museum.
 - file: img_3912.jpg
   city: Betws-y-Coed
   date: '2026-03-22'
-  caption: ''
+  caption: Abergavenny's lit market-hall clock at night.
 - file: img_3962.jpg
   city: Betws-y-Coed
   date: '2026-03-23'
-  caption: ''
+  caption: On the scree near the top of Snowdon.
 - file: img_3967.jpg
   city: Betws-y-Coed
   date: '2026-03-23'
-  caption: ''
+  caption: Hand on the summit disc at the top of Snowdon, a llyn below.
 - file: img_3991.jpg
   city: Abergavenny
   date: '2026-03-23'
-  caption: ''
+  caption: Beans on toast in a hostel kitchen, peanut butter on standby.
 - file: img_3993.jpg
   city: Abergavenny
   date: '2026-03-24'
-  caption: ''
+  caption: A hostel cat crossing the bathroom floor in Abergavenny.
 - file: img_4027.jpg
   city: Holyhead
   date: '2026-03-25'
-  caption: ''
+  caption: Headphones on for the ferry crossing to Ireland.
 - file: img_4048.jpg
   city: Clifden
   date: '2026-03-26'
-  caption: ''
+  caption: Lying in the heather on Clifden's Sky Road.
 - file: img_4127.jpg
   city: Clifden
   date: '2026-03-27'
-  caption: ''
+  caption: A roadside picnic of ham, cheese and crisps on a rock.
 - file: img_6414.jpg
   city: Clifden
   date: '2026-03-27'
-  caption: ''
+  caption: Standing in a window of the ruined Clifden Castle.
 - file: img_4255.jpg
   city: Howth
   date: '2026-03-28'
-  caption: ''
+  caption: The Howth cliff path, the Baily Lighthouse on the point.
 - file: img_4313.jpg
   city: Belfast
   date: '2026-03-30'
-  caption: ''
+  caption: Two of us below a stone obelisk on a blustery Belfast hill.
 - file: img_4325.jpg
   city: Belfast
   date: '2026-03-31'
-  caption: ''
+  caption: An Antonov freighter with its nose up on the apron at Belfast.
 - file: img_4332.jpg
   city: Paris
   date: '2026-04-01'
-  caption: ''
+  caption: Elevator selfie in Paris with a full-length baguette.
 - file: img_4336.jpg
   city: Paris
   date: '2026-04-01'
-  caption: ''
+  caption: Green neon in a Paris cinema before the film.
 - file: img_4339.jpg
   city: Paris
   date: '2026-04-01'
-  caption: ''
+  caption: Green light and a glass of red on a night out in Paris.
 - file: img_4379.jpg
   city: Paris
   date: '2026-04-04'
-  caption: ''
+  caption: A pickup football match on a Paris astro pitch.
 - file: img_4426.jpg
   city: Lille
   date: '2026-04-06'
-  caption: ''
+  caption: A baguette on the tray table, somewhere past Lille.
 - file: img_4439.jpg
   city: Cologne
   date: '2026-04-06'
-  caption: ''
+  caption: Cologne Cathedral floodlit at night.
+  featured: true
 - file: img_4443.jpg
   city: Cologne
   date: '2026-04-06'
-  caption: ''
+  caption: Cologne across the Rhine at night, cathedral and bridge lit.
 - file: img_4453.jpg
   city: Hamburg
   date: '2026-04-07'
-  caption: ''
+  caption: Feet up in a train vestibule on the way north.
 - file: img_4466.jpg
   city: Copenhagen
   date: '2026-04-07'
-  caption: ''
+  caption: A late card game on a hostel bench in Copenhagen.
 - file: img_4471.jpg
   city: Copenhagen
   date: '2026-04-07'
-  caption: ''
+  caption: Another Guinness, this one in Copenhagen.
 - file: img_4501.jpg
   city: Copenhagen
   date: '2026-04-08'
-  caption: ''
+  caption: A woven-timber structure at the Danish Architecture Center.
 - file: img_4518.jpg
   city: Copenhagen
   date: '2026-04-08'
-  caption: ''
+  caption: Nyhavn behind, a friend balancing on a bollard.
 - file: img_4522.jpg
   city: Copenhagen
   date: '2026-04-08'
-  caption: ''
+  caption: Building a custom minifigure at the Lego store.
 - file: img_4563.jpg
   city: Copenhagen
   date: '2026-04-09'
-  caption: ''
+  caption: Pointing at the panels in the Copenhagen design museum.
 - file: img_4580.jpg
   city: Copenhagen
   date: '2026-04-09'
-  caption: ''
+  caption: A red mirrored room at a Copenhagen museum.
 - file: img_4625.jpg
   city: Copenhagen
   date: '2026-04-10'
-  caption: ''
+  caption: Riding a rented bike through Copenhagen at night.
 - file: img_4670.jpg
   city: Stockholm
   date: '2026-04-11'
-  caption: ''
+  caption: A smoke-and-red-light installation room in Stockholm.
 - file: img_4733.jpg
   city: Helsinki
   date: '2026-04-14'
-  caption: ''
+  caption: A wheatpasted flyer in Helsinki about being unemployed and hot.
 - file: img_4779.jpg
   city: Tallinn
   date: '2026-04-16'
-  caption: ''
+  caption: Feet up on the Helsinki-Tallinn ferry, Baltic through the porthole.
 - file: img_4799.jpg
   city: Tallinn
   date: '2026-04-16'
-  caption: ''
+  caption: A door plastered in badges and stickers in Tallinn's old town.
+  featured: true
 - file: img_4806.jpg
   city: Tallinn
   date: '2026-04-16'
-  caption: ''
+  caption: Pointing out the Lidl at dusk, Tallinn.
 - file: img_4818.jpg
   city: Tallinn
   date: '2026-04-17'
-  caption: ''
+  caption: The road out of Tallinn, blurred past the window.
 - file: img_4865.jpg
   city: Riga
   date: '2026-04-18'
-  caption: ''
+  caption: The whole group caught in a convex street mirror, Riga.
 - file: img_4878.jpg
   city: Riga
   date: '2026-04-18'
-  caption: ''
+  caption: Sklandrausis, Latvia's carrot-rye tarts, on a Riga market stall.
 - file: img_4886.jpg
   city: Riga
   date: '2026-04-18'
-  caption: ''
+  caption: Meeting a mascot at the Riga central market.
 - file: img_4940.jpg
   city: Riga
   date: '2026-04-18'
-  caption: ''
+  caption: 'A LIDO canteen spread: grey peas, stew and beer.'
 - file: img_4945.jpg
   city: Riga
   date: '2026-04-18'
-  caption: ''
+  caption: Walking the old town at night, Riga.
 - file: img_4976.jpg
   city: Vilnius
   date: '2026-04-19'
-  caption: ''
+  caption: Gediminas' Tower lit on its hill, Vilnius.
 - file: img_5006.jpg
   city: Kraków
   date: '2026-04-21'
-  caption: ''
+  caption: Asleep under a Burger King crown on the train to Krakow.
 - file: img_5065.jpg
   city: Vienna
   date: '2026-04-23'
-  caption: ''
+  caption: Feet up on an Enzi lounger in Vienna's MuseumsQuartier.
 - file: img_5119.jpg
   city: Bled
   date: '2026-04-24'
-  caption: ''
+  caption: Bled Castle on its crag at first light.
 - file: img_8140.jpg
   city: Bled
   date: '2026-04-24'
@@ -260,23 +264,24 @@
 - file: img_4248.jpg
   city: Bled
   date: '2026-04-25'
-  caption: ''
+  caption: Foosball in the Bled hostel common room.
 - file: img_5136.jpg
   city: Bled
   date: '2026-04-25'
-  caption: ''
+  caption: A quick stretch at a trail sign above Bled.
 - file: img_5149.jpg
   city: Bled
   date: '2026-04-25'
-  caption: ''
+  caption: Lake Bled and its island from the Osojnica viewpoint.
+  featured: true
 - file: img_5188.jpg
   city: Bled
   date: '2026-04-25'
-  caption: ''
+  caption: Up the chairlift at Straza hill, feet over the meadow.
 - file: img_5251.jpg
   city: Ljubljana
   date: '2026-04-25'
-  caption: ''
+  caption: A hostel dorm in Ljubljana, packs down.
 - file: img_5274.jpg
   city: Split
   date: '2026-04-26'
@@ -285,11 +290,11 @@
 - file: img_5283.jpg
   city: Split
   date: '2026-04-27'
-  caption: ''
+  caption: A wall of bootleg cartoon t-shirts at a Split market.
 - file: img_5362.jpg
   city: Split
   date: '2026-04-28'
-  caption: ''
+  caption: Looney Tunes on the projector in the Split hostel bar.
 - file: img_1774.jpg
   city: Krka National Park
   date: '2026-04-29'
@@ -297,19 +302,19 @@
 - file: img_5372.jpg
   city: Split
   date: '2026-04-29'
-  caption: ''
+  caption: In a party hat under green lights, Split.
 - file: img_5382.jpg
   city: Split
   date: '2026-04-29'
-  caption: ''
+  caption: A late-night bakery in Split's old town.
 - file: img_5537.jpg
   city: Split
   date: '2026-04-29'
-  caption: ''
+  caption: The group in a Split backstreet, a car photobombing.
 - file: img_5753.jpg
   city: Split
   date: '2026-04-30'
-  caption: ''
+  caption: Ice cream on the Split Riva, palms behind.
 - file: img_5786.jpg
   city: Split
   date: '2026-04-30'
@@ -317,199 +322,203 @@
 - file: img_5794.jpg
   city: Mostar
   date: '2026-05-01'
-  caption: ''
+  caption: Loading the night bus out of Split.
 - file: img_5802.jpg
   city: Mostar
   date: '2026-05-01'
-  caption: ''
+  caption: Arriving in Mostar down an empty lit road.
 - file: img_5840.jpg
   city: Sarajevo
   date: '2026-05-01'
-  caption: ''
+  caption: War damage still on an apartment block in Sarajevo.
 - file: img_5849.jpg
   city: Sarajevo
   date: '2026-05-01'
-  caption: ''
+  caption: A hillside street in Sarajevo, the city dropping away below.
 - file: img_5854.jpg
   city: Sarajevo
   date: '2026-05-02'
-  caption: ''
+  caption: An early, blurred start out of Sarajevo.
 - file: img_5874.jpg
   city: Pluzine
   date: '2026-05-02'
-  caption: ''
+  caption: Roadside with a Niksic sign, thumbing into Montenegro's interior.
 - file: img_5922.jpg
   city: Žabljak
   date: '2026-05-03'
-  caption: ''
+  caption: On the trail through the pines toward the Black Lake, a dog tagging along.
 - file: img_5943.jpg
   city: Žabljak
   date: '2026-05-03'
-  caption: ''
+  caption: Crossing a spring snowfield in Durmitor.
 - file: img_5973.jpg
   city: Žabljak
   date: '2026-05-03'
-  caption: ''
+  caption: A trail dog joins the Durmitor hike.
 - file: img_6003.jpg
   city: Žabljak
   date: '2026-05-03'
-  caption: ''
+  caption: Feet up in the Zabljak guesthouse yard.
 - file: img_6009.jpg
   city: Žabljak
   date: '2026-05-03'
-  caption: ''
+  caption: 'A grill dinner in Zabljak: cevapi, salad, flatbread.'
 - file: img_6011.jpg
   city: Žabljak
   date: '2026-05-03'
-  caption: ''
+  caption: The same table, cleared.
 - file: img_6034.jpg
   city: Žabljak
   date: '2026-05-04'
-  caption: ''
+  caption: Down into the Tara River Canyon.
+  featured: true
 - file: img_6152.jpg
   city: Žabljak
   date: '2026-05-04'
-  caption: ''
+  caption: Lunch above a little green lake on the Durmitor plateau.
 - file: img_6242.jpg
   city: Žabljak
   date: '2026-05-04'
-  caption: ''
+  caption: At the Black Lake below Meded, bikes ditched on the shingle.
+  featured: true
 - file: img_6270.jpg
   city: Žabljak
   date: '2026-05-05'
-  caption: ''
+  caption: A black timber house in Zabljak.
 - file: img_6285.jpg
   city: Podgorica
   date: '2026-05-05'
-  caption: ''
+  caption: A basketball game in Podgorica's Moraca arena.
 - file: img_6354.jpg
   city: Shkodër
   date: '2026-05-07'
-  caption: ''
+  caption: Dusk over Lake Shkodra from the Rozafa hill.
 - file: img_6360.jpg
   city: Shkodër
   date: '2026-05-07'
-  caption: ''
+  caption: Shkoder's lights from above at night.
 - file: img_6368.jpg
   city: Shkodër
   date: '2026-05-07'
-  caption: ''
+  caption: Drinks on Shkoder's pedestrian street after dark.
 - file: img_6372.jpg
   city: Shkodër
   date: '2026-05-07'
-  caption: ''
+  caption: 'Cafe prices in Albanian lek: coffee and raki, 50 apiece.'
 - file: img_6376.jpg
   city: Theth
   date: '2026-05-08'
-  caption: ''
+  caption: First look at the Accursed Mountains above Theth.
+  featured: true
 - file: img_6402.jpg
   city: Theth
   date: '2026-05-08'
-  caption: ''
+  caption: On a crag above the Theth valley, cloud on the peaks.
 - file: img_6416.jpg
   city: Theth
   date: '2026-05-08'
-  caption: ''
+  caption: The stone church at Theth, mountains all around.
 - file: img_6422.jpg
   city: Theth
   date: '2026-05-08'
-  caption: ''
+  caption: The furgon back down from Theth.
 - file: img_6469.jpg
   city: Tirana
   date: '2026-05-09'
-  caption: ''
+  caption: With the owner of a Tirana juice bar.
 - file: img_5585.jpg
   city: Paris
   date: '2026-05-10'
-  caption: ''
+  caption: Squeezed onto a Paris metro bench, the family in tow.
 - file: img_6480.jpg
   city: Tirana
   date: '2026-05-10'
-  caption: ''
+  caption: The night coach seats, Albania.
 - file: img_6485.jpg
   city: Tirana
   date: '2026-05-10'
-  caption: ''
+  caption: Sunset off the wing at Tirana airport.
 - file: img_6493.jpg
   city: Paris
   date: '2026-05-10'
-  caption: ''
+  caption: Sheltering from Paris rain at a covered market.
 - file: img_6519.jpg
   city: Paris
   date: '2026-05-10'
-  caption: ''
+  caption: Yellow raincoat and the Eiffel Tower at dusk, Trocadero.
 - file: img_6566.jpg
   city: Paris
   date: '2026-05-12'
-  caption: ''
+  caption: Feet over the water at Versailles.
 - file: img_6574.jpg
   city: Paris
   date: '2026-05-12'
-  caption: ''
+  caption: Ice cream with Dad on a Paris street.
 - file: img_6630.jpg
   city: Paris
   date: '2026-05-13'
-  caption: ''
+  caption: A Paris corner and the yellow raincoat again.
 - file: img_6695.jpg
   city: Paris
   date: '2026-05-16'
-  caption: ''
+  caption: Gelato at a window table, Paris at night.
 - file: img_6709.jpg
   city: Paris
   date: '2026-05-17'
-  caption: ''
+  caption: Crepes to go at a Paris street market.
 - file: img_6712.jpg
   city: Paris
   date: '2026-05-17'
-  caption: ''
+  caption: The Seine under low grey rain.
 - file: img_6775.jpg
   city: Paris
   date: '2026-05-18'
-  caption: ''
+  caption: A Guinness in a Paris Irish pub.
 - file: img_6843.jpg
   city: Paris
   date: '2026-05-18'
-  caption: ''
+  caption: Grey Paris and the far-off tower from the Galeries Lafayette roof.
 - file: img_6777.jpg
   city: Paris
   date: '2026-05-19'
-  caption: ''
+  caption: The Louvre colonnade blurred past at night.
 - file: img_6803.jpg
   city: Paris
   date: '2026-05-19'
-  caption: ''
+  caption: Sorting a fan of beer coasters over pizza.
 - file: img_5905.jpg
   city: Paris
   date: '2026-05-20'
-  caption: ''
+  caption: The family on the Champ de Mars grass.
 - file: img_5929.jpg
   city: Paris
   date: '2026-05-20'
-  caption: ''
+  caption: Flat on the grass, feet pointed at the lit tower.
+  featured: true
 - file: img_6933.jpg
   city: Paris
   date: '2026-05-21'
-  caption: ''
+  caption: Arms out above the canal at Versailles.
 - file: img_6956.jpg
   city: Paris
   date: '2026-05-21'
-  caption: ''
+  caption: Two baguette sandwiches and a walk, Paris.
 - file: img_7076.jpg
   city: Paris
   date: '2026-05-22'
-  caption: ''
+  caption: A wine-and-snacks picnic on the stones, Paris.
 - file: img_4849.jpg
   city: Paris
   date: '2026-05-24'
-  caption: ''
+  caption: Dressed up on the steps, Paris.
 - file: img_7128.jpg
   city: Paris
   date: '2026-05-25'
-  caption: ''
+  caption: Strawberry gelato on a Paris street.
 - file: img_7136.jpg
   city: Paris
   date: '2026-05-25'
-  caption: ''
+  caption: A late snack under the lit Eiffel Tower.
 - file: 09db6ea9-f8b5-4c6d-9f85-bea76a8d57cd.jpg
   city: Manchester
   date: ''
@@ -549,19 +558,19 @@
 - file: img_3588.jpg
   city: London
   date: ''
-  caption: ''
+  caption: A one-finger salute to the Emirates.
 - file: img_4007.jpg
   city: Abergavenny
   date: ''
-  caption: ''
+  caption: Night bus selfie, three awake.
 - file: img_4423.jpg
   city: Paris
   date: ''
-  caption: ''
+  caption: On a Paris metro platform, route maps behind.
 - file: img_5010.jpg
   city: Ostrava
   date: ''
-  caption: ''
+  caption: 4:10 a.m. in Ostrava station, breakfast is a jar of peanut butter.
 - file: img_5499.jpg
   city: Krka National Park
   date: ''
@@ -569,11 +578,11 @@
 - file: img_5805.jpg
   city: Mostar
   date: ''
-  caption: ''
+  caption: Backpack down in the dark, Mostar.
 - file: img_7095.jpg
   city: Paris
   date: ''
-  caption: ''
+  caption: Shirt and tie in the mirror before a night out, Paris.
 - file: zabljak-durmitor.jpg
   caption: The Durmitor massif on the walk out of Žabljak.
   city: Žabljak
