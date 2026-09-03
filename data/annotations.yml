@@ -24,7 +24,7 @@ Cologne:
   window: "22:00 – 02:00"        # birthday layover, waiting on the Hamburg train
 
 # Stops on the hitched drive Sarajevo -> Žabljak.
-Pluzine: { kind: transit }
+Plužine: { kind: transit }
 Niksic:  { kind: transit }
 
 # Waypoints on train / ferry / air routes — time on the ground still to fill in.

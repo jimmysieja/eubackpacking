@@ -48,7 +48,7 @@ stop_number,city,country,transport,arrival_date,departure_date
 46,Split,Croatia,Bus,2026-04-30,2026-04-30
 47,Mostar,Bosnia and Herzegovina,Bus,2026-04-30,2026-05-01
 48,Sarajevo,Bosnia and Herzegovina,Train,2026-05-01,2026-05-02
-49,Pluzine,Montenegro,Voiture,2026-05-02,2026-05-02
+49,Plužine,Montenegro,Voiture,2026-05-02,2026-05-02
 50,Niksic,Montenegro,Voiture,2026-05-02,2026-05-02
 51,Žabljak,Montenegro,Bus,2026-05-02,2026-05-05
 52,Podgorica,Montenegro,Bus,2026-05-05,2026-05-07
