@@ -1,5 +1,5 @@
-# Auto-scaffolded by tools/scaffold_photos.py — edit `caption` and fix any
-# wrong `city`. `featured: true` also pulls a photo onto the main page.
+# Auto-scaffolded, then edited. `city` + `date` are set for all; add `caption`
+# text to any you like (blank is fine). `featured: true` also puts it on the main page.
 
 - file: img_3403.jpg
   city: London
@@ -254,9 +254,9 @@
   date: '2026-04-24'
   caption: ''
 - file: img_8140.jpg
-  city: Vienna
+  city: Bled
   date: '2026-04-24'
-  caption: ''
+  caption: Signing the flag over the bar at the Bled hostel.
 - file: img_4248.jpg
   city: Bled
   date: '2026-04-25'
@@ -278,9 +278,10 @@
   date: '2026-04-25'
   caption: ''
 - file: img_5274.jpg
-  city: Krka National Park
+  city: Split
   date: '2026-04-26'
-  caption: ''
+  caption: 'The Ljubljana-Split train: booked as a seat, delivered as a knees contest.'
+  featured: true
 - file: img_5283.jpg
   city: Split
   date: '2026-04-27'
@@ -290,9 +291,9 @@
   date: '2026-04-28'
   caption: ''
 - file: img_1774.jpg
-  city: Split
+  city: Krka National Park
   date: '2026-04-29'
-  caption: ''
+  caption: Two thoroughly unimpressed faces at Krka.
 - file: img_5372.jpg
   city: Split
   date: '2026-04-29'
@@ -312,7 +313,7 @@
 - file: img_5786.jpg
   city: Split
   date: '2026-04-30'
-  caption: ''
+  caption: The Split -> Mostar bus, 155 minutes behind. (screenshot)
 - file: img_5794.jpg
   city: Mostar
   date: '2026-05-01'
@@ -510,37 +511,41 @@
   date: '2026-05-25'
   caption: ''
 - file: 09db6ea9-f8b5-4c6d-9f85-bea76a8d57cd.jpg
-  city: ''
+  city: Manchester
   date: ''
-  caption: ''
+  caption: The Stretford End, from the Old Trafford tour.
+  featured: true
 - file: 28e388cb-6c76-4846-854c-0174034ecc31.jpg
-  city: ''
+  city: Paris
   date: ''
-  caption: ''
+  caption: Family at Trocadero, the tower lit against a wet sky.
 - file: 5f0a6068-0d8f-4f81-94e5-85e2dc537b67.jpg
-  city: ''
+  city: Virpazar
   date: ''
-  caption: ''
+  caption: Straight off the boat into Lake Skadar.
 - file: 6d5eef40-69c1-487c-8135-6138688adfcc.jpg
-  city: ''
+  city: Niksic
   date: ''
-  caption: ''
+  caption: Thumbing a ride to Zabljak, with a very large dog for company.
+  featured: true
 - file: 84ee3683-825b-4157-99f8-00f4f8b54046.jpg
   city: ''
   date: ''
-  caption: ''
+  caption: Waiting out a bus with a stray cat, somewhere in the Balkans.
 - file: ba19eef1-e2aa-477d-9c65-9cf6a0d3e61c.jpg
-  city: ''
+  city: Zabljak
   date: ''
-  caption: ''
+  caption: Rented bikes across the plateau, Durmitor still white.
+  featured: true
 - file: bb08115d-86f3-4727-8192-ca67f6d7068f.jpg
-  city: ''
+  city: Virpazar
   date: ''
-  caption: ''
+  caption: 'The Lake Skadar boat tour: lily pads to the horizon, a shot of rakija.'
+  featured: true
 - file: f6f0ad1c-5103-44cf-b6b0-0b80f47dd071.jpg
-  city: ''
+  city: Podgorica
   date: ''
-  caption: ''
+  caption: Keys to a rented Citroen, Montenegro plates.
 - file: img_3588.jpg
   city: London
   date: ''
@@ -548,7 +553,7 @@
 - file: img_4007.jpg
   city: ''
   date: ''
-  caption: ''
+  caption: Night bus. Everyone asleep but three.
 - file: img_4423.jpg
   city: Paris
   date: ''
@@ -558,9 +563,9 @@
   date: ''
   caption: ''
 - file: img_5499.jpg
-  city: ''
+  city: Krka National Park
   date: ''
-  caption: ''
+  caption: Skradinski Buk at Krka, thumbs firmly up.
 - file: img_5805.jpg
   city: Mostar
   date: ''
