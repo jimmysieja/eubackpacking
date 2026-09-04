@@ -12,7 +12,7 @@
     /* fallback — real values come from palette.json at load */
     --paper:#f3efe6; --ink:#211d17; --dim:#6f6a5c; --rule:#d7d0be;
     --accent:#7c3b2c; --gold:#9a7636; --far:#e2dbc9;
-    --trip1:#356b74; --trip2:#7c3b2c;
+    --trip1:#bf9856; --trip2:#4e9ca2;
     --serif:"Fraunces","Iowan Old Style",Georgia,serif;
     --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,monospace;
   }
@@ -54,6 +54,11 @@
   #panel .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
   #panel h2{font-family:var(--serif);font-weight:400;font-size:30px;margin:0 0 4px;letter-spacing:-.01em}
   #panel .sub{font-family:var(--serif);font-style:italic;color:var(--dim);font-size:14px;margin:0 0 6px}
+  #panel .sub .subdate{display:block;margin-top:5px}
+  #panel .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-style:normal;
+    font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+  #panel .chip + .chip{margin-left:14px}
+  #panel .chip i{width:8px;height:8px;border-radius:50%;flex:none}
   #panel .note{font-family:var(--serif);font-size:14px;color:var(--ink);margin:0 0 22px;
     padding-left:12px;border-left:2px solid var(--accent)}
   #panel figure{margin:0 0 18px}
@@ -63,7 +68,9 @@
   #panel .leghead{font-family:var(--serif);font-size:16px;color:var(--ink);margin:26px 0 12px;
     padding-bottom:5px;border-bottom:1px solid var(--rule)}
   #panel .leghead:first-child{margin-top:2px}
-  #panel .leghead span{display:block;margin-top:3px;font-family:var(--mono);font-size:10px;
+  #panel .leghead .chip{display:flex;margin-bottom:6px}
+  #panel .leghead .lbl{display:block}
+  #panel .leghead .dt{display:block;margin-top:3px;font-family:var(--mono);font-size:10px;
     letter-spacing:.06em;color:var(--dim)}
   #panel .dayhead{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
     margin:18px 0 10px}
@@ -95,7 +102,7 @@
 
   let C = { paper:'#f3efe6', ink:'#211d17', dim:'#6f6a5c', rule:'#d7d0be',
             accent:'#7c3b2c', gold:'#9a7636', far:'#e2dbc9',
-            trip1:'#356b74', trip2:'#7c3b2c' };
+            trip1:'#bf9856', trip2:'#4e9ca2' };
   try {
     const pal = await fetch('palette.json').then(r => r.json());
     C = pal[dark ? 'dark' : 'light'];
@@ -147,27 +154,43 @@
     }).addTo(map);
   });
 
-  const annoFor = c => ((data.annotations || {})[c.trip] || {})[c.city];
+  const annoOf = (trip, city) => ((data.annotations || {})[trip] || {})[city];
+
+  // a dual-trip city gets a disc split down the middle, one half per trip colour
+  function splitIcon(inks, r) {
+    const s = r + 1.4, d = s * 2;
+    const body = inks.length < 2
+      ? `<circle r="${r}" fill="${inks[0]}"/>`
+      : `<path d="M0,${-r} A${r},${r} 0 0,0 0,${r} Z" fill="${inks[0]}"/>`
+      + `<path d="M0,${-r} A${r},${r} 0 0,1 0,${r} Z" fill="${inks[1]}"/>`;
+    return L.divIcon({ className:'', iconSize:[d,d], iconAnchor:[s,s],
+      html:`<svg width="${d}" height="${d}" viewBox="${-s} ${-s} ${d} ${d}">${body}`
+         + `<circle r="${r}" fill="none" stroke="${C.paper}" stroke-width="1.6"/></svg>` });
+  }
+
   const bounds = [];
   data.cities.forEach(c => {
     bounds.push([c.lat, c.lon]);
-    const m = L.circleMarker([c.lat, c.lon], {
-      radius: c.slept ? 5.5 : 4, weight: 1.4,
-      color: C.paper, fillColor: inkVar(c.trip), fillOpacity: 1
-    }).addTo(map);
-    const a = annoFor(c);
+    const r = c.slept ? 6 : 4;
+    const m = c.dual
+      ? L.marker([c.lat, c.lon], { icon: splitIcon(c.inks.map(k => C[k] || C.accent), r) }).addTo(map)
+      : L.circleMarker([c.lat, c.lon], {
+          radius: r, weight: 1.4, color: C.paper,
+          fillColor: C[c.ink] || C.accent, fillOpacity: 1 }).addTo(map);
+
+    const a = c.trip ? annoOf(c.trip, c.city) : null;
+    const st0 = c.stints[0];
     if (a && a.label && a.kind !== 'transit') {
-      m.bindTooltip(a.label, { permanent:true, direction:'right', offset:[7,0],
-        className:'anno-label' });
+      m.bindTooltip(a.label, { permanent:true, direction:'right', offset:[9,0], className:'anno-label' });
     } else if (c.transit) {
-      const t = c.ground ? `${c.city} · ${c.ground} layover`
-        : c.window ? `${c.city} · ${c.window}`
+      const t = st0 && st0.ground ? `${c.city} · ${st0.ground} layover`
+        : st0 && st0.window ? `${c.city} · ${st0.window}`
           : `${c.city} · passing through`;
       m.bindTooltip(t, { direction:'top' });
     } else if (c.slept && c.nights >= 2) {
-      m.bindTooltip(c.city, { permanent:true, direction:'right', offset:[7,0], className:'city-label' });
+      m.bindTooltip(c.city, { permanent:true, direction:'right', offset:[9,0], className:'city-label' });
     } else if (c.slept) {
-      m.bindTooltip(c.city, { direction:'right', offset:[7,0], className:'city-label' });
+      m.bindTooltip(c.city, { direction:'right', offset:[9,0], className:'city-label' });
     } else {
       m.bindTooltip(`${c.city} · day trip`, { direction:'top' });
     }
@@ -179,9 +202,15 @@
   const order = ['train','bus','ferry','car','flight','bike','walk'];
   modesSeen.sort((a,b) => order.indexOf(a) - order.indexOf(b));
   const leg = document.getElementById('legend');
+  const bothRow = data.cities.some(c => c.dual)
+    ? `<div class="row"><svg class="dot" width="10" height="10" viewBox="-5 -5 10 10">`
+      + `<path d="M0,-4.4 A4.4,4.4 0 0,0 0,4.4 Z" fill="${C[data.trips[0].ink] || C.accent}"/>`
+      + `<path d="M0,-4.4 A4.4,4.4 0 0,1 0,4.4 Z" fill="${C[data.trips[1].ink] || C.gold}"/>`
+      + `</svg><b>both trips</b></div>`
+    : '';
   leg.innerHTML = data.trips.map(t =>
     `<div class="row"><span class="dot" style="background:${C[t.ink] || C.accent}"></span><b>${tripName(t.id)}</b></div>`
-  ).join('') + '<hr>' + modesSeen.map(m => {
+  ).join('') + bothRow + '<hr>' + modesSeen.map(m => {
     const [dash, wt, op] = styleFor(m);
     const cap = dash.startsWith('0.1') ? 'round' : 'butt';
     return `<div class="row"><svg width="26" height="8">
@@ -214,11 +243,17 @@
   const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const CC = { 'United Kingdom':'UK', 'United States':'USA',
                'Bosnia and Herzegovina':'Bosnia & Herzegovina' };
-  const fmtDay = iso => {
+  const _wd = iso => {
     const [y, m, d] = iso.split('-').map(Number);
     return `${WD[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}, ${MON[m - 1]} ${d}`;
   };
-  const fmtRange = (a, b) => a === b ? fmtDay(a) : `${fmtDay(a)} – ${fmtDay(b)}`;
+  const _yr = iso => iso.slice(0, 4);
+  const fmtDay = iso => `${_wd(iso)}, ${_yr(iso)}`;
+  const fmtRange = (a, b) => {
+    if (a === b) return fmtDay(a);
+    if (_yr(a) === _yr(b)) return `${_wd(a)} – ${_wd(b)}, ${_yr(a)}`;
+    return `${fmtDay(a)} – ${fmtDay(b)}`;
+  };
 
   function addFigure(wrap, p, fallbackAlt) {
     const fig = document.createElement('figure');
@@ -255,47 +290,68 @@
     });
   }
 
+  const chipHTML = st =>
+    `<span class="chip"><i style="background:${C[st.ink] || C.accent}"></i>${st.tripName}</span>`;
+
+  const stintSub = st =>
+    st.kind === 'transit'
+      ? [fmtDay(st.start), st.window, st.ground && `${st.ground} layover`].filter(Boolean).join('  ·  ')
+      : st.kind === 'daytrip' ? `day trip · ${fmtDay(st.start)}`
+        : fmtRange(st.start, st.end);
+
   function openPanel(c) {
     document.getElementById('p-city').textContent = `${c.city}, ${CC[c.country] || c.country}`;
-    document.getElementById('p-sub').textContent =
-      c.legs ? `${c.legs.length} stays`
-        : c.transit ? [c.window, c.ground && `${c.ground} layover`].filter(Boolean).join('  ·  ') || 'passing through'
-          : c.daytrip ? 'day trip'
-            : c.start ? fmtRange(c.start, c.end) : '';
+    const subEl = document.getElementById('p-sub');
     const noteEl = document.getElementById('p-note');
-    const a = annoFor(c);
-    if (a && a.label) { noteEl.textContent = a.label; noteEl.hidden = false; }
-    else { noteEl.textContent = ''; noteEl.hidden = true; }
-
     const wrap = document.getElementById('p-photos');
     wrap.innerHTML = '';
     const pics = (data.photos && data.photos[c.city]) || [];
+    const multi = c.stints.length > 1;
 
-    if (c.legs) {
-      const used = new Set();
-      c.legs.forEach(lg => {
-        const h = document.createElement('p');
-        h.className = 'leghead';
-        h.textContent = lg.label;
-        const dspan = document.createElement('span');
-        dspan.textContent = fmtRange(lg.start, lg.end);
-        h.appendChild(dspan);
-        wrap.appendChild(h);
-        const inLeg = pics.filter(p => p.date && p.date >= lg.start && p.date <= lg.end);
-        inLeg.forEach(p => used.add(p));
-        if (inLeg.length) {
-          renderDays(wrap, inLeg, c.city);
-        } else {
-          const e = document.createElement('p');
-          e.className = 'empty';
-          e.textContent = 'No photos from this leg yet.';
-          wrap.appendChild(e);
-        }
-      });
-      const rest = pics.filter(p => !used.has(p));
-      if (rest.length) renderDays(wrap, rest, c.city);
-    } else if (pics.length) {
-      renderDays(wrap, pics, c.city);
+    if (!multi) {
+      const st = c.stints[0];
+      subEl.innerHTML = `${chipHTML(st)}<span class="subdate">${stintSub(st)}</span>`;
+      const a = annoOf(st.trip, c.city);
+      if (a && a.label) { noteEl.textContent = a.label; noteEl.hidden = false; }
+      else { noteEl.textContent = ''; noteEl.hidden = true; }
+      if (pics.length) renderDays(wrap, pics, c.city);
+      panel.classList.add('open');
+      return;
+    }
+
+    subEl.innerHTML = c.trips
+      .map(t => chipHTML(c.stints.find(st => st.trip === t)))
+      .join('');
+    noteEl.textContent = ''; noteEl.hidden = true;
+
+    const used = new Set();
+    c.stints.forEach(st => {
+      const h = document.createElement('p');
+      h.className = 'leghead';
+      h.innerHTML = chipHTML(st) + (st.label ? `<span class="lbl">${st.label}</span>` : '');
+      const dspan = document.createElement('span');
+      dspan.className = 'dt';
+      dspan.textContent = stintSub(st);
+      h.appendChild(dspan);
+      wrap.appendChild(h);
+      const inLeg = pics.filter(p => p.date && p.date >= st.start && p.date <= st.end);
+      inLeg.forEach(p => used.add(p));
+      if (inLeg.length) {
+        renderDays(wrap, inLeg, c.city);
+      } else {
+        const e = document.createElement('p');
+        e.className = 'empty';
+        e.textContent = 'No photos from this stint yet.';
+        wrap.appendChild(e);
+      }
+    });
+    const rest = pics.filter(p => !used.has(p));
+    if (rest.length) {
+      const h = document.createElement('p');
+      h.className = 'leghead';
+      h.innerHTML = '<span class="lbl">Other photos</span>';
+      wrap.appendChild(h);
+      renderDays(wrap, rest, c.city);
     }
     panel.classList.add('open');
   }

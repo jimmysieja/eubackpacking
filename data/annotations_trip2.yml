@@ -79,4 +79,3 @@ Niksic:  { kind: transit }
 # Waypoints with no layover to show.
 Holyhead: { kind: transit }
 Galway:   { kind: transit }
-Beauvais: { kind: transit }

@@ -25,12 +25,10 @@ journeys:
   - { from: Interlaken, to: Kandersteg, hm: "1h11" }    # day trip out
   - { from: Kandersteg, to: Interlaken, hm: "1h12" }    # and back
   - { from: Interlaken, to: Zermatt,    hm: "2h18" }
-  - { from: Zermatt,    to: Domodossola, hm: "2h05" }
-  - { from: Domodossola, to: Milan,     hm: "4h51" }
+  - { from: Zermatt,    to: Milan,      hm: "9h11" }    # via Domodossola (2h15 layover); not itemised as a stop
   - { from: Ercolano,   to: Bari,       hm: "6h49" }    # really Napoli Centrale -> Bari; Ercolano->Napoli is a 10-min local
   - { from: Budapest,   to: Kraków,     via: [Břeclav, Ostrava], hm: "16h58" }   # overnight, got on the wrong train and routed via Czechia
-  - { from: Maków Podhalański, to: Zakopane, hm: "1h41" }
-  - { from: Zakopane,   to: Warsaw,     hm: "4h32" }
+  - { from: Kraków,     to: Warsaw,     hm: "6h13" }    # via Zakopane on a wrong-train detour; not itemised
   - { from: Warsaw,     to: Prague,     hm: "8h12" }
   - { from: Prague,     to: Berlin,     hm: "6h11" }
   - { from: Berlin,     to: Amsterdam,  hm: "6h53" }

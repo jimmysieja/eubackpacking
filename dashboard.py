@@ -13,6 +13,7 @@ request. Also writes the light/dark ``assets/*.svg`` used on the repo page.
 from __future__ import annotations
 
 import os
+import math
 import html
 import shutil
 import argparse
@@ -60,16 +61,17 @@ PAL = {
     "light": {
         "paper": "#f3efe6", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
         "accent": "#7c3b2c", "gold": "#9a7636", "faint": "#c9c1ac", "far": "#e2dbc9",
-        # per-trip line/pin colours: trip2 rides the warm brand accent, trip1 a
-        # cool petrol teal — warm/cool split stays legible for colour-blind eyes.
-        "trip1": "#356b74", "trip2": "#7c3b2c",
+        # per-trip line/pin colours. trip2 = a light teal, trip1 = a warm cream
+        # (a deeper wheat in light mode so it still reads on the cream paper).
+        # warm/cool split stays legible for colour-blind eyes. tweak freely.
+        "trip1": "#bf9856", "trip2": "#4e9ca2",
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
         "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
         "accent": "#cf7359", "gold": "#c8a55f", "faint": "#3d3a2f", "far": "#2c281f",
-        "trip1": "#6fb0ab", "trip2": "#cf7359",
+        "trip1": "#ecdcb1", "trip2": "#8ad2cb",
         "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
@@ -80,6 +82,54 @@ CAT_COLOR = {"lodging": "c0", "food": "c1", "transport": "c2", "shopping": "c3",
 # which palette colour each trip draws in (route trace + interactive map).
 TRIP_INK = {"trip1": "trip1", "trip2": "trip2"}
 DEFAULT_INK = "accent"
+
+# --- static route-trace map (assets/route-*.svg + the homepage figure) --------
+# Non-overnight stops that still earn a label, with the sub-line to show under
+# the name. Overnight stops are always labelled (name only).
+ROUTE_EXTRA = {
+    "Vatican City":    "day trip · 25 Jul",
+    "Santa Marinella": "day trip · 27 Jul",
+    "Kandersteg":      "day hike · 15 Jul",
+    "Mürren":          "day hike · 17 Jul",
+    "Monaco-Ville":    "day trip · 6 Jul",
+    "Lyon":            "overnight bus · Nice 6 Jul → Annecy 7 Jul",
+    "Břeclav":         "passing through · 5 Aug",
+    "Ostrava":         "passing through · 6 Aug",
+    "Oxford":          "on the way to Liverpool",
+    "Galway":          "gateway to Connemara",
+    "Naples":          "off the bus, on to Ercolano",
+    "Theth":           "day trip from Shkodër",
+    "Virpazar":        "Lake Skadar day trip",
+}
+# hand nudges for labels that would otherwise collide. (dx, dy, anchor);
+# anchor is "start" (label right of dot), "end" (left) or "middle".
+ROUTE_LABEL_POS = {
+    "Liverpool":    (0, -10, "middle"),
+    "Manchester":   (7, 12, "start"),
+    "Abergavenny":  (-10, 13, "end"),
+    "Betws-y-Coed": (-9, -6, "end"),
+    "Belfast":      (-8, -4, "end"),
+    "Oxford":       (9, 6, "start"),
+    "Ercolano":     (10, 11, "start"),
+    "Naples":       (-9, 1, "end"),
+    "Bari":         (9, 3, "start"),
+    "Rome":         (9, 2, "start"),
+    "Chamonix":     (9, -2, "start"),
+    "Annecy":       (-9, -3, "end"),
+    "Zermatt":      (-9, 7, "end"),
+    "Interlaken":   (9, -3, "start"),
+    "Milan":        (8, 9, "start"),
+    "Nice":         (9, 8, "start"),
+    "Monaco-Ville": (10, -3, "start"),
+    "Marseille":    (-9, 6, "end"),
+    "Bled":         (-9, -3, "end"),
+    "Ljubljana":    (8, 9, "start"),
+    "Vienna":       (8, -3, "start"),
+    "Bratislava":   (8, 10, "start"),
+    "Zagreb":       (8, 6, "start"),
+    "Sarajevo":     (9, 6, "start"),
+    "Mostar":       (-9, 4, "end"),
+}
 
 
 def esc(x) -> str:
@@ -122,15 +172,59 @@ def layover_window(a, b) -> tuple[str, str]:
 # --------------------------------------------------------------------------- #
 # svg building blocks
 # --------------------------------------------------------------------------- #
-def _project(lats, lons, w, h, pad):
-    la0, la1 = min(lats) - 1, max(lats) + 1
-    lo0, lo1 = min(lons) - 1, max(lons) + 1
-    sx = lambda v: pad + (w - 2 * pad) * (v - lo0) / (lo1 - lo0 or 1)
-    sy = lambda v: pad + (h - 2 * pad) * (1 - (v - la0) / (la1 - la0 or 1))
-    return sx, sy
+def _geo_project(lats, lons, w, h, pad, margin=1.4):
+    """Equal-scale lon/lat projection with a cos(lat) longitude squeeze, so the
+    trace keeps roughly true proportions and letterboxes inside w x h. Returns
+    (sx, sy, bbox) with bbox = (lo0, la0, lo1, la1) actually shown."""
+    la0, la1 = min(lats) - margin, max(lats) + margin
+    lo0, lo1 = min(lons) - margin, max(lons) + margin
+    kx = math.cos(math.radians((la0 + la1) / 2))
+    gw, gh = (lo1 - lo0) * kx or 1, (la1 - la0) or 1
+    scale = min((w - 2 * pad) / gw, (h - 2 * pad) / gh)
+    ox = (w - gw * scale) / 2
+    oy = (h - gh * scale) / 2
+    sx = lambda lon: ox + (lon - lo0) * kx * scale
+    sy = lambda lat: oy + (la1 - lat) * scale
+    return sx, sy, (lo0, la0, lo1, la1)
 
 
-def route_trace(d: dict, w: int = 900, h: int = 560) -> str:
+def _country_paths(sx, sy, bbox, w, h) -> str:
+    """Simplified country outlines from docs/map/europe.geojson, projected and
+    clamped to the frame — one thin <path> per ring that touches the view."""
+    p = DOCS / "map" / "europe.geojson"
+    if not p.is_file():
+        return ""
+    lo0, la0, lo1, la1 = bbox
+    try:
+        import json
+        gj = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return ""
+
+    def rings(geom):
+        t, cs = geom.get("type"), geom.get("coordinates", [])
+        if t == "Polygon":
+            return cs
+        if t == "MultiPolygon":
+            return [r for poly in cs for r in poly]
+        return []
+
+    m = 6                                     # let borders run just off-frame
+    cl = lambda v, hi: min(max(v, -m), hi + m)
+    out = []
+    for feat in gj.get("features", []):
+        for ring in rings(feat.get("geometry", {})):
+            if not any(lo0 - 3 <= lon <= lo1 + 3 and la0 - 3 <= lat <= la1 + 3
+                       for lon, lat in ring):
+                continue
+            dd = "".join(f"{'M' if i == 0 else 'L'}{cl(sx(lon), w):.1f} {cl(sy(lat), h):.1f}"
+                         for i, (lon, lat) in enumerate(ring))
+            out.append(f'<path d="{dd}Z" fill="none" stroke="var(--rule)" '
+                       f'stroke-width="0.7" opacity="0.8"/>')
+    return "".join(out)
+
+
+def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
     s = d["stops"]
     if s.empty:
         return ""
@@ -138,11 +232,14 @@ def route_trace(d: dict, w: int = 900, h: int = 560) -> str:
     s = s.sort_values(["trip", "stop_number"])
     if s.empty:
         return ""
-    sx, sy = _project(s["lat"].tolist(), s["lon"].tolist(), w, h, 46)
+    sx, sy, bbox = _geo_project(s["lat"].tolist(), s["lon"].tolist(), w, h, 28)
     trip_ink = {t: TRIP_INK.get(t, DEFAULT_INK) for t in d["trips"].index}
+    nights_by_city = s.groupby("city")["nights"].max().to_dict()
+    slept_cities = {c for c, n in nights_by_city.items() if pd.notna(n) and n > 0}
 
-    seg, ticks, labels = [], [], []
-    seen = set()
+    outlines = _country_paths(sx, sy, bbox, w, h)
+
+    seg = []
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         ink = trip_ink.get(tid, "accent")
@@ -161,37 +258,51 @@ def route_trace(d: dict, w: int = 900, h: int = 560) -> str:
             seg.append(f'<path d="M{x1:.1f} {y1:.1f} Q{cx:.1f} {cy:.1f} {x2:.1f} {y2:.1f}" '
                        f'fill="none" stroke="var(--{ink})" stroke-width="{wt:.2f}"{cap} '
                        f'stroke-dasharray="{dash}" opacity="{op}"/>')
-        for r in recs:
+
+    dots, labels, seen = [], [], set()
+    for tid, grp in s.groupby("trip"):
+        ink = trip_ink.get(tid, "accent")
+        for r in grp.to_dict("records"):
+            city = r["city"]
             x, y = sx(r["lon"]), sy(r["lat"])
-            slept = (r["nights"] or 0) > 0
-            ticks.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{2.6 if slept else 1.4}" '
-                         f'fill="var(--{ink})"><title>{esc(r["city"])} · '
-                         f'{int(r["nights"]) if slept else 0} nights</title></circle>')
-            if slept and r["city"] not in seen:
-                seen.add(r["city"])
-                anchor = "end" if x < w / 2 else "start"
-                dx = -5 if anchor == "end" else 5
-                labels.append(f'<text x="{x+dx:.1f}" y="{y+3:.1f}" text-anchor="{anchor}" '
-                              f'class="tr-city">{esc(r["city"])}</text>')
+            big = city in slept_cities
+            dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{3.0 if big else 1.7}" '
+                        f'fill="var(--{ink})" stroke="var(--paper)" stroke-width="0.8">'
+                        f'<title>{esc(city)}</title></circle>')
+            if city in seen:
+                continue
+            note = ROUTE_EXTRA.get(city)
+            if not (big or note is not None):
+                continue
+            seen.add(city)
+            dx, dy, anchor = ROUTE_LABEL_POS.get(
+                city, (6, 3, "start") if x < w * 0.62 else (-6, 3, "end"))
+            tx, ty = x + dx, y + dy
+            lead = (f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{tx:.1f}" y2="{ty - 3:.1f}" '
+                    f'stroke="var(--rule)" stroke-width="0.7"/>') if abs(dx) > 11 or abs(dy) > 11 else ""
+            sub = (f'<tspan x="{tx:.1f}" dy="10" class="tr-sub">{esc(note)}</tspan>'
+                   if note else "")
+            labels.append(f'{lead}<text x="{tx:.1f}" y="{ty:.1f}" text-anchor="{anchor}" '
+                          f'class="tr-city">{esc(city)}{sub}</text>')
 
     # annotate the longest ride
     ts = A.train_stats(d)
     note = ""
     lg = ts.get("longest")
     if lg:
-        row = s[(s["city"] == lg["to"])]
+        row = s[s["city"] == lg["to"]]
         if not row.empty:
             r = row.iloc[0]
             x, y = sx(r["lon"]), sy(r["lat"])
-            note = (f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{x-70:.1f}" y2="{y+40:.1f}" '
+            note = (f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{x-60:.1f}" y2="{y+36:.1f}" '
                     f'stroke="var(--dim)" stroke-width="0.8"/>'
-                    f'<text x="{x-74:.1f}" y="{y+44:.1f}" text-anchor="end" class="tr-note">'
+                    f'<text x="{x-64:.1f}" y="{y+40:.1f}" text-anchor="end" class="tr-note">'
                     f'{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])} · {hm(lg["hr"])}</text>')
 
     return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="Route trace">'
             f'<rect x="0.5" y="0.5" width="{w-1}" height="{h-1}" fill="none" '
             f'stroke="var(--rule)" stroke-width="1"/>'
-            f'{"".join(seg)}{"".join(ticks)}{"".join(labels)}{note}</svg>')
+            f'{outlines}{"".join(seg)}{"".join(dots)}{"".join(labels)}{note}</svg>')
 
 
 def _month_ticks(span, sx, y):
@@ -486,7 +597,7 @@ body{{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
 .page{{max-width:940px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(20px,5vw,52px) 120px}}
 em{{font-style:italic}}
 b{{font-weight:500}}
-.dateline,.tag,.micro,.ax,.ax-note,.tr-city,.tr-note,.key,.lg-l,.colophon{{
+.dateline,.tag,.micro,.ax,.ax-note,.tr-note,.key,.lg-l,.colophon{{
   font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em}}
 header{{margin-bottom:clamp(40px,8vw,88px)}}
 .dateline{{font-size:11px;color:var(--dim);margin:0 0 22px}}
@@ -521,8 +632,12 @@ figure{{margin:0}}
 .key b{{color:var(--ink)}}
 .ax{{font-size:9px;fill:var(--dim);letter-spacing:.1em}}
 .ax-note{{font-size:9px;fill:var(--ink);letter-spacing:.06em}}
-.tr-city{{font-size:9px;fill:var(--dim);letter-spacing:.08em}}
-.tr-note{{font-size:9.5px;fill:var(--ink);letter-spacing:.05em}}
+.tr-city{{font-family:var(--mono);font-size:10px;fill:var(--ink);letter-spacing:.01em;
+  paint-order:stroke;stroke:var(--paper);stroke-width:2.8px;stroke-linejoin:round}}
+.tr-sub{{font-family:var(--mono);font-size:8px;fill:var(--dim);letter-spacing:.01em;
+  paint-order:stroke;stroke:var(--paper);stroke-width:2.4px;stroke-linejoin:round}}
+.tr-note{{font-size:9.5px;fill:var(--ink);letter-spacing:.05em;
+  paint-order:stroke;stroke:var(--paper);stroke-width:2.6px;stroke-linejoin:round}}
 .itin-trip{{margin-bottom:34px}}
 .itin{{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}}
 .itin li{{break-inside:avoid;display:flex;align-items:baseline;gap:8px;padding:6px 0;
@@ -571,13 +686,18 @@ def _standalone(svg: str, theme: str) -> str:
     style = (f'<style>svg{{background:{p["paper"]}}}:root{{{css}}}'
              f'text{{font-family:"Spline Sans Mono",ui-monospace,monospace}}'
              f'.ax{{fill:{p["dim"]};font-size:9px}} .ax-note{{fill:{p["ink"]};font-size:9px}}'
-             f'.tr-city{{fill:{p["dim"]};font-size:9px}} .tr-note{{fill:{p["ink"]};font-size:9.5px}}</style>')
+             f'.tr-city{{fill:{p["ink"]};font-size:10px;paint-order:stroke;'
+             f'stroke:{p["paper"]};stroke-width:2.8px;stroke-linejoin:round}}'
+             f'.tr-sub{{fill:{p["dim"]};font-size:8px;paint-order:stroke;'
+             f'stroke:{p["paper"]};stroke-width:2.4px;stroke-linejoin:round}}'
+             f'.tr-note{{fill:{p["ink"]};font-size:9.5px;paint-order:stroke;'
+             f'stroke:{p["paper"]};stroke-width:2.6px}}</style>')
     return svg.replace(">", ">" + style, 1)
 
 
 def _chart_set(d: dict) -> dict:
     charts = {}
-    tr = route_trace(d, 900, 520)
+    tr = route_trace(d, 900, 720)
     if tr:
         charts["route"] = tr
     span = A.active_span(d)
@@ -651,10 +771,12 @@ def write_map_data(d: dict) -> None:
     """docs/map/data.json — stops, legs and photos for the interactive map."""
     import json
     annos = A.load_annotations()
+    trips = d["trips"]
+    tname = {t: trips.loc[t, "name"] for t in trips.index}
     s = d["stops"]
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
     s = s.sort_values(["trip", "stop_number"])
-    legs, cities = [], []
+    legs = []
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         for a, b in zip(recs, recs[1:]):
@@ -664,34 +786,62 @@ def write_map_data(d: dict) -> None:
                          "a": [round(a["lat"], 4), round(a["lon"], 4)],
                          "b": [round(b["lat"], 4), round(b["lon"], 4)]})
 
-    # one panel entry per (trip, city); its dated span is the longest continuous
-    # run of that city's stop rows, unless CITY_LEGS spells out separate stints.
-    by_city: dict = {}
+    # one "stint" per continuous visit; a city visited on both trips (or more
+    # than once with a CITY_LEGS override) collects several. The map draws a
+    # split-disc for a city seen on two trips and a per-stint panel.
+    by_ct: dict = {}
     for _, r in s.iterrows():
-        by_city.setdefault((r["trip"], r["city"]), []).append(r)
-    for (tid, city), rows in by_city.items():
+        by_ct.setdefault((r["trip"], r["city"]), []).append(r)
+
+    per_city: dict = {}
+    for (tid, city), rows in by_ct.items():
         r0 = rows[0]
         nights = max((0 if pd.isna(rr["nights"]) else int(rr["nights"])) for rr in rows)
-        entry = {"city": city, "country": r0["country"], "trip": tid,
-                 "lat": round(r0["lat"], 4), "lon": round(r0["lon"], 4),
-                 "nights": nights, "slept": nights > 0, "daytrip": nights == 0,
-                 "arrive": r0["arrival_date"].strftime("%d %b %Y")}
+        an = annos.get(tid, {}).get(city) or {}
+        transit = an.get("kind") == "transit"
+        kind = "stay" if nights > 0 else ("transit" if transit else "daytrip")
+        base = {"trip": tid, "tripName": tname.get(tid, tid),
+                "ink": TRIP_INK.get(tid, DEFAULT_INK), "kind": kind,
+                "nights": nights, "slept": nights > 0}
+        lo = an.get("layover")
+        if lo and len(lo) == 2:
+            base["window"], base["ground"] = layover_window(lo[0], lo[1])
+        elif an.get("window"):
+            base["window"] = str(an["window"])
+
+        stints = []
         override = CITY_LEGS.get((tid, city))
         if override:
-            entry["legs"] = override
+            for lg in override:
+                stints.append({**base, "label": lg["label"],
+                               "start": lg["start"], "end": lg["end"]})
         else:
             a, b = max(_stay_runs([(rr["arrival_date"], rr["departure_date"]) for rr in rows]),
                        key=lambda ab: (ab[1] - ab[0]).days)
-            entry["start"], entry["end"] = a.strftime("%Y-%m-%d"), b.strftime("%Y-%m-%d")
-        an = annos.get(tid, {}).get(city)
-        if an and an.get("kind") == "transit":
-            entry["transit"] = True
-            lo = an.get("layover")
-            if lo and len(lo) == 2:
-                entry["window"], entry["ground"] = layover_window(lo[0], lo[1])
-            elif an.get("window"):
-                entry["window"] = an["window"]
-        cities.append(entry)
+            stints.append({**base, "label": None,
+                           "start": a.strftime("%Y-%m-%d"), "end": b.strftime("%Y-%m-%d")})
+
+        e = per_city.setdefault(city, {
+            "city": city, "country": r0["country"],
+            "lat": round(r0["lat"], 4), "lon": round(r0["lon"], 4),
+            "stints": [], "trips": []})
+        e["stints"] += stints
+        if tid not in e["trips"]:
+            e["trips"].append(tid)
+
+    cities = []
+    for e in per_city.values():
+        e["stints"].sort(key=lambda st: st["start"])
+        e["trips"].sort()
+        e["slept"] = any(st["slept"] for st in e["stints"])
+        e["nights"] = max((st["nights"] for st in e["stints"]), default=0)
+        e["dual"] = len(e["trips"]) > 1
+        e["daytrip"] = not e["slept"]
+        e["transit"] = (not e["slept"]) and all(st["kind"] == "transit" for st in e["stints"])
+        e["trip"] = e["trips"][0] if len(e["trips"]) == 1 else None
+        e["ink"] = TRIP_INK.get(e["trip"], DEFAULT_INK) if e["trip"] else None
+        e["inks"] = [TRIP_INK.get(t, DEFAULT_INK) for t in e["trips"]]
+        cities.append(e)
 
     photos = {}
     for e in _photo_entries():

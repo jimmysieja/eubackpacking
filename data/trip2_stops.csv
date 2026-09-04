@@ -58,8 +58,7 @@ stop_number,city,country,transport,arrival_date,departure_date
 56,Theth,Albania,Bus,2026-05-08,2026-05-08
 57,Shkodër,Albania,Voiture,2026-05-08,2026-05-08
 58,Tirana,Albania,Bus,2026-05-09,2026-05-10
-59,Beauvais,France,Avion,2026-05-10,2026-05-10
-60,Paris,France,Bus,2026-05-10,2026-05-26
-61,London,United Kingdom,Avion,2026-05-26,2026-05-26
-62,"Nashville, TN",USA,Avion,2026-05-26,2026-05-26
-63,"Huntsville, AL",USA,,,
+59,Paris,France,Avion,2026-05-10,2026-05-26
+60,London,United Kingdom,Avion,2026-05-26,2026-05-26
+61,"Nashville, TN",USA,Avion,2026-05-26,2026-05-26
+62,"Huntsville, AL",USA,,,

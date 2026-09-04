@@ -5,19 +5,10 @@
 # "day trip" line from the panel; the map hover reads "· passing through".
 # layover: ["<arrive>", "<leave>"] times off the Eurail app format the window.
 
-Domodossola:
-  kind: transit
-  layover: ["2025-07-18 08:11", "2025-07-18 10:26"]   # off the Zermatt train, waiting on the Milan one
-
 # Night train Budapest -> Kraków: got on the wrong one and ended up routed
 # through Czechia. No separately-timed layovers.
 Břeclav: { kind: transit }
 Ostrava: { kind: transit }
-
-# On the Kraków -> Warszawa run (via a wrong-train detour south) — passed
-# through, never stopped to look around.
-Maków Podhalański: { kind: transit }
-Zakopane:          { kind: transit }
 
 # Brief stops, no overnight.
 Lyon:
