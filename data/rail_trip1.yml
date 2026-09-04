@@ -1,0 +1,47 @@
+# Real rail stats for Trip 1 (Summer 2025), straight from the Eurail / Interrail
+# Rail Planner app — My Trip -> Statistics. NOT estimated: the app only counts
+# journeys marked as taken (yellow toggle). It showed 45 of 82 saved journeys
+# completed.
+source: Eurail Rail Planner app — Statistics screen
+trains: 45
+distance_km: 5610          # of 9782 saved
+hours: 75.85               # 3 days, 3 hours, 51 minutes
+countries: 4               # of 9 saved (FR, CH, IT, CZ marked complete)
+overnight: 1               # Budapest -> Kraków, dep ~13:30, in ~06:28 next day
+
+# No `longest:` block here on purpose — Trip 2's Ljubljana -> Split (13h37) is the
+# longest ride across both trips, so analytics picks that up from rail_trip2.yml.
+
+# Ride time per drawn leg, read off the app's journey list. `from`/`to` are city
+# names from trip1_stops.csv; `hm` is the app's displayed duration. `via:` lists
+# CamelCase intermediate stops that are their own CSV row — every sub-leg then
+# carries the whole-journey time and an "A -> B" hover label. Legs with no clean
+# app reading (Nice<->Monaco, Chamonix->Interlaken, the Mürren return) are left
+# out and simply show no duration on the map.
+journeys:
+  - { from: Paris,      to: Marseille,  hm: "3h20" }
+  - { from: Marseille,  to: Barcelona,  hm: "9h17" }
+  - { from: Barcelona,  to: Nice,       hm: "11h21" }   # 3 changes, via Marseille
+  - { from: Interlaken, to: Kandersteg, hm: "1h11" }    # day trip out
+  - { from: Kandersteg, to: Interlaken, hm: "1h12" }    # and back
+  - { from: Interlaken, to: Zermatt,    hm: "2h18" }
+  - { from: Zermatt,    to: Domodossola, hm: "2h05" }
+  - { from: Domodossola, to: Milan,     hm: "4h51" }
+  - { from: Ercolano,   to: Bari,       hm: "6h49" }    # really Napoli Centrale -> Bari; Ercolano->Napoli is a 10-min local
+  - { from: Budapest,   to: Kraków,     via: [Břeclav, Ostrava], hm: "16h58" }   # overnight, got on the wrong train and routed via Czechia
+  - { from: Maków Podhalański, to: Zakopane, hm: "1h41" }
+  - { from: Zakopane,   to: Warsaw,     hm: "4h32" }
+  - { from: Warsaw,     to: Prague,     hm: "8h12" }
+  - { from: Prague,     to: Berlin,     hm: "6h11" }
+  - { from: Berlin,     to: Amsterdam,  hm: "6h53" }
+  - { from: Amsterdam,  to: Paris,      hm: "7h42" }
+
+# Long hauls, for the transit strip and annotations. `from`/`to` match
+# trip1_stops.csv.
+notable:
+  - { date: 2025-08-05, from: Budapest,  to: Kraków,    hours: 16.97, overnight: true }
+  - { date: 2025-07-04, from: Barcelona, to: Nice,      hours: 11.35 }
+  - { date: 2025-06-30, from: Marseille, to: Barcelona, hours: 9.28 }
+  - { date: 2025-08-09, from: Warsaw,    to: Prague,    hours: 8.20 }
+  - { date: 2025-08-18, from: Amsterdam, to: Paris,     hours: 7.70 }
+  - { date: 2025-07-31, from: Ercolano,  to: Bari,      hours: 6.82 }

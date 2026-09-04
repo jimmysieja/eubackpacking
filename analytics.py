@@ -32,6 +32,12 @@ DATA = ROOT / "data"
 
 HOME_COUNTRY = "USA"          # bookend stops — excluded from "countries visited"
 
+# Countries actually set foot in across both trips, by the traveller's own count
+# (includes day trips, walk-ins like Vatican/Monaco, and countries only passed
+# through by train — border hops and airport layovers the stop data doesn't
+# fully capture). Hand-maintained; bump it when a trip is added.
+COUNTRIES_VISITED = 28
+
 # transport words accepted in the stops files (English or French)
 MODE_ALIASES = {
     "": "", "train": "train", "bus": "bus", "flight": "flight", "plane": "flight",
@@ -66,14 +72,9 @@ def load_fx() -> dict:
     return yaml.safe_load((DATA / "fx.yml").read_text(encoding="utf-8"))
 
 
-def load_annotations() -> dict:
-    """Optional per-stop call-outs from data/annotations.yml: {city: {label, kind}}."""
-    p = DATA / "annotations.yml"
-    if not p.is_file():
-        return {}
-    raw = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+def _parse_annotations(raw: dict) -> dict:
     out = {}
-    for city, v in raw.items():
+    for city, v in (raw or {}).items():
         if isinstance(v, str):
             out[city] = {"label": v, "kind": "stop"}
         elif isinstance(v, dict) and (v.get("label") or v.get("kind")
@@ -83,6 +84,20 @@ def load_annotations() -> dict:
                 out[city]["window"] = str(v["window"])
             if v.get("layover"):
                 out[city]["layover"] = list(v["layover"])
+    return out
+
+
+def load_annotations() -> dict:
+    """Per-trip stop call-outs from data/annotations_<trip>.yml, keyed
+    {trip_id: {city: {label, kind, ...}}}. A bare data/annotations.yml (no trip
+    suffix) is still read and treated as trip2's."""
+    out = {}
+    legacy = DATA / "annotations.yml"
+    if legacy.is_file():
+        out["trip2"] = _parse_annotations(yaml.safe_load(legacy.read_text(encoding="utf-8")))
+    for p in sorted(DATA.glob("annotations_*.yml")):
+        tid = p.stem.split("_", 1)[1]
+        out[tid] = _parse_annotations(yaml.safe_load(p.read_text(encoding="utf-8")))
     return out
 
 
@@ -240,6 +255,7 @@ def overview(d: dict) -> dict:
         "n_trips": len(trips),
         "first_day": trips["start"].min(),
         "last_day": trips["end"].max(),
+        "n_countries_visited": COUNTRIES_VISITED,
     }
     if not sl.empty:
         out["n_cities"] = int(sl["city"].nunique())

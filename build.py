@@ -45,9 +45,9 @@ def stats_markdown(d: dict) -> str:
     L.append(f"<sub>{ov['first_day']:%b %Y} – {ov['last_day']:%b %Y} &nbsp;·&nbsp; "
              f"generated {d['generated']:%d %b %Y}</sub>")
     L.append("")
-    L.append("| Countries | Cities | Nights | Trains | Spent |")
+    L.append("| Countries | Cities | Days | Trains | Spent |")
     L.append("|:-:|:-:|:-:|:-:|:-:|")
-    L.append(f"| **{ov['n_countries']}** | **{ov['n_cities']}** | **{ov['nights_logged']}** "
+    L.append(f"| **{ov['n_countries_visited']}** | **{ov['n_cities']}** | **{ov['trip_days']}** "
              f"| **{ts.get('rail_legs', 0)}** | **${sp['total']:,.0f}**{star} |")
     L.append("")
 

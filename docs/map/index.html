@@ -12,6 +12,7 @@
     /* fallback — real values come from palette.json at load */
     --paper:#f3efe6; --ink:#211d17; --dim:#6f6a5c; --rule:#d7d0be;
     --accent:#7c3b2c; --gold:#9a7636; --far:#e2dbc9;
+    --trip1:#356b74; --trip2:#7c3b2c;
     --serif:"Fraunces","Iowan Old Style",Georgia,serif;
     --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,monospace;
   }
@@ -93,16 +94,17 @@
   const dark = matchMedia('(prefers-color-scheme: dark)').matches;
 
   let C = { paper:'#f3efe6', ink:'#211d17', dim:'#6f6a5c', rule:'#d7d0be',
-            accent:'#7c3b2c', gold:'#9a7636', far:'#e2dbc9' };
+            accent:'#7c3b2c', gold:'#9a7636', far:'#e2dbc9',
+            trip1:'#356b74', trip2:'#7c3b2c' };
   try {
     const pal = await fetch('palette.json').then(r => r.json());
     C = pal[dark ? 'dark' : 'light'];
-    for (const k of ['paper','ink','dim','rule','accent','gold','far'])
+    for (const k of ['paper','ink','dim','rule','accent','gold','far','trip1','trip2'])
       if (C[k]) document.documentElement.style.setProperty('--' + k, C[k]);
   } catch (e) { /* fall back to CSS defaults */ }
 
   const data = await fetch('data.json').then(r => r.json());
-  const inkVar = t => (data.trips.find(x => x.id === t) || {}).ink === 'gold' ? C.gold : C.accent;
+  const inkVar = t => C[(data.trips.find(x => x.id === t) || {}).ink] || C.accent;
   const tripName = t => (data.trips.find(x => x.id === t) || {}).name || t;
 
   // per-mode line style: [dashArray, weight, opacity, bow]
@@ -145,7 +147,7 @@
     }).addTo(map);
   });
 
-  const anno = data.annotations || {};
+  const annoFor = c => ((data.annotations || {})[c.trip] || {})[c.city];
   const bounds = [];
   data.cities.forEach(c => {
     bounds.push([c.lat, c.lon]);
@@ -153,8 +155,9 @@
       radius: c.slept ? 5.5 : 4, weight: 1.4,
       color: C.paper, fillColor: inkVar(c.trip), fillOpacity: 1
     }).addTo(map);
-    if (anno[c.city] && anno[c.city].label && anno[c.city].kind !== 'transit') {
-      m.bindTooltip(anno[c.city].label, { permanent:true, direction:'right', offset:[7,0],
+    const a = annoFor(c);
+    if (a && a.label && a.kind !== 'transit') {
+      m.bindTooltip(a.label, { permanent:true, direction:'right', offset:[7,0],
         className:'anno-label' });
     } else if (c.transit) {
       const t = c.ground ? `${c.city} · ${c.ground} layover`
@@ -177,7 +180,7 @@
   modesSeen.sort((a,b) => order.indexOf(a) - order.indexOf(b));
   const leg = document.getElementById('legend');
   leg.innerHTML = data.trips.map(t =>
-    `<div class="row"><span class="dot" style="background:${t.ink === 'gold' ? C.gold : C.accent}"></span><b>${tripName(t.id)}</b></div>`
+    `<div class="row"><span class="dot" style="background:${C[t.ink] || C.accent}"></span><b>${tripName(t.id)}</b></div>`
   ).join('') + '<hr>' + modesSeen.map(m => {
     const [dash, wt, op] = styleFor(m);
     const cap = dash.startsWith('0.1') ? 'round' : 'butt';
@@ -260,7 +263,8 @@
           : c.daytrip ? 'day trip'
             : c.start ? fmtRange(c.start, c.end) : '';
     const noteEl = document.getElementById('p-note');
-    if (anno[c.city] && anno[c.city].label) { noteEl.textContent = anno[c.city].label; noteEl.hidden = false; }
+    const a = annoFor(c);
+    if (a && a.label) { noteEl.textContent = a.label; noteEl.hidden = false; }
     else { noteEl.textContent = ''; noteEl.hidden = true; }
 
     const wrap = document.getElementById('p-photos');

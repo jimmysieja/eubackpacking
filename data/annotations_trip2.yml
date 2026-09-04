@@ -1,3 +1,6 @@
+# Trip 2 (Spring 2026) call-outs. One file per trip: annotations_<trip>.yml,
+# loaded like the rail_<trip>.yml overrides.
+#
 # Optional call-outs for specific stops. Key = city name exactly as it appears
 # in the stops CSV. Shows as an italic note in that city's panel on the map, and
 # (for slept/day-trip pins) replaces the plain label on the map itself.

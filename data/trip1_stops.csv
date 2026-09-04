@@ -1,2 +1,48 @@
 stop_number,city,country,transport,arrival_date,departure_date
 0,"Huntsville, AL",USA,,,
+1,"Nashville, TN",USA,Voiture,2025-06-24,2025-06-24
+2,Paris,France,Avion,2025-06-25,2025-06-27
+3,Marseille,France,Train,2025-06-27,2025-06-30
+4,Barcelona,Spain,Train,2025-06-30,2025-07-04
+5,Nice,France,Train,2025-07-04,2025-07-06
+6,Monaco,Monaco,Train,2025-07-06,2025-07-06
+7,Nice,France,Train,2025-07-06,2025-07-06
+8,Lyon,France,Bus,2025-07-07,2025-07-07
+9,Annecy,France,Bus,2025-07-07,2025-07-08
+10,Chamonix,France,Bus,2025-07-08,2025-07-11
+11,Interlaken,Switzerland,Train,2025-07-11,2025-07-17
+12,Kandersteg,Switzerland,Train,2025-07-15,2025-07-15
+13,Interlaken,Switzerland,Train,2025-07-15,2025-07-15
+14,Mürren,Switzerland,Train,2025-07-17,2025-07-17
+15,Interlaken,Switzerland,Train,2025-07-17,2025-07-17
+16,Zermatt,Switzerland,Train,2025-07-17,2025-07-18
+17,Domodossola,Italy,Train,2025-07-18,2025-07-18
+18,Milan,Italy,Train,2025-07-18,2025-07-21
+19,Florence,Italy,Bus,2025-07-21,2025-07-23
+20,Rome,Italy,Bus,2025-07-23,2025-07-28
+21,Vatican City,Vatican City,Walk,2025-07-25,2025-07-25
+22,Rome,Italy,Walk,2025-07-25,2025-07-25
+23,Santa Marinella,Italy,Train,2025-07-27,2025-07-27
+24,Rome,Italy,Train,2025-07-28,2025-07-28
+25,Naples,Italy,Bus,2025-07-28,2025-07-28
+26,Ercolano,Italy,Train,2025-07-28,2025-07-31
+27,Sorrento,Italy,Train,2025-07-29,2025-07-29
+28,Ercolano,Italy,Train,2025-07-29,2025-07-29
+29,Amalfi,Italy,Bus,2025-07-30,2025-07-30
+30,Ercolano,Italy,Bus,2025-07-31,2025-07-31
+31,Bari,Italy,Train,2025-07-31,2025-07-31
+32,Durrës,Albania,Bateau,2025-08-01,2025-08-01
+33,Tirana,Albania,Bus,2025-08-01,2025-08-03
+34,Budapest,Hungary,Avion,2025-08-04,2025-08-05
+35,Břeclav,Czechia,Train,2025-08-05,2025-08-05
+36,Ostrava,Czechia,Train,2025-08-06,2025-08-06
+37,Kraków,Poland,Train,2025-08-06,2025-08-07
+38,Maków Podhalański,Poland,Train,2025-08-07,2025-08-07
+39,Zakopane,Poland,Train,2025-08-07,2025-08-07
+40,Warsaw,Poland,Train,2025-08-07,2025-08-09
+41,Prague,Czechia,Train,2025-08-09,2025-08-13
+42,Berlin,Germany,Train,2025-08-13,2025-08-15
+43,Amsterdam,Netherlands,Train,2025-08-15,2025-08-18
+44,Paris,France,Train,2025-08-18,2025-08-21
+45,"Nashville, TN",USA,Avion,2025-08-21,2025-08-21
+46,"Huntsville, AL",USA,,,

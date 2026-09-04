@@ -4,12 +4,15 @@
 # arrival_date, departure_date).
 - id: trip1
   name: Summer 2025
-  start: 2025-06-01
-  end: 2025-07-31
+  start: 2025-06-25
+  end: 2025-08-21
   stops: trip1_stops.csv
   expenses: expenses_trip1.csv
   expenses_complete: false      # roughly half logged so far
-  blurb: Two months. Itinerary and expenses still being entered.
+  blurb: >-
+    Two months. Paris down to the French Med, across the Alps, the length of
+    Italy, ferry to Albania, then the long haul home through Kraków, Prague and
+    Berlin. Expenses still being entered.
 
 - id: trip2
   name: Spring 2026

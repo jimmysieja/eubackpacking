@@ -60,18 +60,26 @@ PAL = {
     "light": {
         "paper": "#f3efe6", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
         "accent": "#7c3b2c", "gold": "#9a7636", "faint": "#c9c1ac", "far": "#e2dbc9",
+        # per-trip line/pin colours: trip2 rides the warm brand accent, trip1 a
+        # cool petrol teal — warm/cool split stays legible for colour-blind eyes.
+        "trip1": "#356b74", "trip2": "#7c3b2c",
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
         "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
         "accent": "#cf7359", "gold": "#c8a55f", "faint": "#3d3a2f", "far": "#2c281f",
+        "trip1": "#6fb0ab", "trip2": "#cf7359",
         "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
 }
 CAT_COLOR = {"lodging": "c0", "food": "c1", "transport": "c2", "shopping": "c3",
              "activities": "c4", "gifts": "c5", "misc": "c6"}
+
+# which palette colour each trip draws in (route trace + interactive map).
+TRIP_INK = {"trip1": "trip1", "trip2": "trip2"}
+DEFAULT_INK = "accent"
 
 
 def esc(x) -> str:
@@ -131,7 +139,7 @@ def route_trace(d: dict, w: int = 900, h: int = 560) -> str:
     if s.empty:
         return ""
     sx, sy = _project(s["lat"].tolist(), s["lon"].tolist(), w, h, 46)
-    trip_ink = {t: ("accent" if i == 0 else "gold") for i, t in enumerate(d["trips"].index)}
+    trip_ink = {t: TRIP_INK.get(t, DEFAULT_INK) for t in d["trips"].index}
 
     seg, ticks, labels = [], [], []
     seen = set()
@@ -260,7 +268,7 @@ def masthead(d: dict) -> str:
   <p class="dateline">A gap year &middot; Europe &middot; {yr}</p>
   <h1>A gap year around Europe</h1>
   <p class="dek">Two backpacking trips, Summer 2025 and Spring 2026 &mdash; the route,
-  the spending, and the time spent on trains. {ov['n_countries']} countries,
+  the spending, and the time spent on trains. {ov['n_countries_visited']} countries,
   {ov['n_cities']} cities.</p>
 </header>"""
 
@@ -272,7 +280,7 @@ def ledger(d: dict) -> str:
     perday = sp["total"] / d["trips"].loc["trip2", "days"] if sp["total"] else 0
     items = [
         (fmt(ov["trip_days"]), "days away", "across two trips"),
-        (fmt(ov["n_countries"]), "countries", f"most nights in {top_ctry}"),
+        (fmt(ov["n_countries_visited"]), "countries", f"most nights in {top_ctry}"),
         (fmt(ts["rail_legs"]), "trains boarded", f"{fmt(ts['rail_km'])} km of track"),
         (f"{ts['rail_hours']:.0f}", "hours in a seat", f"{ts['full_days_equiv']:.1f} full days"),
         (money(sp["total"]), "spent" + (" *" if sp["any_partial"] else ""),
@@ -615,6 +623,10 @@ def _photo_entries():
 # cities visited in distinct stints — the map panel gives each its own dated
 # header instead of one lumped range.
 CITY_LEGS = {
+    ("trip1", "Paris"): [
+        {"label": "Paris — arrival", "start": "2025-06-25", "end": "2025-06-27"},
+        {"label": "Paris — return", "start": "2025-08-18", "end": "2025-08-21"},
+    ],
     ("trip2", "Paris"): [
         {"label": "Paris — 1st leg", "start": "2026-02-24", "end": "2026-03-10"},
         {"label": "Paris — 2nd leg", "start": "2026-03-31", "end": "2026-04-06"},
@@ -671,7 +683,7 @@ def write_map_data(d: dict) -> None:
             a, b = max(_stay_runs([(rr["arrival_date"], rr["departure_date"]) for rr in rows]),
                        key=lambda ab: (ab[1] - ab[0]).days)
             entry["start"], entry["end"] = a.strftime("%Y-%m-%d"), b.strftime("%Y-%m-%d")
-        an = annos.get(city)
+        an = annos.get(tid, {}).get(city)
         if an and an.get("kind") == "transit":
             entry["transit"] = True
             lo = an.get("layover")
@@ -691,8 +703,8 @@ def write_map_data(d: dict) -> None:
         lst.sort(key=lambda p: p["date"] or "9999-99-99")  # chronological; file order within a day
     (DOCS / "map").mkdir(parents=True, exist_ok=True)
     (DOCS / "map" / "data.json").write_text(
-        json.dumps({"trips": [{"id": t, "name": r["name"], "ink": "gold" if i else "accent"}
-                              for i, (t, r) in enumerate(d["trips"].iterrows())],
+        json.dumps({"trips": [{"id": t, "name": r["name"], "ink": TRIP_INK.get(t, DEFAULT_INK)}
+                              for t, r in d["trips"].iterrows()],
                     "cities": cities, "legs": legs, "photos": photos,
                     "annotations": annos,
                     "modeStyle": MODE_STYLE},
