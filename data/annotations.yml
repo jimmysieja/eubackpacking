@@ -13,46 +13,67 @@
 # kind: transit  — a rail/ferry/air waypoint, not a day trip. The panel drops
 # the "day trip" line and the map hover reads "· passing through".
 #
-# Time on the ground for a transit stop — give the arrive / leave timestamps
-# straight off the Eurail app and the build formats the window + duration:
+# Layover for a transit stop — give the arrive / leave timestamps straight off
+# the Eurail app and the build formats the window + length:
 #   Cologne:
 #     kind: transit
-#     layover: ["2026-04-06 22:00", "2026-04-07 02:00"]
-# -> panel + hover read "06 Apr 22:00 – 07 Apr 02:00 · 4h on the ground".
+#     layover: ["2026-04-06 22:15", "2026-04-07 02:09"]
+# -> panel reads "06 Apr 22:15 – 07 Apr 02:09 · 3h54 layover", hover "· 3h54 layover".
 # (`window: "22:00 – 02:00"` still works if you only have the clock times.)
 
-Zagreb:
-  kind: transit
-  label: Quick 3 hour layover between Ljubljana and Split
+# --- Layovers, timed off the Eurail journey detail (arrive → leave) ---------
 
-# Layovers below are timed off the Eurail journey list (arrival of the inbound
-# journey → departure of the outbound one).
+Oxford:
+  kind: transit
+  layover: ["2026-03-17 13:28", "2026-03-17 15:39"]   # walk round town, on the way to Liverpool
+
+# The Paris → Copenhagen haul, 6–7 Apr (four changes, then Hamburg overnight)
+Lille:
+  kind: transit
+  layover: ["2026-04-06 13:00", "2026-04-06 13:54"]
+Tournai:
+  kind: transit
+  layover: ["2026-04-06 14:21", "2026-04-06 17:58"]
+Brussels:
+  kind: transit
+  layover: ["2026-04-06 19:12", "2026-04-06 20:25"]
 Cologne:
   kind: transit
-  layover: ["2026-04-06 22:15", "2026-04-07 02:09"]   # birthday layover, waiting on the Hamburg train
+  layover: ["2026-04-06 22:15", "2026-04-07 02:09"]   # turned 23 here, waiting on the Hamburg train
+Hamburg:
+  kind: transit
+  layover: ["2026-04-07 06:50", "2026-04-07 08:53"]
+
+Turku:
+  kind: transit
+  layover: ["2026-04-13 16:00", "2026-04-13 20:57"]   # ferry-in time approximate
+
+# Vilnius → Bratislava, 20–21 Apr (via Warsaw and Kraków, then the sleeper)
+Mockava:
+  kind: transit
+  layover: ["2026-04-20 14:52", "2026-04-20 15:12"]
 Warsaw:
   kind: transit
-  layover: ["2026-04-20 19:03", "2026-04-20 19:40"]   # off the Vilnius train, straight onto Kraków
+  layover: ["2026-04-20 19:03", "2026-04-20 19:40"]
 Kraków:
   kind: transit
   layover: ["2026-04-20 22:33", "2026-04-21 00:18"]   # midnight wait for the Bratislava sleeper
+Ostrava:
+  kind: transit
+  layover: ["2026-04-21 03:22", "2026-04-21 04:33"]
+Brno:
+  kind: transit
+  layover: ["2026-04-21 07:00", "2026-04-21 07:18"]
+
+Zagreb:
+  kind: transit
+  layover: ["2026-04-26 10:30", "2026-04-26 13:49"]   # half a day between the Ljubljana and Split trains
 
 # Stops on the hitched drive Sarajevo -> Žabljak.
 Plužine: { kind: transit }
 Niksic:  { kind: transit }
 
-# Waypoints with no separately-timed layover — they sit inside a single
-# multi-change journey the app never split (Lille/Tournai/Brussels within
-# Paris→Köln; Hamburg within Köln→Copenhagen; Mockava within Vilnius→Warszawa;
-# Ostrava/Brno within Kraków→Bratislava).
+# Waypoints with no layover to show.
 Holyhead: { kind: transit }
 Galway:   { kind: transit }
-Lille:    { kind: transit }
-Tournai:  { kind: transit }
-Brussels: { kind: transit }
-Hamburg:  { kind: transit }
-Turku:    { kind: transit }
-Mockava:  { kind: transit }
-Ostrava:  { kind: transit }
-Brno:     { kind: transit }
 Beauvais: { kind: transit }

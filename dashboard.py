@@ -100,9 +100,9 @@ def hm(hours: float) -> str:
 
 
 def layover_window(a, b) -> tuple[str, str]:
-    """(display window, time-on-the-ground) for a transit stop, from raw
-    arrive/leave timestamps. Same day -> '13:20 – 16:05, 26 Apr'; across
-    midnight -> '06 Apr 22:01 – 07 Apr 02:14'."""
+    """(display window, layover length) for a transit stop, from raw arrive/leave
+    timestamps. Same day -> '13:20 – 16:05, 26 Apr'; across midnight ->
+    '06 Apr 22:01 – 07 Apr 02:14'."""
     a, b = pd.to_datetime(a), pd.to_datetime(b)
     if a.date() == b.date():
         win = f"{a:%H:%M} – {b:%H:%M}, {a:%d %b}"
@@ -642,35 +642,15 @@ def write_map_data(d: dict) -> None:
     s = d["stops"]
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
     s = s.sort_values(["trip", "stop_number"])
-    # ride time per drawn leg, keyed by (from city, to city), from the `journeys:`
-    # list in data/rail_<trip>.yml. A journey with `via:` spreads its total time
-    # (and an "A → B" label) across every sub-leg it covers.
-    ride: dict = {}
-    for o in d.get("rail", {}).values():
-        for j in o.get("journeys", []):
-            if not (j.get("from") and j.get("to") and j.get("hm")):
-                continue
-            hm_s = str(j["hm"])
-            path = [j["from"], *(j.get("via") or []), j["to"]]
-            label = f'{j["from"]} → {j["to"]}' if j.get("via") else None
-            for p, q in zip(path, path[1:]):
-                ride[(p, q)] = (hm_s, label)
-
     legs, cities = [], []
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         for a, b in zip(recs, recs[1:]):
             if a["city"] == b["city"]:
                 continue
-            leg = {"trip": tid, "mode": b["transport"] or "train",
-                   "a": [round(a["lat"], 4), round(a["lon"], 4)],
-                   "b": [round(b["lat"], 4), round(b["lon"], 4)]}
-            info = ride.get((a["city"], b["city"]))
-            if info and leg["mode"] != "flight":   # journeys are rail/ferry, never the flight home
-                leg["dur"] = info[0]
-                if info[1]:
-                    leg["journey"] = info[1]
-            legs.append(leg)
+            legs.append({"trip": tid, "mode": b["transport"] or "train",
+                         "a": [round(a["lat"], 4), round(a["lon"], 4)],
+                         "b": [round(b["lat"], 4), round(b["lon"], 4)]})
 
     # one panel entry per (trip, city); its dated span is the longest continuous
     # run of that city's stop rows, unless CITY_LEGS spells out separate stints.
