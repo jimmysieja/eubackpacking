@@ -1,9 +1,8 @@
 # Trip 1 (Summer 2025) call-outs. Same format as annotations_trip2.yml:
 # key = city name exactly as it appears in trip1_stops.csv.
 #
-# kind: transit — a rail/ferry/air waypoint, not a day trip. Drops the
-# "day trip" line from the panel; the map hover reads "· passing through".
-# layover: ["<arrive>", "<leave>"] times off the Eurail app format the window.
+# kind: transit — a rail/ferry/air waypoint, not a day trip. The panel shows
+# just the date; the map hover reads "· passing through".
 
 # Night train Budapest -> Kraków: got on the wrong one and ended up routed
 # through Czechia. No separately-timed layovers.

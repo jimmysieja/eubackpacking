@@ -11,7 +11,7 @@ Spring 2026) told through the itinerary, the rail pass, and every receipt.
 
 | Countries | Cities | Days | Trains | Spent |
 |:-:|:-:|:-:|:-:|:-:|
-| **28** | **43** | **150** | **93** | **$5,848** |
+| **28** | **44** | **150** | **93** | **$5,848** |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/route-dark.svg">

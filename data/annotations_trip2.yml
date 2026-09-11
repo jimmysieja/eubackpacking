@@ -13,16 +13,11 @@
 #     label: a hitched ride caught on the way south
 #     kind: leg
 #
-# kind: transit  — a rail/ferry/air waypoint, not a day trip. The panel drops
-# the "day trip" line and the map hover reads "· passing through".
+# kind: transit  — a rail/ferry/air waypoint, not a day trip. The panel shows
+# just the date and the map hover reads "· passing through".
 #
-# Layover for a transit stop — give the arrive / leave timestamps straight off
-# the Eurail app and the build formats the window + length:
-#   Cologne:
-#     kind: transit
-#     layover: ["2026-04-06 22:15", "2026-04-07 02:09"]
-# -> panel reads "06 Apr 22:15 – 07 Apr 02:09 · 3h54 layover", hover "· 3h54 layover".
-# (`window: "22:00 – 02:00"` still works if you only have the clock times.)
+# layover: ["<arrive>", "<leave>"] — timestamps off the Eurail app, kept as a
+# record only. Nothing on the site shows them.
 
 # --- Layovers, timed off the Eurail journey detail (arrive → leave) ---------
 
@@ -76,6 +71,5 @@ Zagreb:
 Plužine: { kind: transit }
 Niksic:  { kind: transit }
 
-# Waypoints with no layover to show.
+# Waypoints with no layover recorded.
 Holyhead: { kind: transit }
-Galway:   { kind: transit }

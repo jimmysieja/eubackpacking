@@ -45,6 +45,8 @@ MODE_ALIASES = {
     "avion": "flight", "bateau": "ferry", "voiture": "car", "vélo": "bike",
 }
 RAIL_MODES = {"train"}
+# hops made on foot (Rome <-> Vatican City) aren't journeys: not counted, drawn or keyed
+ON_FOOT = {"walk"}
 
 # rough effective speeds (km/h) and fixed per-journey overhead (h) used to
 # ESTIMATE journey time from route distance — there are no stopwatch numbers in
@@ -73,17 +75,13 @@ def load_fx() -> dict:
 
 
 def _parse_annotations(raw: dict) -> dict:
+    # `layover:` timestamps in the yml are kept there as a record only
     out = {}
     for city, v in (raw or {}).items():
         if isinstance(v, str):
             out[city] = {"label": v, "kind": "stop"}
-        elif isinstance(v, dict) and (v.get("label") or v.get("kind")
-                                      or v.get("window") or v.get("layover")):
+        elif isinstance(v, dict) and (v.get("label") or v.get("kind")):
             out[city] = {"label": v.get("label", ""), "kind": v.get("kind", "stop")}
-            if v.get("window"):
-                out[city]["window"] = str(v["window"])
-            if v.get("layover"):
-                out[city]["layover"] = list(v["layover"])
     return out
 
 
@@ -153,9 +151,9 @@ def load_legs(stops: pd.DataFrame | None = None) -> pd.DataFrame:
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         for prev, cur in zip(recs, recs[1:]):
-            if prev["city"] == cur["city"]:
-                continue
             mode = cur["transport"] or "train"
+            if prev["city"] == cur["city"] or mode in ON_FOOT:
+                continue
             km = _haversine(prev["lat"], prev["lon"], cur["lat"], cur["lon"])
             hrs = float("nan")
             if not math.isnan(km):

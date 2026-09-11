@@ -42,16 +42,17 @@ PHOTO_SRC = (Path(os.environ["EUBP_PHOTO_SRC"]).expanduser()
 
 MODE_LABEL = {"train": "train", "bus": "bus", "ferry": "ferry", "flight": "flight",
               "car": "car", "bike": "bike", "walk": "walk"}
-# per-mode line style: (svg-dasharray, relative-weight, opacity, bow-factor)
-# kept deliberately distinct so the modes read apart at a glance.
+# per-mode line style: (svg-dasharray, relative-weight, opacity, bow-factor, wave)
+# wave = amplitude in px of a sine traced along the leg (0 = plain line); one
+# period is 4x the amplitude. kept deliberately distinct so the modes read
+# apart at a glance.
 MODE_STYLE = {
-    "train":  ("",           1.9, 0.95, 0.10),
-    "bus":    ("9 6",        1.4, 0.85, 0.14),
-    "ferry":  ("0.1 6",      1.9, 0.80, 0.22),   # round-cap dots
-    "flight": ("2 7",        1.3, 0.62, 0.55),   # sparse + big arc
-    "car":    ("1 4 7 4",    1.3, 0.85, 0.10),   # dash-dot
-    "bike":   ("2 4",        1.2, 0.80, 0.10),
-    "walk":   ("0.1 5",      1.4, 0.70, 0.06),
+    "train":  ("",           1.9, 0.95, 0.10, 0),
+    "bus":    ("9 6",        1.4, 0.85, 0.14, 0),
+    "ferry":  ("",           1.4, 0.85, 0.22, 2),   # a wave
+    "flight": ("2 7",        1.3, 0.62, 0.55, 0),   # sparse + big arc
+    "car":    ("1 4 7 4",    1.3, 0.85, 0.10, 0),   # dash-dot
+    "bike":   ("2 4",        1.2, 0.80, 0.10, 0),
 }
 MODE_DASH = {m: s[0] for m, s in MODE_STYLE.items()}
 
@@ -96,7 +97,6 @@ ROUTE_EXTRA = {
     "Břeclav":         "passing through · 5 Aug",
     "Ostrava":         "passing through · 6 Aug",
     "Oxford":          "on the way to Liverpool",
-    "Galway":          "gateway to Connemara",
     "Naples":          "off the bus, on to Ercolano",
     "Theth":           "day trip from Shkodër",
     "Virpazar":        "Lake Skadar day trip",
@@ -107,8 +107,9 @@ ROUTE_LABEL_POS = {
     "Liverpool":    (0, -10, "middle"),
     "Manchester":   (7, 12, "start"),
     "Abergavenny":  (-10, 13, "end"),
-    "Betws-y-Coed": (-9, -6, "end"),
+    "Betws-y-Coed": (-7, 12, "end"),
     "Belfast":      (-8, -4, "end"),
+    "Clifden":      (-6, 3, "end"),
     "Oxford":       (9, 6, "start"),
     "Ercolano":     (10, 11, "start"),
     "Naples":       (-9, 1, "end"),
@@ -155,18 +156,6 @@ def hm(hours: float) -> str:
     h = int(hours)
     m = round((hours - h) * 60)
     return f"{h}h{m:02d}m" if m else f"{h}h"
-
-
-def layover_window(a, b) -> tuple[str, str]:
-    """(display window, layover length) for a transit stop, from raw arrive/leave
-    timestamps. Same day -> '13:20 – 16:05, 26 Apr'; across midnight ->
-    '06 Apr 22:01 – 07 Apr 02:14'."""
-    a, b = pd.to_datetime(a), pd.to_datetime(b)
-    if a.date() == b.date():
-        win = f"{a:%H:%M} – {b:%H:%M}, {a:%d %b}"
-    else:
-        win = f"{a:%d %b %H:%M} – {b:%d %b %H:%M}"
-    return win, hm((b - a).total_seconds() / 3600).rstrip("m")
 
 
 # --------------------------------------------------------------------------- #
@@ -224,6 +213,33 @@ def _country_paths(sx, sy, bbox, w, h) -> str:
     return "".join(out)
 
 
+def _wave_path(p0, c, p1, amp, samples=64) -> str:
+    """SVG path of a sine (amplitude `amp`) traced along the quadratic curve
+    p0 -> p1 with control point c, fitted to a whole number of periods so it
+    starts and ends on the pins. Mirrors wavy() on the map page."""
+    pts = [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * c[0] + t * t * p1[0],
+            (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * c[1] + t * t * p1[1])
+           for t in (i / samples for i in range(samples + 1))]
+    cum = [0.0]
+    for (xa, ya), (xb, yb) in zip(pts, pts[1:]):
+        cum.append(cum[-1] + math.hypot(xb - xa, yb - ya))
+    total = cum[-1]
+    if total < amp * 2:
+        return f"M{p0[0]:.1f} {p0[1]:.1f} L{p1[0]:.1f} {p1[1]:.1f}"
+    periods = max(1, round(total / (amp * 4)))
+    n, out, j = periods * 12, [], 0
+    for i in range(n + 1):
+        s = total * i / n
+        while j < samples - 1 and cum[j + 1] < s:
+            j += 1
+        (xa, ya), (xb, yb) = pts[j], pts[j + 1]
+        seg = (cum[j + 1] - cum[j]) or 1
+        t, o = (s - cum[j]) / seg, amp * math.sin(2 * math.pi * periods * i / n)
+        out.append((xa + (xb - xa) * t - (yb - ya) / seg * o,
+                    ya + (yb - ya) * t + (xb - xa) / seg * o))
+    return "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in out)
+
+
 def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
     s = d["stops"]
     if s.empty:
@@ -244,10 +260,10 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
         recs = grp.to_dict("records")
         ink = trip_ink.get(tid, "accent")
         for a, b in zip(recs, recs[1:]):
-            if a["city"] == b["city"]:
-                continue
             mode = b["transport"] or "train"
-            dash, wt, op, bow = MODE_STYLE.get(mode, MODE_STYLE["train"])
+            if a["city"] == b["city"] or mode in A.ON_FOOT:
+                continue
+            dash, wt, op, bow, wave = MODE_STYLE.get(mode, MODE_STYLE["train"])
             x1, y1, x2, y2 = sx(a["lon"]), sy(a["lat"]), sx(b["lon"]), sy(b["lat"])
             mx, my = (x1 + x2) / 2, (y1 + y2) / 2
             nx, ny = -(y2 - y1), (x2 - x1)
@@ -255,7 +271,9 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
             k = min(60, ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5 * bow)
             cx, cy = mx + nx / nl * k, my + ny / nl * k
             cap = ' stroke-linecap="round"' if dash.startswith("0.1") else ""
-            seg.append(f'<path d="M{x1:.1f} {y1:.1f} Q{cx:.1f} {cy:.1f} {x2:.1f} {y2:.1f}" '
+            dd = (_wave_path((x1, y1), (cx, cy), (x2, y2), wave) if wave else
+                  f"M{x1:.1f} {y1:.1f} Q{cx:.1f} {cy:.1f} {x2:.1f} {y2:.1f}")
+            seg.append(f'<path d="{dd}" '
                        f'fill="none" stroke="var(--{ink})" stroke-width="{wt:.2f}"{cap} '
                        f'stroke-dasharray="{dash}" opacity="{op}"/>')
 
@@ -755,7 +773,7 @@ def write_map_data(d: dict) -> None:
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         for a, b in zip(recs, recs[1:]):
-            if a["city"] == b["city"]:
+            if a["city"] == b["city"] or b["transport"] in A.ON_FOOT:
                 continue
             legs.append({"trip": tid, "mode": b["transport"] or "train",
                          "a": [round(a["lat"], 4), round(a["lon"], 4)],
@@ -778,11 +796,6 @@ def write_map_data(d: dict) -> None:
         base = {"trip": tid, "tripName": tname.get(tid, tid),
                 "ink": TRIP_INK.get(tid, DEFAULT_INK), "kind": kind,
                 "nights": nights, "slept": nights > 0}
-        lo = an.get("layover")
-        if lo and len(lo) == 2:
-            base["window"], base["ground"] = layover_window(lo[0], lo[1])
-        elif an.get("window"):
-            base["window"] = str(an["window"])
 
         stints = []
         override = CITY_LEGS.get((tid, city))

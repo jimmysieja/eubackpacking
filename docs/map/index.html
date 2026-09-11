@@ -118,10 +118,10 @@
   const inkVar = t => C[(data.trips.find(x => x.id === t) || {}).ink] || C.accent;
   const tripName = t => (data.trips.find(x => x.id === t) || {}).name || t;
 
-  // per-mode line style: [dashArray, weight, opacity, bow]
+  // per-mode line style: [dashArray, weight, opacity, bow, wave]
   const MS = data.modeStyle || {
-    train:['',1.9,0.95,0.1], bus:['9 6',1.4,0.85,0.14], ferry:['0.1 6',1.9,0.8,0.22],
-    flight:['2 7',1.3,0.62,0.55], car:['1 4 7 4',1.3,0.85,0.1] };
+    train:['',1.9,0.95,0.1,0], bus:['9 6',1.4,0.85,0.14,0], ferry:['',1.4,0.85,0.22,2],
+    flight:['2 7',1.3,0.62,0.55,0], car:['1 4 7 4',1.3,0.85,0.1,0] };
   const styleFor = m => MS[m] || MS.train;
 
   function curve(a, b, bow) {
@@ -150,14 +150,41 @@
     map.attributionControl.addAttribution('outline: Natural Earth');
   } catch (e) {}
 
+  // a ferry leg is a wave of constant on-screen size, so it's re-traced at each zoom
+  const waves = [];
   data.legs.forEach(g => {
-    const [dash, wt, op, bow] = styleFor(g.mode);
-    L.polyline(curve(g.a, g.b, bow), {
+    const [dash, wt, op, bow, wave] = styleFor(g.mode);
+    const pts = curve(g.a, g.b, bow);
+    const line = L.polyline(pts, {
       color: C.ink, weight: wt, opacity: op,
       dashArray: dash || null, lineCap: dash.startsWith('0.1') ? 'round' : 'butt',
-      interactive: false
+      interactive: false, smoothFactor: wave ? 0 : 1
     }).addTo(map);
+    if (wave) waves.push({ line, pts, amp: wave });
   });
+
+  // a sine of amplitude `amp` px along a polyline, fitted to a whole number of
+  // periods (each 4x amp) so it meets both pins. Mirrors _wave_path() in dashboard.py.
+  function wavy(pts, amp) {
+    const px = pts.map(p => map.latLngToLayerPoint(p));
+    const cum = [0];
+    for (let i = 1; i < px.length; i++) cum.push(cum[i - 1] + px[i].distanceTo(px[i - 1]));
+    const total = cum[cum.length - 1];
+    if (total < amp * 2) return pts;
+    const periods = Math.max(1, Math.round(total / (amp * 4))), n = periods * 12, out = [];
+    for (let i = 0, j = 0; i <= n; i++) {
+      const s = total * i / n;
+      while (j < px.length - 2 && cum[j + 1] < s) j++;
+      const a = px[j], b = px[j + 1], seg = (cum[j + 1] - cum[j]) || 1;
+      const t = (s - cum[j]) / seg, o = amp * Math.sin(2 * Math.PI * periods * i / n);
+      out.push(map.layerPointToLatLng([a.x + (b.x - a.x) * t - (b.y - a.y) / seg * o,
+                                       a.y + (b.y - a.y) * t + (b.x - a.x) / seg * o]));
+    }
+    return out;
+  }
+  const retraceWaves = () => waves.forEach(w => w.line.setLatLngs(wavy(w.pts, w.amp)));
+  retraceWaves();
+  map.on('zoomend', retraceWaves);
 
   const annoOf = (trip, city) => ((data.annotations || {})[trip] || {})[city];
 
@@ -204,16 +231,12 @@
     pins.push(pin);
 
     const a = c.trip ? annoOf(c.trip, c.city) : null;
-    const st0 = c.stints[0];
     if (a && a.label && a.kind !== 'transit') {
       addLabel(pin, m, c.nights, a.label, 'anno-label');
     } else if (c.slept) {
       addLabel(pin, m, c.nights, c.city, 'city-label');
     } else if (c.transit) {
-      const t = st0 && st0.ground ? `${c.city} · ${st0.ground} layover`
-        : st0 && st0.window ? `${c.city} · ${st0.window}`
-          : `${c.city} · passing through`;
-      m.bindTooltip(t, { direction:'top' });
+      m.bindTooltip(`${c.city} · passing through`, { direction:'top' });
     } else {
       m.bindTooltip(`${c.city} · day trip`, { direction:'top' });
     }
@@ -289,10 +312,12 @@
   leg.innerHTML = data.trips.map(t =>
     `<div class="row"><span class="dot" style="background:${C[t.ink] || C.accent}"></span><b>${tripName(t.id)}</b></div>`
   ).join('') + bothRow + '<hr>' + modesSeen.map(m => {
-    const [dash, wt, op] = styleFor(m);
+    const [dash, wt, op, , wave] = styleFor(m);
     const cap = dash.startsWith('0.1') ? 'round' : 'butt';
+    const mark = wave ? `<path d="M1 4 q2 ${-2 * wave} 4 0 t4 0 t4 0 t4 0 t4 0 t4 0" fill="none"`
+                      : `<line x1="1" y1="4" x2="25" y2="4"`;
     return `<div class="row"><svg width="26" height="8">
-      <line x1="1" y1="4" x2="25" y2="4" stroke="${C.ink}" stroke-width="${wt}"
+      ${mark} stroke="${C.ink}" stroke-width="${wt}"
         stroke-dasharray="${dash}" stroke-linecap="${cap}" opacity="${op}"/></svg>${m}</div>`;
   }).join('');
 
@@ -372,8 +397,7 @@
     `<span class="chip"><i style="background:${C[st.ink] || C.accent}"></i>${st.tripName}</span>`;
 
   const stintSub = st =>
-    st.kind === 'transit'
-      ? [fmtDay(st.start), st.window, st.ground && `${st.ground} layover`].filter(Boolean).join('  ·  ')
+    st.kind === 'transit' ? fmtDay(st.start)
       : st.kind === 'daytrip' ? `day trip · ${fmtDay(st.start)}`
         : fmtRange(st.start, st.end);
 

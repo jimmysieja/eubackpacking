@@ -25,8 +25,8 @@ stop_number,city,country,transport,arrival_date,departure_date
 23,Rome,Italy,Train,2025-07-28,2025-07-28
 24,Naples,Italy,Bus,2025-07-28,2025-07-28
 25,Ercolano,Italy,Train,2025-07-28,2025-07-31
-26,Sorrento,Italy,Train,2025-07-29,2025-07-29
-27,Ercolano,Italy,Train,2025-07-29,2025-07-29
+26,Sorrento,Italy,Bus,2025-07-29,2025-07-29
+27,Ercolano,Italy,Bus,2025-07-29,2025-07-29
 28,Amalfi,Italy,Bus,2025-07-30,2025-07-30
 29,Ercolano,Italy,Bus,2025-07-31,2025-07-31
 30,Bari,Italy,Train,2025-07-31,2025-07-31

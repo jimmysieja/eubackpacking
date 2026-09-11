@@ -12,7 +12,7 @@ stop_number,city,country,transport,arrival_date,departure_date
 10,Abergavenny,United Kingdom,Train,2026-03-23,2026-03-25
 11,Holyhead,United Kingdom,Train,2026-03-25,2026-03-25
 12,Dublin,Ireland,Bateau,2026-03-25,2026-03-25
-13,Galway,Ireland,Train,2026-03-25,2026-03-25
+13,Galway,Ireland,Train,2026-03-25,2026-03-26
 14,Clifden,Ireland,Bus,2026-03-26,2026-03-28
 15,Galway,Ireland,Bus,2026-03-28,2026-03-28
 16,Dublin,Ireland,Bus,2026-03-28,2026-03-28
