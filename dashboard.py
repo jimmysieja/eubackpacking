@@ -408,16 +408,11 @@ def trace_movement(d: dict) -> str:
     svg = route_trace(d)
     if not svg:
         return ""
-    dt_ = A.day_trips(d)
-    extra = (f' Off the line, no bed: {esc(", ".join(sorted(dt_["city"].unique())))}.'
-             if not dt_.empty else "")
     return f"""
 <section class="movement">
   <p class="tag">Route</p>
   <figure class="trace">{svg}</figure>
-  <p class="caption">Every stop in order. Solid = rail, dashed = bus, dotted = ferry,
-  hairline = flight. The two trips aren't connected.{extra}
-  &nbsp;<a href="map/">Interactive map &rarr;</a></p>
+  <p class="caption"><a href="map/">Interactive map &rarr;</a></p>
 </section>"""
 
 
@@ -439,23 +434,12 @@ def trains_movement(d: dict) -> str:
                 stack.append((other, "ink", 0.28))
             if stack:
                 cols.append((day, stack))
-    annos = []
-    for o in d.get("rail", {}).values():
-        top = sorted(o.get("notable", []), key=lambda j: -j["hours"])[:3]
-        for j in top:
-            annos.append((pd.to_datetime(j["date"]).date(),
-                          f'{j["from"]}→{j["to"]} {hm(j["hours"])}'))
-    strip = day_strip(span, cols, annos=annos,
-                      baseline_label="hours in transit, by day") if cols else ""
+    strip = day_strip(span, cols, baseline_label="hours in transit, by day") if cols else ""
     lg = ts.get("longest")
     longest = (f' Longest single ride: <b>{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])}</b>, '
                f'{hm(lg["hr"])}.') if lg else ""
     ov = [f'{ts["rail_legs"]} trains', f'{fmt(ts["rail_km"])} km',
-          f'{ts["countries_by_train"]} countries', f'{ts["rail_hour_share"]*100:.0f}% of all transit']
-    if d.get("rail"):
-        onn = sum(o.get("overnight", 0) for o in d["rail"].values())
-        if onn:
-            ov.append(f'{onn} overnight')
+          f'{ts["rail_hour_share"]*100:.0f}% of all transit']
     return f"""
 <section class="movement">
   <p class="tag">Trains</p>
@@ -501,9 +485,6 @@ def money_movement(d: dict) -> str:
     strip = day_strip(span, cols, annos=annos, h=136,
                       baseline_label="spend per day, tinted by country") if cols else ""
 
-    top2 = cats[:2]
-    lead = (f"{money(sum(v for _, v in top2))}" if top2 else money(sp["total"]))
-    lead_txt = " and ".join(c for c, _ in top2) if top2 else "everything"
     perday = sp["total"] / d["trips"].loc["trip2", "days"]
     facts = [f'{money(perday)}/day', f'{sp["tgtg_count"]} Too Good To Go bags']
     if sp.get("priciest_day"):
@@ -515,8 +496,6 @@ def money_movement(d: dict) -> str:
     return f"""
 <section class="movement">
   <p class="tag">Money</p>
-  <p class="statement"><b>{esc(money(sp['total']))}</b> on the Spring 2026 trip &mdash; {esc(lead)}
-  of it {esc(lead_txt)}.</p>
   <figure class="bandfig">{cat_band}<div class="key">{cat_key}</div></figure>
   <figure class="bandfig">{ctry_band}<div class="key">{ctry_key} &nbsp; &hellip;</div></figure>
   <figure class="strip">{strip}</figure>
@@ -710,11 +689,7 @@ def _chart_set(d: dict) -> dict:
             if tr_h > 0: st.append((tr_h, "accent", 0.9))
             if ot > 0: st.append((ot, "ink", 0.28))
             if st: cols.append((day, st))
-        annos = []
-        for o in d.get("rail", {}).values():
-            for j in sorted(o.get("notable", []), key=lambda x: -x["hours"])[:3]:
-                annos.append((pd.to_datetime(j["date"]).date(), f'{j["from"]}→{j["to"]}'))
-        charts["trains"] = day_strip(span, cols, annos=annos, baseline_label="hours in transit / day")
+        charts["trains"] = day_strip(span, cols, baseline_label="hours in transit / day")
     sp = A.spend_summary(d)
     if not d["expenses"].empty:
         charts["spend"] = band([(c, v, CAT_COLOR.get(c, "c6"), 0.9)

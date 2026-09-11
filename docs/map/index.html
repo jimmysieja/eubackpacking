@@ -17,9 +17,10 @@
     --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,monospace;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--mono)}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--mono)}
   #map{position:absolute;inset:0;background:var(--paper)}
   .leaflet-container{background:var(--paper);font-family:var(--mono);outline:none}
+  .leaflet-top.leaflet-left{top:44px;left:6px}   /* zoom buttons below the back link */
   .leaflet-control-zoom a{background:var(--paper);color:var(--ink);border-color:var(--rule)}
   .leaflet-control-attribution{background:transparent;color:var(--dim);font-size:9px}
   .leaflet-control-attribution a{color:var(--dim)}
@@ -39,10 +40,13 @@
   .legend .dot{width:9px;height:9px;border-radius:50%;border:1.4px solid var(--paper)}
   .legend hr{border:none;border-top:1px solid var(--rule);margin:8px 0 6px}
 
-  .city-label{background:none;border:none;box-shadow:none;font-family:var(--mono);font-size:10px;
-    letter-spacing:.06em;color:var(--ink);
+  /* permanent name labels, seated round their pin by placeLabels() */
+  .pinlabel span{position:absolute;white-space:nowrap;line-height:12px;padding:0 1px}
+  .pinlabel.off span{visibility:hidden}
+  .pinlabel.off.peek span{visibility:visible}
+  .city-label{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink);
     text-shadow:0 0 3px var(--paper),0 0 3px var(--paper),0 0 3px var(--paper),0 0 2px var(--paper)}
-  .anno-label{background:none;border:none;box-shadow:none;font-family:var(--serif);font-style:italic;
+  .anno-label{font-family:var(--serif);font-style:italic;
     font-size:11px;color:var(--dim);text-shadow:0 0 3px var(--paper),0 0 3px var(--paper),0 0 3px var(--paper)}
 
   #panel{position:absolute;top:0;right:0;bottom:0;width:min(380px,86vw);z-index:1000;
@@ -133,7 +137,8 @@
     return pts;
   }
 
-  const map = L.map('map', { zoomControl:true, attributionControl:true, minZoom:3, maxZoom:9 });
+  const map = L.map('map', { zoomControl:true, attributionControl:true, minZoom:3, maxZoom:9,
+                             zoomSnap:0.5 });   // half steps, so the opening fit fills the screen
   map.setView([54, 12], 4);
   map.attributionControl.setPrefix('');
 
@@ -168,7 +173,25 @@
          + `<circle r="${r}" fill="none" stroke="${C.paper}" stroke-width="1.6"/></svg>` });
   }
 
-  const bounds = [];
+  // Every city slept in gets a permanent name label (an annotation, if it has
+  // one, stands in for the name); waypoints and day trips only name themselves
+  // on hover. placeLabels() seats the labels afresh at each zoom, longest stays
+  // first, trying eight spots round the pin. One with nowhere free waits for a
+  // closer zoom and shows on hover in the meantime.
+  map.createPane('labels').style.zIndex = 650;
+  const bounds = [], pins = [], labels = [];
+
+  function addLabel(pin, m, rank, text, cls) {
+    const span = document.createElement('span');
+    span.className = cls;
+    span.textContent = text;
+    const mk = L.marker(pin.ll, { pane:'labels', interactive:false, keyboard:false,
+      icon: L.divIcon({ className:'pinlabel', html:span, iconSize:null, iconAnchor:[0, 0] }) }).addTo(map);
+    labels.push({ pin, rank, mk, span, w:0, h:0 });
+    m.on('mouseover', () => { mk.getElement().classList.add('peek'); mk.setZIndexOffset(1000); });
+    m.on('mouseout', () => { mk.getElement().classList.remove('peek'); mk.setZIndexOffset(0); });
+  }
+
   data.cities.forEach(c => {
     bounds.push([c.lat, c.lon]);
     const r = c.slept ? 6 : 4;
@@ -177,25 +200,80 @@
       : L.circleMarker([c.lat, c.lon], {
           radius: r, weight: 1.4, color: C.paper,
           fillColor: C[c.ink] || C.accent, fillOpacity: 1 }).addTo(map);
+    const pin = { ll: L.latLng(c.lat, c.lon), r };
+    pins.push(pin);
 
     const a = c.trip ? annoOf(c.trip, c.city) : null;
     const st0 = c.stints[0];
     if (a && a.label && a.kind !== 'transit') {
-      m.bindTooltip(a.label, { permanent:true, direction:'right', offset:[9,0], className:'anno-label' });
+      addLabel(pin, m, c.nights, a.label, 'anno-label');
+    } else if (c.slept) {
+      addLabel(pin, m, c.nights, c.city, 'city-label');
     } else if (c.transit) {
       const t = st0 && st0.ground ? `${c.city} · ${st0.ground} layover`
         : st0 && st0.window ? `${c.city} · ${st0.window}`
           : `${c.city} · passing through`;
       m.bindTooltip(t, { direction:'top' });
-    } else if (c.slept && c.nights >= 2) {
-      m.bindTooltip(c.city, { permanent:true, direction:'right', offset:[9,0], className:'city-label' });
-    } else if (c.slept) {
-      m.bindTooltip(c.city, { direction:'right', offset:[9,0], className:'city-label' });
     } else {
       m.bindTooltip(`${c.city} · day trip`, { direction:'top' });
     }
     m.on('click', () => openPanel(c));
   });
+  labels.sort((a, b) => b.rank - a.rank);
+
+  // candidate spots, in order of preference: offset of the label's top-left
+  // corner from the pin centre, given the label's size and the pin radius
+  const d45 = r => Math.round(r * 0.7) + 2;
+  const SPOTS = [
+    (w, h, r) => [r + 3, -h / 2],                    // right
+    (w, h, r) => [-r - 3 - w, -h / 2],               // left
+    (w, h, r) => [d45(r), -d45(r) - h],              // above right
+    (w, h, r) => [d45(r), d45(r)],                   // below right
+    (w, h, r) => [-d45(r) - w, -d45(r) - h],         // above left
+    (w, h, r) => [-d45(r) - w, d45(r)],              // below left
+    (w, h, r) => [-w / 2, -r - 2 - h],               // above
+    (w, h, r) => [-w / 2, r + 2],                    // below
+  ];
+  const hits = (b, o) => b[0] < o[2] && b[2] > o[0] && b[1] < o[3] && b[3] > o[1];
+
+  function placeLabels() {
+    labels.forEach(lb => { lb.w = lb.span.offsetWidth; lb.h = lb.span.offsetHeight; });
+    const pt = new Map(pins.map(p => [p, map.latLngToLayerPoint(p.ll)]));
+    // does a box touch a pin's disc (its outline included)?
+    const covers = (b, p) => {
+      const q = pt.get(p), x = Math.max(b[0], Math.min(q.x, b[2])), y = Math.max(b[1], Math.min(q.y, b[3]));
+      return (x - q.x) ** 2 + (y - q.y) ** 2 < (p.r + 1) ** 2;
+    };
+    const tl = map.containerPointToLayerPoint([0, 0]), br = map.containerPointToLayerPoint(map.getSize());
+    const inView = b => b[0] >= tl.x && b[1] >= tl.y && b[2] <= br.x && b[3] <= br.y;
+    // other labels and the overnight pins are off limits. Beyond that, the
+    // best spot is on screen and clear of the small waypoint pins; on screen
+    // but over a waypoint beats clear but cut off by the edge.
+    const bigPins = pins.filter(p => p.r >= 6);
+    const taken = [];
+    labels.forEach(lb => {
+      const q = pt.get(lb.pin);
+      let spot = null, best = Infinity;
+      for (const f of SPOTS) {
+        const [dx, dy] = f(lb.w, lb.h, lb.pin.r).map(Math.round);
+        const box = [q.x + dx, q.y + dy, q.x + dx + lb.w, q.y + dy + lb.h];
+        const padded = [box[0] - 1, box[1] - 1, box[2] + 1, box[3] + 1];   // labels keep a hair apart
+        const onPin = p => p !== lb.pin && covers(box, p);
+        if (taken.some(o => hits(padded, o)) || bigPins.some(onPin)) continue;
+        const cost = (inView(box) ? 0 : 2) + (pins.some(onPin) ? 1 : 0);
+        if (cost < best) { best = cost; spot = [dx, dy, padded]; }
+        if (!cost) break;
+      }
+      const [dx, dy] = spot || SPOTS[0](lb.w, lb.h, lb.pin.r).map(Math.round);
+      lb.span.style.left = dx + 'px';
+      lb.span.style.top = dy + 'px';
+      lb.mk.getElement().classList.toggle('off', !spot);
+      if (spot) taken.push(spot[2]);
+    });
+  }
+  placeLabels();
+  map.on('moveend', placeLabels);                                // after every zoom and pan
+  if (document.fonts) document.fonts.ready.then(placeLabels);   // re-measure once the webfont is in
 
   // legend — every mode that appears, plus the trips
   const modesSeen = [...new Set(data.legs.map(g => g.mode))];

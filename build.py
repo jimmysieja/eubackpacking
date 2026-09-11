@@ -60,8 +60,8 @@ def stats_markdown(d: dict) -> str:
         long_txt = (f" The longest single ride was **{lg['from']} → {lg['to']}**, "
                     f"{lg['hr']:.1f} h.") if lg else ""
         L.append(f"**{ts['rail_hours']:,.0f} hours on trains** — about {ts['full_days_equiv']:.1f} "
-                 f"full days — over {ts['rail_legs']} trains and {ts['rail_km']:,.0f} km of track, "
-                 f"through {ts['countries_by_train']} countries.{long_txt}")
+                 f"full days — over {ts['rail_legs']} trains and {ts['rail_km']:,.0f} km of track."
+                 f"{long_txt}")
         L.append("")
         if "trains" in charts:
             L.append(_picture("trains", "Hours in transit, by day"))

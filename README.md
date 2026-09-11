@@ -7,7 +7,7 @@ Spring 2026) told through the itinerary, the rail pass, and every receipt.
 
 <!-- STATS:START -->
 
-<sub>Jun 2025 – May 2026 &nbsp;·&nbsp; generated 04 Sep 2026</sub>
+<sub>Jun 2025 – May 2026 &nbsp;·&nbsp; generated 11 Sep 2026</sub>
 
 | Countries | Cities | Days | Trains | Spent |
 |:-:|:-:|:-:|:-:|:-:|
@@ -18,7 +18,7 @@ Spring 2026) told through the itinerary, the rail pass, and every receipt.
   <img alt="Route trace of every stop in order" src="assets/route-light.svg" width="100%">
 </picture>
 
-**178 hours on trains** — about 7.4 full days — over 93 trains and 12,709 km of track, through 12 countries. The longest single ride was **Ljubljana → Split**, 13.6 h.
+**178 hours on trains** — about 7.4 full days — over 93 trains and 12,709 km of track. The longest single ride was **Ljubljana → Split**, 13.6 h.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/trains-dark.svg">
