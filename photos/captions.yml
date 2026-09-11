@@ -1,31 +1,37 @@
-# Auto-scaffolded, then described. city + date are set for all; caption is a
-# plain description for now - edit to taste. featured: true also puts it on
-# the main page.
+# One entry per photo, kept in date order (then capture time within a day).
+# The site groups a city's photos under a dated header and, inside a day,
+# follows this file — so move lines to reorder a day, and change `date:` to
+# move a photo to another day (e.g. a 2am shot you want with the night before).
+# featured: true also puts a photo on the main page.
 
 - file: img_7445.jpg
   city: Nashville, TN
   date: '2025-06-24'
   caption: BNA -> JFK -> CDG
-- file: img_8044.jpg
+- file: img_8015.jpg
   city: Paris
-  date: '2025-06-26'
-  caption: Paris fashion week
+  date: '2025-06-25'
+  caption: 'Debit cards were not cooperating, almost died of starvation'
 - file: img_8238.jpg
   city: Paris
   date: '2025-06-26'
   caption: Shoutout Vélib
+- file: img_8044.jpg
+  city: Paris
+  date: '2025-06-26'
+  caption: Paris fashion week
 - file: img_8245.jpg
   city: Marseille
   date: '2025-06-28'
   caption: Plage des Catalans
-- file: img_7724.jpg
-  city: Marseille
-  date: '2025-06-29'
-  caption: No reservation, no problem (until you get halfway down and they turn you away for having no reservation)
 - file: img_8097.jpg
   city: Marseille
   date: '2025-06-29'
   caption: Still worth
+- file: img_7724.jpg
+  city: Marseille
+  date: '2025-06-29'
+  caption: No reservation, no problem (until you get halfway down and they turn you away for having no reservation)
 - file: img_8126.jpg
   city: Barcelona
   date: '2025-06-30'
@@ -46,10 +52,18 @@
   city: Barcelona
   date: '2025-07-01'
   caption: Beer me
+- file: img_8174.jpg
+  city: Barcelona
+  date: '2025-07-02'
+  caption: Waking up bright and early for a productive morning (getting back from the night out)
 - file: img_8277.jpg
   city: Barcelona
   date: '2025-07-02'
   caption: LOADED TooGoodToGo order
+- file: img_8321.jpg
+  city: 'Barcelona'
+  date: '2025-07-03'
+  caption: Oh Razzmatazz...
 - file: img_8344.jpg
   city: Barcelona
   date: '2025-07-03'
@@ -62,10 +76,10 @@
   city: Nice
   date: '2025-07-05'
   caption: 1am view
-- file: img_8084.jpg
+- file: img_8357.jpg
   city: Nice
-  date: '2025-07-06'
-  caption: Preppin for the night bus to Lyon
+  date: '2025-07-05'
+  caption: Camping somewhere in Parc du Mont Boron (completely legal btw trust)
 - file: img_8387.jpg
   city: Monaco-Ville
   date: '2025-07-06'
@@ -78,6 +92,10 @@
   city: Monaco-Ville
   date: '2025-07-06'
   caption: Easily the coolest car in the city
+- file: img_8084.jpg
+  city: Nice
+  date: '2025-07-06'
+  caption: Preppin for the night bus to Lyon
 - file: img_8515.jpg
   city: Annecy
   date: '2025-07-07'
@@ -94,7 +112,7 @@
   city: Chamonix
   date: '2025-07-10'
   caption: Campsite in Chamonix, froze the entire first night bc no sleeping bag
-- file: img_8668.jpg
+- file: img_8671.jpg
   city: Chamonix
   date: '2025-07-10'
   caption: Chocolate + Bread + Hike
@@ -138,6 +156,10 @@
   city: Kandersteg
   date: '2025-07-15'
   caption: Taking in the view over Oeschinensee
+- file: img_9112.jpg
+  city: Kandersteg
+  date: '2025-07-15'
+  caption: Zach is a cow whisperer
 - file: img_9113.jpg
   city: Kandersteg
   date: '2025-07-15'
@@ -146,10 +168,10 @@
   city: Kandersteg
   date: '2025-07-15'
   caption: Translating between my broken French and Florian's broken English
-- file: img_0184.jpg
+- file: img_9156.jpg
   city: Mürren
   date: '2025-07-17'
-  caption: Mürren via ferrata suspension bridge
+  caption: Ready to fall 400m, we have a helmet on we'll be okay
 - file: img_9191.jpg
   city: Mürren
   date: '2025-07-17'
@@ -158,10 +180,22 @@
   city: Mürren
   date: '2025-07-17'
   caption: Had to hit the shimmy all the way across
+- file: img_0184.jpg
+  city: Mürren
+  date: '2025-07-17'
+  caption: Mürren via ferrata suspension bridge
 - file: img_9260.jpg
   city: Mürren
   date: '2025-07-17'
-  caption: What's the guy carrying in there ???
+  caption: What's he got in there ???
+- file: img_9281.jpg
+  city: Zermatt
+  date: '2025-07-17'
+  caption: Getting cozy on the bench before moving out fear of being seen from the main trail (not illegal btw trust)
+- file: img_9283.jpg
+  city: Zermatt
+  date: '2025-07-18'
+  caption: 25 degree incline behind a big bush on the hillside = maybe 20 minutes of sleep. Saw Matterhorn tho
 - file: img_9582.jpg
   city: Milan
   date: '2025-07-19'
@@ -198,247 +232,238 @@
   city: Rome
   date: '2025-07-25'
   caption: Piazza Trilussa
-- file: img_0073.jpg
-  city: Rome
-  date: '2025-07-27'
-  caption: Two boxed wines lined up on the windowsill, Rome rooftops outside
 - file: img_9964.jpg
   city: Santa Marinella
   date: '2025-07-27'
-  caption: Beach day on the rocky jetty at Santa Marinella with the group
+  caption: Santa Marinella day trip w/Brooke and Paola
+- file: img_0073.jpg
+  city: Rome
+  date: '2025-07-27'
+  caption: Box wined out
 - file: img_0149.jpg
   city: Rome
   date: '2025-07-28'
-  caption: An assortment of pizza slices from a Rome takeaway spot
+  caption: 4 euros btw (TGTG)
 - file: img_0171.jpg
   city: Ercolano
   date: '2025-07-28'
-  caption: A "Hasta Siempre Diego" Maradona mural on a street wall
+  caption: Cool Maradona mural, had these everywhere
 - file: img_0191.jpg
   city: Sorrento
   date: '2025-07-29'
-  caption: The narrow gorge street through Sorrento, cliffs rising on both sides
+  caption: 10 ss and I jump
 - file: img_0215.jpg
   city: Sorrento
   date: '2025-07-29'
-  caption: Sunset over the Sorrento marina, seen through a torn net
+  caption: Peak Clash Royale spot
 - file: img_0232.jpg
   city: Amalfi
   date: '2025-07-30'
-  caption: Standing room only on the bus, headed out of Sorrento
+  caption: Bus driver earned his thanks on this one
 - file: img_0248.jpg
   city: Amalfi
   date: '2025-07-30'
-  caption: Waiting for the bus in Amalfi, the hilltop town rising up behind
+  caption: Most organized bus system in Italy
 - file: img_0274.jpg
   city: Bari
   date: '2025-07-31'
-  caption: An evening walk through a plaza in Bari
+  caption: Parco Rossani = 10/10 people watching spot
 - file: img_0291.jpg
   city: Tirana
   date: '2025-08-01'
-  caption: Gelato break in Skanderbeg Square, Tirana
+  caption: Classic
 - file: img_0321.jpg
   city: Tirana
   date: '2025-08-02'
-  caption: Entrance to the Site of Witness and Memory museum, on Albania's communist-era political prisoners
+  caption: House of Leaves -- Albania's former secret HQ for spying on its own civilians during communist regime
 - file: img_0338.jpg
   city: Tirana
   date: '2025-08-02'
-  caption: A Tom and Jerry mural painted on a utility box, Tirana skyline behind
+  caption: Great taste
 - file: img_0413.jpg
   city: Tirana
   date: '2025-08-03'
-  caption: The group together, checkerboard mural on the wall behind
+  caption: La lune, anyone ?!?
 - file: img_0430.jpg
   city: Tirana
   date: '2025-08-03'
-  caption: Breakfast cereal in a pink bowl
+  caption: Always got a spoon in my hand come on
 - file: img_0449.jpg
   city: Tirana
   date: '2025-08-03'
-  caption: Fresh juice with a local host at a Tirana fruit stand
+  caption: Rajmonda and FruitJuice&More (pt. 1)
+- file: img_0461.jpg
+  city: Tirana
+  date: '2025-08-03'
+  caption: Imagine it said jizz air tho
 - file: img_0481.jpg
   city: Budapest
   date: '2025-08-04'
-  caption: A chocolate-dipped soft serve cone in Budapest
+  caption: Chimney cake yummers
 - file: img_0490.jpg
   city: Budapest
   date: '2025-08-04'
-  caption: Group photo on a Budapest street at dusk
+  caption: Hogan Family YMCA lifeguard meetup in Budapest ft. Emma and Dalton
 - file: img_0608.jpg
   city: Budapest
   date: '2025-08-04'
-  caption: A night out in Budapest
+  caption: Electric
 - file: img_0614.jpg
   city: Budapest
   date: '2025-08-05'
-  caption: A night out with the group - somewhere between Budapest and Kraków
+  caption: Crew
 - file: img_0528.jpg
   city: Kraków
   date: '2025-08-06'
-  caption: A pastry bag in hand, walking the streets of Kraków at night
+  caption: Shoutout Paul for helping me navigate Kraków's train station at 5am
 - file: img_0530.jpg
   city: Kraków
   date: '2025-08-06'
-  caption: A quiet, rainy street in Kraków's Old Town
+  caption: The Motherland
 - file: img_0559.jpg
   city: Kraków
   date: '2025-08-06'
-  caption: A home-cooked plate - chicken, mash and fresh fruit - with a beer in Kraków
+  caption: Greg & Tom Beer House Hostel -- beer mandatory @dinner
 - file: img_0589.jpg
   city: Kraków
   date: '2025-08-07'
-  caption: Round of beers with the group under the Lech sign, Kraków
+  caption: Solved all of UK's and Ireland's conflicts at this table
 - file: img_0594.jpg
   city: Kraków
   date: '2025-08-07'
-  caption: Goofing around on the dance floor in Kraków
+  caption: Quite loud
 - file: img_0595.jpg
   city: Kraków
   date: '2025-08-07'
-  caption: Right up against the speaker at a Kraków club
-- file: img_0641.jpg
-  city: Kraków
-  date: '2025-08-07'
-  caption: Checking the train route toward Zakopane on a day trip from Kraków
+  caption: This or Davis Wade Stadium
 - file: img_0644.jpg
   city: Kraków
   date: '2025-08-07'
-  caption: Train options back from Zakopane, deciding on a route to Warsaw
+  caption: Google translating to tell me I'm on the wrong train after 2 hours
 - file: img_0646.jpg
   city: Kraków
   date: '2025-08-07'
-  caption: A pastry snack on the train back from the Zakopane day trip
+  caption: Pączki!
 - file: img_0661.jpg
   city: Warsaw
   date: '2025-08-08'
-  caption: Digging through a dusty, chalk-covered pack
+  caption: My yogurt exploded EVERYWHERE from the train door (post cleanup)
 - file: img_0669.jpg
   city: Warsaw
   date: '2025-08-08'
-  caption: A cup of pierogi with crispy fried onions, Warsaw
+  caption: Pierogis street food
 - file: img_0713.jpg
   city: Prague
   date: '2025-08-09'
-  caption: Dusk on the Vltava, Vyšehrad's spires on the far bank
+  caption: Pretty city
 - file: img_0730.jpg
   city: Prague
   date: '2025-08-10'
-  caption: The courtyard of Prague Castle, St. Vitus Cathedral's spires overhead
+  caption: Jakub giving us the Prague local tour
 - file: img_0744.jpg
   city: Prague
   date: '2025-08-10'
-  caption: Mirror selfie at a rooftop lounge overlooking Prague
-- file: img_0765.jpg
-  city: Prague
-  date: '2025-08-12'
-  caption: Out front of a club in Prague's old town
-- file: img_0768.jpg
-  city: Prague
-  date: '2025-08-12'
-  caption: The whole group at an outdoor cafe table in Prague
+  caption: Watched Pulp Fiction - Tarantino on a rooftop
 - file: img_0785.jpg
   city: Prague
   date: '2025-08-12'
-  caption: A nighttime photo with the group in Prague
+  caption: Beer o'clock
 - file: img_0788.jpg
   city: Prague
   date: '2025-08-12'
-  caption: Beers all around in a Prague cellar bar
+  caption: Spamming "Pin-Pon-Pan" all night
 - file: img_0799.jpg
   city: Prague
   date: '2025-08-12'
-  caption: Posing in front of a graffitied wall in Prague
+  caption: Small town Prague-- ran into Jakub coincidentally
+- file: img_0768.jpg
+  city: Prague
+  date: '2025-08-12'
+  caption: Prague crew is up there on the all-time leaderboards (Lars, Mari, Mik, Neo, Jana)
 - file: img_0866.jpg
   city: Prague
   date: '2025-08-12'
-  caption: Trdelník ice cream cones with the group in Prague's Jewish Quarter
+  caption: Chimney cake (stolen from Hungary)
 - file: img_0861.jpg
   city: Prague
   date: '2025-08-13'
-  caption: A late-night photo with the group
+  caption: Might be the jollyest guy ever in between Zach and I
 - file: img_0891.jpg
   city: Berlin
   date: '2025-08-13'
-  caption: Sunset at Berlin Hauptbahnhof, a double-decker train pulling in
+  caption: Hello Berlin Hauptbahnhof
 - file: img_0901.jpg
   city: Berlin
   date: '2025-08-14'
-  caption: Checking out a car's questionable window decal outside the Volksbühne
+  caption: Need dat
 - file: img_0917.jpg
   city: Berlin
   date: '2025-08-14'
-  caption: On the phone in an old graffiti-covered Telekom phone booth
+  caption: SELL SELL SELL
 - file: img_0934.jpg
   city: Berlin
   date: '2025-08-14'
-  caption: The famous "Kiss" mural at the East Side Gallery, Berlin Wall
-- file: img_0941.jpg
+  caption: Now kith
+- file: img_0947.jpg
   city: Berlin
   date: '2025-08-14'
-  caption: Browsing the Ampelmann shop at Ampelmannplatz
+  caption: Ampelmann hat Ampelmann hat Ampelmann hat
 - file: img_0951.jpg
   city: Berlin
   date: '2025-08-14'
-  caption: Holding up a water bottle by a park bench
+  caption: Worked hard for that deathly public water fountain water
 - file: img_0952.jpg
   city: Berlin
   date: '2025-08-14'
-  caption: Two beers on the table at a Berlin bar
+  caption: We're cider guys now
 - file: img_0979.jpg
   city: Amsterdam
   date: '2025-08-15'
-  caption: Catching up on the trip journal - "August 14th, Thursday, Berlin" - on the train through the
-    Dutch countryside
+  caption: Catching up on the ole trip journal
 - file: img_0994.jpg
   city: Amsterdam
   date: '2025-08-16'
-  caption: Cycling down a tree-lined path through an Amsterdam park
+  caption: Cycling in Amsterdam-- Vondelpark
 - file: img_1102.jpg
   city: Amsterdam
   date: '2025-08-17'
-  caption: Domino's and a side of chicken bites in the middle of a shop full of antique cash registers
-- file: img_1113.jpg
-  city: Paris
-  date: '2025-08-19'
-  caption: The Champions d'Europe mural outside Parc des Princes
+  caption: Where are all the red lights ??
 - file: img_1125.jpg
   city: Paris
   date: '2025-08-19'
-  caption: Outside Parc des Princes, home of PSG - "Ici c'est Paris"
+  caption: Parc des Princes UCL winners mural
 - file: img_1157.jpg
   city: Paris
   date: '2025-08-20'
-  caption: Steak frites with a tartare sauce, back in Paris
+  caption: First real meal of the trip to celebrate our last night in EU
 - file: img_1227.jpg
   city: Paris
   date: '2025-08-20'
-  caption: A long-exposure shot of the Eiffel Tower at night
+  caption: Eiffel Tower taking flight??
 - file: img_1202.jpg
   city: Paris
   date: '2025-08-21'
-  caption: Boarding the flight out of Paris
-- file: 9e0a3ed5-a83f-455e-a4c7-9b9a45beb029.jpg
-  city: Paris
-  date: '2026-02-24'
-  caption: Supermarket selfie with a bottle of red and some cheese
+  caption: Made it to CDG with so much time to spare (we were still in Paris proper an hour before boarding started)
 - file: img_3194.jpg
   city: Paris
   date: '2026-02-26'
-  caption: Clash Royale screenshot - a three-crown win
+  caption: No time zone difference will stop me from beating Aditya
 - file: img_3195.jpg
   city: Paris
   date: '2026-02-26'
-  caption: Watch sleep chart - a 17-hour night on the 25th, the day after landing
+  caption: Accidentally slept for 17 hours the 1st night
+- file: 9e0a3ed5-a83f-455e-a4c7-9b9a45beb029.jpg
+  city: Paris
+  date: '2026-03-04'
+  caption: Ran into the brother at Carrefour
 - file: img_3282.jpg
   city: Paris
   date: '2026-03-06'
-  caption: At a PSG match at the Parc des Princes
+  caption: PSG 3-1 Monaco Ligue 1 match
 - file: img_3305.jpg
   city: Paris
   date: '2026-03-08'
-  caption: Balcony seat looking down on the stage of an ornate red-and-gold Paris theatre
+  caption: La Watch Party for Paris Fashion Week
 - file: img_3403.jpg
   city: London
   date: '2026-03-13'
@@ -447,14 +472,14 @@
   city: London
   date: '2026-03-13'
   caption: Wetherspoons fish n chips-- yummers
-- file: img_3509.jpg
-  city: London
-  date: '2026-03-15'
-  caption: 1st successful G split
 - file: img_4596.jpg
   city: London
   date: '2026-03-15'
   caption: Looking out over our city
+- file: img_3509.jpg
+  city: London
+  date: '2026-03-15'
+  caption: 1st successful G split
 - file: img_3588.jpg
   city: London
   date: '2026-03-16'
@@ -687,7 +712,7 @@
     73 times)
 - file: img_5006.jpg
   city: Kraków
-  date: '2026-04-21'
+  date: '2026-04-20'
   caption: No sleep mask, no problem (~24hr train journey from Vilnius to Bratislava)
 - file: img_5010.jpg
   city: Ostrava
@@ -705,10 +730,6 @@
   city: Bled
   date: '2026-04-24'
   caption: Pledging my allegiance
-- file: img_4248.jpg
-  city: Bled
-  date: '2026-04-25'
-  caption: Foosball before the hike
 - file: img_5136.jpg
   city: Bled
   date: '2026-04-25'
@@ -718,6 +739,10 @@
   date: '2026-04-25'
   caption: Lake Bled (basically Loot Lake from Fortnite)
   featured: true
+- file: img_4248.jpg
+  city: Bled
+  date: '2026-04-25'
+  caption: Foosball before the hike
 - file: img_5188.jpg
   city: Bled
   date: '2026-04-25'
@@ -739,10 +764,6 @@
   city: Split
   date: '2026-04-28'
   caption: Looney Tunes in the bar ???
-- file: img_1774.jpg
-  city: Krka National Park
-  date: '2026-04-29'
-  caption: Dad selfie at Krka National Park (underwhelmed)
 - file: img_5372.jpg
   city: Split
   date: '2026-04-29'
@@ -751,6 +772,10 @@
   city: Split
   date: '2026-04-29'
   caption: 24hr bakery yerrrrr
+- file: img_1774.jpg
+  city: Krka National Park
+  date: '2026-04-29'
+  caption: Dad selfie at Krka National Park (underwhelmed)
 - file: img_5499.jpg
   city: Krka National Park
   date: '2026-04-29'
@@ -818,6 +843,10 @@
   city: Žabljak
   date: '2026-05-03'
   caption: '"Don''t forget to feed the dog" - Camille'
+- file: zabljak-durmitor.jpg
+  city: Žabljak
+  date: '2026-05-03'
+  caption: The Durmitor massif at the bottom of our hike
 - file: img_6003.jpg
   city: Žabljak
   date: '2026-05-03'
@@ -830,10 +859,6 @@
   city: Žabljak
   date: '2026-05-03'
   caption: No problem for Felix and I
-- file: zabljak-durmitor.jpg
-  city: Žabljak
-  date: '2026-05-03'
-  caption: The Durmitor massif at the bottom of our hike
 - file: ba19eef1-e2aa-477d-9c65-9cf6a0d3e61c.jpg
   city: Žabljak
   date: '2026-05-04'
@@ -916,10 +941,6 @@
   city: Paris
   date: '2026-05-10'
   caption: Trocadero after Lulu's restaurant (& icecream ofc)
-- file: img_5585.jpg
-  city: Paris
-  date: '2026-05-10'
-  caption: Metro boomin
 - file: img_6480.jpg
   city: Tirana
   date: '2026-05-10'
@@ -932,6 +953,10 @@
   city: Paris
   date: '2026-05-10'
   caption: Surprised the mother on mother's day and pretended to pickpocket her as my present
+- file: img_5585.jpg
+  city: Paris
+  date: '2026-05-10'
+  caption: Metro boomin
 - file: img_6519.jpg
   city: Paris
   date: '2026-05-10'
@@ -956,14 +981,14 @@
   city: Paris
   date: '2026-05-17'
   caption: Paris moment in the rain
-- file: img_6775.jpg
-  city: Paris
-  date: '2026-05-18'
-  caption: Successful G split again (still 50% success rate), but unsuccessful Arsenal hate watch
 - file: img_6843.jpg
   city: Paris
   date: '2026-05-18'
   caption: Galeries Lafayette roof
+- file: img_6775.jpg
+  city: Paris
+  date: '2026-05-18'
+  caption: Successful G split again (still 50% success rate), but unsuccessful Arsenal hate watch
 - file: img_6777.jpg
   city: Paris
   date: '2026-05-19'
@@ -1009,51 +1034,3 @@
   city: Paris
   date: '2026-05-25'
   caption: Double crêped up on the nostalgia walk before leaving the next day
-- file: img_0461.jpg
-  city: Tirana
-  date: ''
-  caption: Boarding a Wizz Air flight out of Tirana at night
-- file: img_0947.jpg
-  city: Berlin
-  date: ''
-  caption: Wearing the Ampelmann cap on a Berlin street, the little green man in the background
-- file: img_8015.jpg
-  city: Paris
-  date: ''
-  caption: '"FINALLY" - a McDonald''s stop on the day trip north of Paris'
-- file: img_8173.jpg
-  city: Barcelona
-  date: ''
-  caption: Sitting on the beach at night in Barcelona
-- file: img_8174.jpg
-  city: Barcelona
-  date: ''
-  caption: A very late-night selfie on an empty Barcelona avenue - 4:51 AM
-- file: img_8321.jpg
-  city: ''
-  date: ''
-  caption: Looking down over a packed dance floor, flamingo decor hanging from the ceiling
-- file: img_8357.jpg
-  city: Nice
-  date: ''
-  caption: Shoes off, tucked into the tent for the night
-- file: img_8671.jpg
-  city: Chamonix
-  date: ''
-  caption: Baguette and a chocolate bar, Chamonix town spread out below
-- file: img_9112.jpg
-  city: Kandersteg
-  date: ''
-  caption: Making friends with a cow in the Kandersteg pastures
-- file: img_9156.jpg
-  city: Mürren
-  date: ''
-  caption: Geared up in helmets and harnesses for the via ferrata above Mürren
-- file: img_9281.jpg
-  city: Zermatt
-  date: ''
-  caption: Bivying out for the night on a bench in Zermatt - "bed for the night"
-- file: img_9283.jpg
-  city: Zermatt
-  date: ''
-  caption: Bags packed and gear laid out for a night sleeping rough in Zermatt
