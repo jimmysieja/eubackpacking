@@ -52,6 +52,7 @@ Mockava:
   layover: ["2026-04-20 14:52", "2026-04-20 15:12"]
 Warsaw:
   kind: transit
+  label: just passing through
   layover: ["2026-04-20 19:03", "2026-04-20 19:40"]
 Kraków:
   kind: transit

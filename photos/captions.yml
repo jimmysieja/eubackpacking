@@ -19,7 +19,7 @@
 - file: img_8044.jpg
   city: Paris
   date: '2025-06-26'
-  caption: Paris fashion week
+  caption: Was also Paris fashion week, never seen more beautiful people (shoutout Maison Bergeron)
 - file: img_8245.jpg
   city: Marseille
   date: '2025-06-28'
@@ -275,7 +275,7 @@
 - file: img_0321.jpg
   city: Tirana
   date: '2025-08-02'
-  caption: House of Leaves -- Albania's former secret HQ for spying on its own civilians during communist regime
+  caption: House of Leaves-- Albania's former secret HQ for spying on its own civilians during communist regime
 - file: img_0338.jpg
   city: Tirana
   date: '2025-08-02'
@@ -335,7 +335,7 @@
 - file: img_0595.jpg
   city: Kraków
   date: '2025-08-07'
-  caption: This or Davis Wade Stadium
+  caption: Which is louder-- this or Davis Wade Stadium?
 - file: img_0644.jpg
   city: Kraków
   date: '2025-08-07'
@@ -444,14 +444,14 @@
   city: Paris
   date: '2025-08-21'
   caption: Made it to CDG with so much time to spare (we were still in Paris proper an hour before boarding started)
-- file: img_3194.jpg
-  city: Paris
-  date: '2026-02-26'
-  caption: No time zone difference will stop me from beating Aditya
 - file: img_3195.jpg
   city: Paris
   date: '2026-02-26'
   caption: Accidentally slept for 17 hours the 1st night
+- file: img_3194.jpg
+  city: Paris
+  date: '2026-02-26'
+  caption: No time zone difference will stop me from beating Aditya
 - file: 9e0a3ed5-a83f-455e-a4c7-9b9a45beb029.jpg
   city: Paris
   date: '2026-03-04'
@@ -507,7 +507,7 @@
 - file: img_3676.jpg
   city: Liverpool
   date: '2026-03-18'
-  caption: 3/18 - Liverpool 4 - 0 Galatasaray UCL RO16
+  caption: Liverpool 4 - 0 Galatasaray UCL RO16
   featured: true
 - file: img_3687.jpg
   city: Liverpool
@@ -524,11 +524,11 @@
 - file: img_3726.jpg
   city: Liverpool
   date: '2026-03-19'
-  caption: Wirtz for balon d'or until he dies
+  caption: Wirtz for ballon d'or
 - file: img_3816.jpg
   city: Chinley
   date: '2026-03-20'
-  caption: Quick day trip hike near Manchester while waiting for RJ to get in
+  caption: Quick day trip hike near Manchester while waiting for Ralph to get in
 - file: 09db6ea9-f8b5-4c6d-9f85-bea76a8d57cd.jpg
   city: Manchester
   date: '2026-03-21'
@@ -609,7 +609,7 @@
 - file: img_4379.jpg
   city: Paris
   date: '2026-04-04'
-  caption: Built up the courage to ask if I could play pickup footy at a place near RJ's
+  caption: Built up the courage to ask if I could play pickup footy at a place near Ralph's
 - file: img_4426.jpg
   city: Lille
   date: '2026-04-06'
@@ -718,6 +718,10 @@
   city: Ostrava
   date: '2026-04-21'
   caption: Munchin on some breakfast
+- file: img_5035.jpg
+  city: Bratislava
+  date: '2026-04-22'
+  caption: City of creamers (everyone had a cone in their hand fr)
 - file: img_5065.jpg
   city: Vienna
   date: '2026-04-23'
@@ -742,7 +746,7 @@
 - file: img_4248.jpg
   city: Bled
   date: '2026-04-25'
-  caption: Foosball before the hike
+  caption: Lil bit of foosball before the hike
 - file: img_5188.jpg
   city: Bled
   date: '2026-04-25'
@@ -752,7 +756,7 @@
   date: '2026-04-25'
   caption: Quick pitstop in Ljubljana before a long train day to Split
 - file: img_5274.jpg
-  city: Split
+  city: Zagreb
   date: '2026-04-26'
   caption: Met and talked to Matteo, who lives in Split
   featured: true
@@ -775,7 +779,7 @@
 - file: img_1774.jpg
   city: Krka National Park
   date: '2026-04-29'
-  caption: Dad selfie at Krka National Park (underwhelmed)
+  caption: Dad selfie at Krka National Park w/ Isla (underwhelmed)
 - file: img_5499.jpg
   city: Krka National Park
   date: '2026-04-29'
@@ -800,12 +804,12 @@
 - file: img_5802.jpg
   city: Mostar
   date: '2026-05-01'
-  caption: Homeless in Mostar so walk from random gas station where I was dropped off at 3:00am to an
-    abandoned outside train station platform
+  caption: Homeless in Mostar so walked from random gas station where I was dropped off at 3:00am to an
+    outside & abandoned train station platform
 - file: img_5805.jpg
   city: Mostar
   date: '2026-05-01'
-  caption: Home for the night at an abandoned train station platform
+  caption: Cozy home for the night on a mattress of rocks
 - file: img_5840.jpg
   city: Sarajevo
   date: '2026-05-01'
@@ -820,7 +824,7 @@
   caption: This big guy kept us company
   featured: true
 - file: f6f0ad1c-5103-44cf-b6b0-0b80f47dd071.jpg
-  city: Sarajevo
+  city: Plužine
   date: '2026-05-02'
   caption: Shoutout Emilie for the lift
 - file: img_5854.jpg
@@ -887,6 +891,11 @@
   date: '2026-05-05'
   caption: Somehow ended up at a Montenegrin basketball game. Am now the world's biggest KK Budućnost
     VOLI fan
+- file: bb08115d-86f3-4727-8192-ca67f6d7068f.jpg
+  city: Virpazar
+  date: '2026-05-06'
+  caption: Felix and I on tha boat
+  featured: true
 - file: 5f0a6068-0d8f-4f81-94e5-85e2dc537b67.jpg
   city: Virpazar
   date: '2026-05-06'
@@ -895,11 +904,6 @@
   city: Virpazar
   date: '2026-05-06'
   caption: I don't remember this
-- file: bb08115d-86f3-4727-8192-ca67f6d7068f.jpg
-  city: Virpazar
-  date: '2026-05-06'
-  caption: Felix and I on tha boat
-  featured: true
 - file: img_6354.jpg
   city: Shkodër
   date: '2026-05-07'
@@ -907,11 +911,11 @@
 - file: img_6360.jpg
   city: Shkodër
   date: '2026-05-07'
-  caption: Shkoderrrrrrr
+  caption: Shkodërrrrrrr
 - file: img_6368.jpg
   city: Shkodër
   date: '2026-05-07'
-  caption: Icecream w the aussi (Emerson)and brit (Emma)
+  caption: Icecream w the aussie (Emerson) and brit (Emma)
 - file: img_6372.jpg
   city: Shkodër
   date: '2026-05-07'
@@ -936,11 +940,11 @@
 - file: img_6469.jpg
   city: Tirana
   date: '2026-05-09'
-  caption: Rajmonda!!! Revisited FruitJuiceandMore to talk to Rajmonda for a while, almost a year later
+  caption: Rajmonda!!! Revisited FruitJuiceandMore to talk to Rajmonda for a while once again, almost a year later
 - file: 28e388cb-6c76-4846-854c-0174034ecc31.jpg
   city: Paris
   date: '2026-05-10'
-  caption: Trocadero after Lulu's restaurant (& icecream ofc)
+  caption: Trocadéro after Lulu's restaurant (& icecream ofc)
 - file: img_6480.jpg
   city: Tirana
   date: '2026-05-10'
@@ -960,7 +964,7 @@
 - file: img_6519.jpg
   city: Paris
   date: '2026-05-10'
-  caption: Well done Dorothy
+  caption: That's mint Dorothy
 - file: img_6566.jpg
   city: Paris
   date: '2026-05-12'

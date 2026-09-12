@@ -51,7 +51,7 @@ MODE_STYLE = {
     "bus":    ("9 6",        1.4, 0.85, 0.14, 0),
     "ferry":  ("",           1.4, 0.85, 0.22, 2),   # a wave
     "flight": ("2 7",        1.3, 0.62, 0.55, 0),   # sparse + big arc
-    "car":    ("1 4 7 4",    1.3, 0.85, 0.10, 0),   # dash-dot
+    "car":    ("6 2 1 2 1 2", 1.3, 0.85, 0.10, 0),  # dash-dot-dot, a road marking
     "bike":   ("2 4",        1.2, 0.80, 0.10, 0),
 }
 MODE_DASH = {m: s[0] for m, s in MODE_STYLE.items()}
@@ -62,17 +62,18 @@ PAL = {
     "light": {
         "paper": "#f3efe6", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
         "accent": "#7c3b2c", "gold": "#9a7636", "faint": "#c9c1ac", "far": "#e2dbc9",
-        # per-trip line/pin colours. trip2 = a light teal, trip1 = a warm cream
-        # (a deeper wheat in light mode so it still reads on the cream paper).
-        # warm/cool split stays legible for colour-blind eyes. tweak freely.
-        "trip1": "#bf9856", "trip2": "#4e9ca2",
+        # per-trip line/pin colours. trip1 = yellow, trip2 = teal, chosen to sit
+        # far apart on the wheel so the two routes never get mistaken for each
+        # other even in a tangle. warm/cool split stays legible for colour-blind
+        # eyes. tweak freely.
+        "trip1": "#cc9a1f", "trip2": "#4e9ca2",
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
         "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
         "accent": "#cf7359", "gold": "#c8a55f", "faint": "#3d3a2f", "far": "#2c281f",
-        "trip1": "#ecdcb1", "trip2": "#8ad2cb",
+        "trip1": "#f0c94c", "trip2": "#8ad2cb",
         "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
