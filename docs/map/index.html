@@ -72,7 +72,8 @@
   /* a dual-trip city's stints each carry their trip colour down the margin, so
      the 2025 -> 2026 switch reads at a glance while scrolling through photos,
      not just from the small chip dot. */
-  #panel .stint{border-left:4px solid var(--stint,var(--rule));padding-left:9px;margin-left:-13px}
+  #panel .stint{border-left:4px solid var(--stint,var(--rule));padding-left:9px;margin-left:-13px;
+    border-right:4px solid var(--stint,var(--rule));padding-right:9px;margin-right:-13px}
   #panel .stint:first-child .leghead{margin-top:2px}
   #panel .leghead{font-family:var(--serif);font-size:16px;color:var(--ink);margin:26px 0 12px;
     padding-bottom:5px;border-bottom:2px solid var(--stint,var(--rule))}
@@ -160,7 +161,7 @@
     const [dash, wt, op, bow, wave] = styleFor(g.mode);
     const pts = curve(g.a, g.b, bow);
     const line = L.polyline(pts, {
-      color: C.ink, weight: wt, opacity: op,
+      color: inkVar(g.trip), weight: wt, opacity: op,
       dashArray: dash || null, lineCap: dash.startsWith('0.1') ? 'round' : 'butt',
       interactive: false, smoothFactor: wave ? 0 : 1
     }).addTo(map);
