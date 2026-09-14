@@ -56,24 +56,26 @@ MODE_STYLE = {
 }
 MODE_DASH = {m: s[0] for m, s in MODE_STYLE.items()}
 
-# "Field atlas" palette. Single source of truth — the map page reads this too
+# "Cotton candy" palette. Single source of truth — the map page reads this too
 # (docs/map/palette.json). Change colours here, rerun build, both pages update.
+# The Transit and Featured sections locally override `accent` (see .movement-
+# transit / .movement-featured in _css()) — everything else, including the
+# interactive map, reads these values directly.
 PAL = {
     "light": {
-        "paper": "#f3efe6", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
-        "accent": "#7c3b2c", "gold": "#9a7636", "faint": "#c9c1ac", "far": "#e2dbc9",
-        # per-trip line/pin colours. trip1 = yellow, trip2 = teal, chosen to sit
-        # far apart on the wheel so the two routes never get mistaken for each
-        # other even in a tangle. warm/cool split stays legible for colour-blind
-        # eyes. tweak freely.
-        "trip1": "#cc9a1f", "trip2": "#4e9ca2",
+        "paper": "#f6f2f0", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
+        "accent": "#c93f8a", "gold": "#9b6fc9", "faint": "#c9c1ac", "far": "#e2dbc9",
+        # per-trip line/pin colours. trip1 = blue, trip2 = purple — still far
+        # enough apart on the wheel that the two routes don't get mistaken for
+        # each other even in a tangle. tweak freely.
+        "trip1": "#aadbff", "trip2": "#c9a0e8",
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
         "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
-        "accent": "#cf7359", "gold": "#c8a55f", "faint": "#3d3a2f", "far": "#2c281f",
-        "trip1": "#f0c94c", "trip2": "#8ad2cb",
+        "accent": "#ff8fc4", "gold": "#b990e0", "faint": "#3d3a2f", "far": "#2c281f",
+        "trip1": "#7ec2ff", "trip2": "#d8a6f5",
         "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
@@ -86,20 +88,29 @@ DEFAULT_INK = "accent"
 # --- static route-trace map (assets/route-*.svg + the homepage figure) --------
 # Non-overnight stops that still earn a label (name only). Overnight stops are
 # always labelled.
+#
+# Kandersteg, Mürren, Ostrava, Břeclav, Theth, Virpazar, Santa Marinella,
+# Vatican City and Lyon are deliberately left out for now (2026-09) — too
+# cramped alongside their neighbours. Their ROUTE_LABEL_POS entries below are
+# kept (not deleted) since a few other labels were repositioned "to where X
+# used to be"; restore a name here to bring its label back.
 ROUTE_EXTRA = {
-    "Vatican City", "Santa Marinella", "Kandersteg", "Mürren", "Monaco-Ville",
-    "Lyon", "Břeclav", "Ostrava", "Oxford", "Naples", "Theth", "Virpazar",
+    "Monaco-Ville", "Oxford", "Naples",
 }
+# display text for a city label, where it differs from the data's city name
+ROUTE_DISPLAY = {"Monaco-Ville": "Monaco"}
 # hand nudges for labels that would otherwise collide. (dx, dy, anchor);
 # anchor is "start" (label right of dot), "end" (left) or "middle".
 ROUTE_LABEL_POS = {
     "Liverpool":    (0, -10, "middle"),
     "Manchester":   (7, 12, "start"),
     "Abergavenny":  (-10, 13, "end"),
-    "Betws-y-Coed": (-7, 12, "end"),
+    "Betws-y-Coed": (6, 16, "start"),
     "Belfast":      (-8, -4, "end"),
     "Clifden":      (-6, 3, "end"),
-    "Oxford":       (-6, 13, "end"),
+    "Galway":       (-3, 14, "middle"),
+    "Dublin":       (-7, 12, "end"),
+    "Oxford":       (10, -4, "start"),
     "Ercolano":     (10, 11, "start"),
     "Naples":       (-9, 1, "end"),
     "Bari":         (9, 3, "start"),
@@ -107,15 +118,15 @@ ROUTE_LABEL_POS = {
     "Vatican City": (-2, 20, "middle"),
     "Santa Marinella": (-10, -10, "end"),
     "Lyon":         (-10, 26, "end"),
-    "Chamonix":     (9, -2, "start"),
-    "Annecy":       (-4, 22, "middle"),
-    "Zermatt":      (16, 13, "start"),
+    "Chamonix":     (-16, 16, "end"),
+    "Annecy":       (0, -14, "middle"),
+    "Zermatt":      (9, -2, "start"),
     "Kandersteg":   (-6, -30, "end"),
     "Interlaken":   (6, -24, "start"),
     "Mürren":       (0, -13, "middle"),
     "Milan":        (8, 9, "start"),
-    "Nice":         (9, 8, "start"),
-    "Monaco-Ville": (10, -3, "start"),
+    "Nice":         (0, 13, "middle"),
+    "Monaco-Ville": (5, -3, "start"),
     "Marseille":    (-9, 6, "end"),
     "Florence":     (11, 10, "start"),
     "Bled":         (-9, -3, "end"),
@@ -124,14 +135,15 @@ ROUTE_LABEL_POS = {
     "Bratislava":   (8, 10, "start"),
     "Zagreb":       (8, 6, "start"),
     "Kraków":       (8, -3, "start"),
-    "Sarajevo":     (9, 6, "start"),
+    "Sarajevo":     (2, -30, "middle"),
     "Split":        (0, -16, "middle"),
     "Mostar":       (-16, 13, "end"),
-    "Žabljak":      (2, -30, "middle"),
-    "Podgorica":    (-24, -2, "end"),
+    "Žabljak":      (9, 6, "start"),
+    "Podgorica":    (-10, -2, "end"),
     "Virpazar":     (-2, 20, "middle"),
-    "Shkodër":      (20, 22, "start"),
+    "Shkodër":      (-2, 20, "middle"),
     "Theth":        (22, -4, "start"),
+    "Tirana":       (-6, 10, "end"),
 }
 
 
@@ -291,7 +303,7 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
             lead = (f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{tx:.1f}" y2="{ty - 3:.1f}" '
                     f'stroke="var(--rule)" stroke-width="0.7"/>') if abs(dx) > 11 or abs(dy) > 11 else ""
             labels.append(f'{lead}<text x="{tx:.1f}" y="{ty:.1f}" text-anchor="{anchor}" '
-                          f'class="tr-city">{esc(city)}</text>')
+                          f'class="tr-city">{esc(ROUTE_DISPLAY.get(city, city))}</text>')
 
     return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="Route trace">'
             f'<rect x="0.5" y="0.5" width="{w-1}" height="{h-1}" fill="none" '
@@ -432,7 +444,7 @@ def transit_movement(d: dict) -> str:
                 ov.append(f'{n} {label}')
     ov.append(f'{fmt(ts["rail_km"])} km')
     return f"""
-<section class="movement">
+<section class="movement movement-transit">
   <p class="tag">Transit</p>
   <p class="statement"><b>{hm(ts['rail_hours'])} on trains</b> &mdash; about
   {ts['full_days_equiv']:.1f} days.</p>
@@ -499,7 +511,7 @@ def gallery_movement(d: dict) -> str:
         return ""
     cells = "".join(_photo_cell(e) for e in entries)
     return f"""
-<section class="movement">
+<section class="movement movement-featured">
   <p class="tag">Favorites</p>
   <div class="mosaic">{cells}</div>
 </section>
@@ -542,6 +554,12 @@ def _css() -> str:
   --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,Menlo,monospace}}
 @media (prefers-color-scheme:dark){{:root:not([data-theme=light]){{{vars_('dark')}}}}}
 :root[data-theme=dark]{{{vars_('dark')}}}
+.movement-transit{{--accent:#1a94c4}}
+.movement-featured{{--accent:#a9713f}}
+@media (prefers-color-scheme:dark){{:root:not([data-theme=light]) .movement-transit{{--accent:#5cd3f5}}
+  :root:not([data-theme=light]) .movement-featured{{--accent:#d19a5e}}}}
+:root[data-theme=dark] .movement-transit{{--accent:#5cd3f5}}
+:root[data-theme=dark] .movement-featured{{--accent:#d19a5e}}
 *{{box-sizing:border-box}}
 body{{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}}
@@ -579,7 +597,7 @@ figure{{margin:0}}
 .key b{{color:var(--ink)}}
 .ax{{font-size:9px;fill:var(--dim);letter-spacing:.1em}}
 .ax-note{{font-size:9px;fill:var(--ink);letter-spacing:.06em}}
-.tr-city{{font-family:var(--mono);font-size:10px;fill:var(--ink);letter-spacing:.01em;
+.tr-city{{font-family:var(--mono);font-size:9px;fill:var(--ink);letter-spacing:.01em;
   paint-order:stroke;stroke:var(--paper);stroke-width:2.8px;stroke-linejoin:round}}
 .itin-trip{{margin-bottom:34px}}
 .itin{{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}}
@@ -637,7 +655,7 @@ def _standalone(svg: str, theme: str) -> str:
     style = (f'<style>svg{{background:{p["paper"]}}}:root{{{css}}}'
              f'text{{font-family:"Spline Sans Mono",ui-monospace,monospace}}'
              f'.ax{{fill:{p["dim"]};font-size:9px}} .ax-note{{fill:{p["ink"]};font-size:9px}}'
-             f'.tr-city{{fill:{p["ink"]};font-size:10px;paint-order:stroke;'
+             f'.tr-city{{fill:{p["ink"]};font-size:9px;paint-order:stroke;'
              f'stroke:{p["paper"]};stroke-width:2.8px;stroke-linejoin:round}}</style>')
     return svg.replace(">", ">" + style, 1)
 
