@@ -19,7 +19,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
 .page{max-width:940px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(20px,5vw,52px) 120px}
 em{font-style:italic}
 b{font-weight:500}
-.dateline,.tag,.micro,.ax,.ax-note,.key,.colophon{
+.dateline,.tag,.micro,.ax,.ax-note,.key{
   font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em}
 header{margin-bottom:clamp(40px,8vw,88px)}
 .dateline{font-size:11px;color:var(--dim);margin:0 0 22px}
@@ -31,8 +31,9 @@ h1 em{color:var(--accent)}
 .movement{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}
 .tag{font-size:10.5px;color:var(--accent);margin:0 0 20px}
 .map-link{font-family:var(--serif);font-size:clamp(18px,2.6vw,22px);margin:0 0 18px}
-.map-link a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}
-.map-link a:hover{color:var(--accent);border-color:var(--accent)}
+.map-link a{color:var(--accent);text-decoration:underline;text-decoration-color:currentColor;
+  text-underline-offset:4px}
+.map-link a:hover{color:var(--ink)}
 .statement{font-family:var(--serif);font-size:clamp(20px,3vw,28px);line-height:1.4;
   font-weight:400;max-width:32ch;margin:0 0 30px}
 .statement b{color:var(--accent);font-weight:500}
@@ -68,8 +69,13 @@ figure{margin:0}
 .mosaic img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:3px}
 .mosaic figcaption{font-family:var(--serif);font-style:italic;font-size:11px;color:var(--dim);
   margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.colophon{font-size:9.5px;color:var(--dim);margin-top:110px;padding-top:20px;
-  border-top:1px solid var(--rule)}
+#lightbox{position:fixed;inset:0;z-index:100;background:rgba(20,18,14,.92);display:none;
+  align-items:center;justify-content:center;padding:32px;cursor:zoom-out}
+#lightbox.open{display:flex}
+#lightbox figure{max-width:100%;max-height:100%;cursor:default;text-align:center}
+#lightbox img{max-width:100%;max-height:80vh;object-fit:contain;display:block;margin:0 auto}
+#lightbox figcaption{font-family:var(--serif);font-style:italic;font-size:14px;
+  color:#f3efe6;margin-top:16px;max-width:60ch}
 a{color:var(--accent)}
 </style>
 </head><body><main class="page">
@@ -98,5 +104,35 @@ a{color:var(--accent)}
   <p class="tag">Too Good To Go</p>
   <p class="statement"><b>22 bags</b> rescued across 3 cities.</p>
   <p class="micro">22 bags &nbsp;&middot;&nbsp; 3 cities</p>
-</section><section class="movement"><p class="tag">Favorites</p><div class="mosaic"><figure class="ph"><a href="photos/large/img_8220.jpg"><img loading="lazy" src="photos/thumb/img_8220.jpg" alt="Beer me"></a><figcaption>Beer me &mdash; Barcelona</figcaption></figure><figure class="ph"><a href="photos/large/IMG_8733.jpg"><img loading="lazy" src="photos/thumb/IMG_8733.jpg" alt="Adding Tour du Mont Blanc to bucket list"></a><figcaption>Adding Tour du Mont Blanc to bucket list &mdash; Chamonix</figcaption></figure><figure class="ph"><a href="photos/large/img_9008.jpg"><img loading="lazy" src="photos/thumb/img_9008.jpg" alt="Taking in the view over Oeschinensee"></a><figcaption>Taking in the view over Oeschinensee &mdash; Kandersteg</figcaption></figure><figure class="ph"><a href="photos/large/img_9191.jpg"><img loading="lazy" src="photos/thumb/img_9191.jpg" alt="Not even worried..."></a><figcaption>Not even worried... &mdash; Mürren</figcaption></figure><figure class="ph"><a href="photos/large/img_9763.jpg"><img loading="lazy" src="photos/thumb/img_9763.jpg" alt="Sunset @ Piazza Michelangelo"></a><figcaption>Sunset @ Piazza Michelangelo &mdash; Florence</figcaption></figure><figure class="ph"><a href="photos/large/img_0449.jpg"><img loading="lazy" src="photos/thumb/img_0449.jpg" alt="Rajmonda and FruitJuice&amp;More (pt. 1)"></a><figcaption>Rajmonda and FruitJuice&amp;More (pt. 1) &mdash; Tirana</figcaption></figure><figure class="ph"><a href="photos/large/img_1227.jpg"><img loading="lazy" src="photos/thumb/img_1227.jpg" alt="Eiffel Tower taking flight??"></a><figcaption>Eiffel Tower taking flight?? &mdash; Paris</figcaption></figure><figure class="ph"><a href="photos/large/img_3282.jpg"><img loading="lazy" src="photos/thumb/img_3282.jpg" alt="PSG 3-1 Monaco Ligue 1 match"></a><figcaption>PSG 3-1 Monaco Ligue 1 match &mdash; Paris</figcaption></figure><figure class="ph"><a href="photos/large/img_3676.jpg"><img loading="lazy" src="photos/thumb/img_3676.jpg" alt="Liverpool 4 - 0 Galatasaray UCL RO16"></a><figcaption>Liverpool 4 - 0 Galatasaray UCL RO16 &mdash; Liverpool</figcaption></figure><figure class="ph"><a href="photos/large/img_3816.jpg"><img loading="lazy" src="photos/thumb/img_3816.jpg" alt="Quick day trip hike near Manchester"></a><figcaption>Quick day trip hike near Manchester &mdash; Chinley</figcaption></figure><figure class="ph"><a href="photos/large/img_4733.jpg"><img loading="lazy" src="photos/thumb/img_4733.jpg" alt="Facts."></a><figcaption>Facts. &mdash; Helsinki</figcaption></figure><figure class="ph"><a href="photos/large/img_5149.jpg"><img loading="lazy" src="photos/thumb/img_5149.jpg" alt="Lake Bled (basically Loot Lake from Fortnite)"></a><figcaption>Lake Bled (basically Loot Lake from Fortnite) &mdash; Bled</figcaption></figure><figure class="ph"><a href="photos/large/img_5753.jpg"><img loading="lazy" src="photos/thumb/img_5753.jpg" alt="yummers"></a><figcaption>yummers &mdash; Split</figcaption></figure><figure class="ph"><a href="photos/large/6d5eef40-69c1-487c-8135-6138688adfcc.jpg"><img loading="lazy" src="photos/thumb/6d5eef40-69c1-487c-8135-6138688adfcc.jpg" alt="This big guy kept us company"></a><figcaption>This big guy kept us company &mdash; Plužine</figcaption></figure><figure class="ph"><a href="photos/large/zabljak-durmitor.jpg"><img loading="lazy" src="photos/thumb/zabljak-durmitor.jpg" alt="The Durmitor massif at the bottom of our hike"></a><figcaption>The Durmitor massif at the bottom of our hike &mdash; Žabljak</figcaption></figure><figure class="ph"><a href="photos/large/img_6469.jpg"><img loading="lazy" src="photos/thumb/img_6469.jpg" alt="Rajmonda again!! Revisited FruitJuiceandMore to catch up for a while, almost a year later"></a><figcaption>Rajmonda again!! Revisited FruitJuiceandMore to catch up for a while, almost a year later &mdash; Tirana</figcaption></figure><figure class="ph"><a href="photos/large/28e388cb-6c76-4846-854c-0174034ecc31.jpg"><img loading="lazy" src="photos/thumb/28e388cb-6c76-4846-854c-0174034ecc31.jpg" alt="Trocadéro after Lulu&#x27;s restaurant (&amp; icecream ofc)"></a><figcaption>Trocadéro after Lulu&#x27;s restaurant (&amp; icecream ofc) &mdash; Paris</figcaption></figure><figure class="ph"><a href="photos/large/img_7095.jpg"><img loading="lazy" src="photos/thumb/img_7095.jpg" alt="Fit check"></a><figcaption>Fit check &mdash; Paris</figcaption></figure></div></section><footer class="colophon">Rail figures from the Interrail app &middot; other distances estimated &middot; 14 Sep 2026</footer>
+</section>
+<section class="movement">
+  <p class="tag">Favorites</p>
+  <div class="mosaic"><figure class="ph"><a href="photos/large/img_8220.jpg" data-lightbox data-caption="Beer me" data-city="Barcelona"><img loading="lazy" src="photos/thumb/img_8220.jpg" alt="Beer me"></a><figcaption>Beer me &mdash; Barcelona</figcaption></figure><figure class="ph"><a href="photos/large/IMG_8733.jpg" data-lightbox data-caption="Adding Tour du Mont Blanc to bucket list" data-city="Chamonix"><img loading="lazy" src="photos/thumb/IMG_8733.jpg" alt="Adding Tour du Mont Blanc to bucket list"></a><figcaption>Adding Tour du Mont Blanc to bucket list &mdash; Chamonix</figcaption></figure><figure class="ph"><a href="photos/large/img_9008.jpg" data-lightbox data-caption="Taking in the view over Oeschinensee" data-city="Kandersteg"><img loading="lazy" src="photos/thumb/img_9008.jpg" alt="Taking in the view over Oeschinensee"></a><figcaption>Taking in the view over Oeschinensee &mdash; Kandersteg</figcaption></figure><figure class="ph"><a href="photos/large/img_9191.jpg" data-lightbox data-caption="Not even worried..." data-city="Mürren"><img loading="lazy" src="photos/thumb/img_9191.jpg" alt="Not even worried..."></a><figcaption>Not even worried... &mdash; Mürren</figcaption></figure><figure class="ph"><a href="photos/large/img_9763.jpg" data-lightbox data-caption="Sunset @ Piazza Michelangelo" data-city="Florence"><img loading="lazy" src="photos/thumb/img_9763.jpg" alt="Sunset @ Piazza Michelangelo"></a><figcaption>Sunset @ Piazza Michelangelo &mdash; Florence</figcaption></figure><figure class="ph"><a href="photos/large/img_0449.jpg" data-lightbox data-caption="Rajmonda and FruitJuice&amp;More (pt. 1)" data-city="Tirana"><img loading="lazy" src="photos/thumb/img_0449.jpg" alt="Rajmonda and FruitJuice&amp;More (pt. 1)"></a><figcaption>Rajmonda and FruitJuice&amp;More (pt. 1) &mdash; Tirana</figcaption></figure><figure class="ph"><a href="photos/large/img_1227.jpg" data-lightbox data-caption="Eiffel Tower taking flight??" data-city="Paris"><img loading="lazy" src="photos/thumb/img_1227.jpg" alt="Eiffel Tower taking flight??"></a><figcaption>Eiffel Tower taking flight?? &mdash; Paris</figcaption></figure><figure class="ph"><a href="photos/large/img_3282.jpg" data-lightbox data-caption="PSG 3-1 Monaco Ligue 1 match" data-city="Paris"><img loading="lazy" src="photos/thumb/img_3282.jpg" alt="PSG 3-1 Monaco Ligue 1 match"></a><figcaption>PSG 3-1 Monaco Ligue 1 match &mdash; Paris</figcaption></figure><figure class="ph"><a href="photos/large/img_3676.jpg" data-lightbox data-caption="Liverpool 4 - 0 Galatasaray UCL RO16" data-city="Liverpool"><img loading="lazy" src="photos/thumb/img_3676.jpg" alt="Liverpool 4 - 0 Galatasaray UCL RO16"></a><figcaption>Liverpool 4 - 0 Galatasaray UCL RO16 &mdash; Liverpool</figcaption></figure><figure class="ph"><a href="photos/large/img_3816.jpg" data-lightbox data-caption="Quick day trip hike near Manchester" data-city="Chinley"><img loading="lazy" src="photos/thumb/img_3816.jpg" alt="Quick day trip hike near Manchester"></a><figcaption>Quick day trip hike near Manchester &mdash; Chinley</figcaption></figure><figure class="ph"><a href="photos/large/img_4733.jpg" data-lightbox data-caption="Facts." data-city="Helsinki"><img loading="lazy" src="photos/thumb/img_4733.jpg" alt="Facts."></a><figcaption>Facts. &mdash; Helsinki</figcaption></figure><figure class="ph"><a href="photos/large/img_5149.jpg" data-lightbox data-caption="Lake Bled (basically Loot Lake from Fortnite)" data-city="Bled"><img loading="lazy" src="photos/thumb/img_5149.jpg" alt="Lake Bled (basically Loot Lake from Fortnite)"></a><figcaption>Lake Bled (basically Loot Lake from Fortnite) &mdash; Bled</figcaption></figure><figure class="ph"><a href="photos/large/img_5753.jpg" data-lightbox data-caption="yummers" data-city="Split"><img loading="lazy" src="photos/thumb/img_5753.jpg" alt="yummers"></a><figcaption>yummers &mdash; Split</figcaption></figure><figure class="ph"><a href="photos/large/6d5eef40-69c1-487c-8135-6138688adfcc.jpg" data-lightbox data-caption="This big guy kept us company" data-city="Plužine"><img loading="lazy" src="photos/thumb/6d5eef40-69c1-487c-8135-6138688adfcc.jpg" alt="This big guy kept us company"></a><figcaption>This big guy kept us company &mdash; Plužine</figcaption></figure><figure class="ph"><a href="photos/large/zabljak-durmitor.jpg" data-lightbox data-caption="The Durmitor massif at the bottom of our hike" data-city="Žabljak"><img loading="lazy" src="photos/thumb/zabljak-durmitor.jpg" alt="The Durmitor massif at the bottom of our hike"></a><figcaption>The Durmitor massif at the bottom of our hike &mdash; Žabljak</figcaption></figure><figure class="ph"><a href="photos/large/img_6469.jpg" data-lightbox data-caption="Rajmonda again!! Revisited FruitJuiceandMore to catch up for a while, almost a year later" data-city="Tirana"><img loading="lazy" src="photos/thumb/img_6469.jpg" alt="Rajmonda again!! Revisited FruitJuiceandMore to catch up for a while, almost a year later"></a><figcaption>Rajmonda again!! Revisited FruitJuiceandMore to catch up for a while, almost a year later &mdash; Tirana</figcaption></figure><figure class="ph"><a href="photos/large/28e388cb-6c76-4846-854c-0174034ecc31.jpg" data-lightbox data-caption="Trocadéro after Lulu&#x27;s restaurant (&amp; icecream ofc)" data-city="Paris"><img loading="lazy" src="photos/thumb/28e388cb-6c76-4846-854c-0174034ecc31.jpg" alt="Trocadéro after Lulu&#x27;s restaurant (&amp; icecream ofc)"></a><figcaption>Trocadéro after Lulu&#x27;s restaurant (&amp; icecream ofc) &mdash; Paris</figcaption></figure><figure class="ph"><a href="photos/large/img_7095.jpg" data-lightbox data-caption="Fit check" data-city="Paris"><img loading="lazy" src="photos/thumb/img_7095.jpg" alt="Fit check"></a><figcaption>Fit check &mdash; Paris</figcaption></figure></div>
+</section>
+<div id="lightbox" aria-hidden="true">
+  <figure>
+    <img alt="">
+    <figcaption></figcaption>
+  </figure>
+</div>
+<script>
+(function(){
+  var lb = document.getElementById('lightbox');
+  var img = lb.querySelector('img');
+  var cap = lb.querySelector('figcaption');
+  var fig = lb.querySelector('figure');
+  document.querySelectorAll('.mosaic a[data-lightbox]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      img.src = a.getAttribute('href');
+      var caption = a.dataset.caption || '', city = a.dataset.city || '';
+      img.alt = caption;
+      cap.textContent = city ? caption + ' \u2014 ' + city : caption;
+      lb.classList.add('open');
+    });
+  });
+  fig.addEventListener('click', function(e){ e.stopPropagation(); });
+  lb.addEventListener('click', function(){ lb.classList.remove('open'); });
+})();
+</script>
 </main></body></html>

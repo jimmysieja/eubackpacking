@@ -480,17 +480,43 @@ def gallery_movement(d: dict) -> str:
     if not entries:
         return ""
     cells = "".join(
-        f'<figure class="ph"><a href="photos/large/{esc(_pub_name(e["file"]))}">'
+        f'<figure class="ph"><a href="photos/large/{esc(_pub_name(e["file"]))}" data-lightbox '
+        f'data-caption="{esc(e.get("caption",""))}" data-city="{esc(e.get("city",""))}">'
         f'<img loading="lazy" src="photos/thumb/{esc(_pub_name(e["file"]))}" alt="{esc(e.get("caption",""))}"></a>'
         f'<figcaption>{esc(e.get("caption",""))}'
         f'{" &mdash; " + esc(e["city"]) if e.get("city") else ""}</figcaption></figure>'
         for e in entries)
-    return f'<section class="movement"><p class="tag">Favorites</p><div class="mosaic">{cells}</div></section>'
-
-
-def colophon(d: dict) -> str:
-    return (f'<footer class="colophon">Rail figures from the Interrail app &middot; '
-            f'other distances estimated &middot; {d["generated"]:%d %b %Y}</footer>')
+    return f"""
+<section class="movement">
+  <p class="tag">Favorites</p>
+  <div class="mosaic">{cells}</div>
+</section>
+<div id="lightbox" aria-hidden="true">
+  <figure>
+    <img alt="">
+    <figcaption></figcaption>
+  </figure>
+</div>
+<script>
+(function(){{
+  var lb = document.getElementById('lightbox');
+  var img = lb.querySelector('img');
+  var cap = lb.querySelector('figcaption');
+  var fig = lb.querySelector('figure');
+  document.querySelectorAll('.mosaic a[data-lightbox]').forEach(function(a){{
+    a.addEventListener('click', function(e){{
+      e.preventDefault();
+      img.src = a.getAttribute('href');
+      var caption = a.dataset.caption || '', city = a.dataset.city || '';
+      img.alt = caption;
+      cap.textContent = city ? caption + ' \\u2014 ' + city : caption;
+      lb.classList.add('open');
+    }});
+  }});
+  fig.addEventListener('click', function(e){{ e.stopPropagation(); }});
+  lb.addEventListener('click', function(){{ lb.classList.remove('open'); }});
+}})();
+</script>"""
 
 
 # --------------------------------------------------------------------------- #
@@ -510,7 +536,7 @@ body{{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
 .page{{max-width:940px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(20px,5vw,52px) 120px}}
 em{{font-style:italic}}
 b{{font-weight:500}}
-.dateline,.tag,.micro,.ax,.ax-note,.key,.colophon{{
+.dateline,.tag,.micro,.ax,.ax-note,.key{{
   font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em}}
 header{{margin-bottom:clamp(40px,8vw,88px)}}
 .dateline{{font-size:11px;color:var(--dim);margin:0 0 22px}}
@@ -522,8 +548,9 @@ h1 em{{color:var(--accent)}}
 .movement{{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}}
 .tag{{font-size:10.5px;color:var(--accent);margin:0 0 20px}}
 .map-link{{font-family:var(--serif);font-size:clamp(18px,2.6vw,22px);margin:0 0 18px}}
-.map-link a{{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}}
-.map-link a:hover{{color:var(--accent);border-color:var(--accent)}}
+.map-link a{{color:var(--accent);text-decoration:underline;text-decoration-color:currentColor;
+  text-underline-offset:4px}}
+.map-link a:hover{{color:var(--ink)}}
 .statement{{font-family:var(--serif);font-size:clamp(20px,3vw,28px);line-height:1.4;
   font-weight:400;max-width:32ch;margin:0 0 30px}}
 .statement b{{color:var(--accent);font-weight:500}}
@@ -559,8 +586,13 @@ figure{{margin:0}}
 .mosaic img{{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:3px}}
 .mosaic figcaption{{font-family:var(--serif);font-style:italic;font-size:11px;color:var(--dim);
   margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
-.colophon{{font-size:9.5px;color:var(--dim);margin-top:110px;padding-top:20px;
-  border-top:1px solid var(--rule)}}
+#lightbox{{position:fixed;inset:0;z-index:100;background:rgba(20,18,14,.92);display:none;
+  align-items:center;justify-content:center;padding:32px;cursor:zoom-out}}
+#lightbox.open{{display:flex}}
+#lightbox figure{{max-width:100%;max-height:100%;cursor:default;text-align:center}}
+#lightbox img{{max-width:100%;max-height:80vh;object-fit:contain;display:block;margin:0 auto}}
+#lightbox figcaption{{font-family:var(--serif);font-style:italic;font-size:14px;
+  color:#f3efe6;margin-top:16px;max-width:60ch}}
 a{{color:var(--accent)}}
 """
 
@@ -568,7 +600,7 @@ a{{color:var(--accent)}}
 def build_html(d: dict) -> str:
     body = "".join([
         masthead(d), trace_movement(d), trains_movement(d), itinerary_movement(d),
-        tgtg_movement(d), gallery_movement(d), colophon(d),
+        tgtg_movement(d), gallery_movement(d),
     ])
     return f"""<!doctype html>
 <html lang="en"><head>
