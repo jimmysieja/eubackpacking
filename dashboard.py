@@ -92,6 +92,10 @@ PAL = {
 TRIP_INK = {"trip1": "trip1", "trip2": "trip2"}
 DEFAULT_INK = "accent"
 
+# both trips begin and end here — ringed on the static map so it reads as
+# the shared home base rather than just another overnight stop.
+START_CITY = "Paris"
+
 # --- static route-trace map (assets/route-*.svg + the homepage figure) --------
 # Non-overnight stops that still earn a label (name only). Overnight stops are
 # always labelled.
@@ -109,6 +113,7 @@ ROUTE_DISPLAY = {"Monaco-Ville": "Monaco"}
 # hand nudges for labels that would otherwise collide. (dx, dy, anchor);
 # anchor is "start" (label right of dot), "end" (left) or "middle".
 ROUTE_LABEL_POS = {
+    "Paris":        (9, 3, "start"),   # clears the start/end ring
     "Liverpool":    (0, -10, "middle"),
     "Manchester":   (7, 12, "start"),
     "Abergavenny":  (-10, 13, "end"),
@@ -292,7 +297,7 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
                        f'fill="none" stroke="var(--{ink})" stroke-width="{wt:.2f}"{cap} '
                        f'stroke-dasharray="{dash}" opacity="{op}"/>')
 
-    dots, labels, seen = [], [], set()
+    dots, labels, seen, ringed = [], [], set(), set()
     for tid, grp in s.groupby("trip"):
         ink = trip_ink.get(tid, "accent")
         for r in grp.to_dict("records"):
@@ -302,6 +307,11 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{3.0 if big else 1.7}" '
                         f'fill="var(--{ink})" stroke="var(--paper)" stroke-width="0.8">'
                         f'<title>{esc(city)}</title></circle>')
+            if city == START_CITY and city not in ringed:
+                ringed.add(city)
+                dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6.5" fill="none" '
+                            f'stroke="var(--ink)" stroke-width="0.9" opacity="0.55">'
+                            f'<title>Start / end of both trips</title></circle>')
             if city in seen:
                 continue
             if not (big or city in ROUTE_EXTRA):
