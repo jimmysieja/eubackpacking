@@ -114,7 +114,7 @@ So on a machine without the originals you can still edit captions/dates, run
 The header (dateline, title, dek) and section labels aren't data — they're
 written directly into `dashboard.py`: the headline text is in `masthead()`,
 and each section's heading/blurb lives at the top of its own `*_movement()`
-function (`trains_movement()`, `itinerary_movement()`, etc., all in that file).
+function (`transit_movement()`, `itinerary_movement()`, etc., all in that file).
 Edit the strings there and rerun `python build.py`.
 
 ## 4. Build

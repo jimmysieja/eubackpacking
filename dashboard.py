@@ -84,21 +84,11 @@ TRIP_INK = {"trip1": "trip1", "trip2": "trip2"}
 DEFAULT_INK = "accent"
 
 # --- static route-trace map (assets/route-*.svg + the homepage figure) --------
-# Non-overnight stops that still earn a label, with the sub-line to show under
-# the name. Overnight stops are always labelled (name only).
+# Non-overnight stops that still earn a label (name only). Overnight stops are
+# always labelled.
 ROUTE_EXTRA = {
-    "Vatican City":    "day trip · 25 Jul",
-    "Santa Marinella": "day trip · 27 Jul",
-    "Kandersteg":      "day hike · 15 Jul",
-    "Mürren":          "day hike · 17 Jul",
-    "Monaco-Ville":    "day trip · 6 Jul",
-    "Lyon":            "overnight bus · Nice 6 Jul → Annecy 7 Jul",
-    "Břeclav":         "passing through · 5 Aug",
-    "Ostrava":         "passing through · 6 Aug",
-    "Oxford":          "on the way to Liverpool",
-    "Naples":          "off the bus, on to Ercolano",
-    "Theth":           "day trip from Shkodër",
-    "Virpazar":        "Lake Skadar day trip",
+    "Vatican City", "Santa Marinella", "Kandersteg", "Mürren", "Monaco-Ville",
+    "Lyon", "Břeclav", "Ostrava", "Oxford", "Naples", "Theth", "Virpazar",
 }
 # hand nudges for labels that would otherwise collide. (dx, dy, anchor);
 # anchor is "start" (label right of dot), "end" (left) or "middle".
@@ -109,26 +99,39 @@ ROUTE_LABEL_POS = {
     "Betws-y-Coed": (-7, 12, "end"),
     "Belfast":      (-8, -4, "end"),
     "Clifden":      (-6, 3, "end"),
-    "Oxford":       (9, 6, "start"),
+    "Oxford":       (-6, 13, "end"),
     "Ercolano":     (10, 11, "start"),
     "Naples":       (-9, 1, "end"),
     "Bari":         (9, 3, "start"),
-    "Rome":         (9, 2, "start"),
+    "Rome":         (10, -8, "start"),
+    "Vatican City": (-2, 20, "middle"),
+    "Santa Marinella": (-10, -10, "end"),
+    "Lyon":         (-10, 26, "end"),
     "Chamonix":     (9, -2, "start"),
-    "Annecy":       (-9, -3, "end"),
-    "Zermatt":      (-9, 7, "end"),
-    "Interlaken":   (9, -3, "start"),
+    "Annecy":       (-4, 22, "middle"),
+    "Zermatt":      (16, 13, "start"),
+    "Kandersteg":   (-6, -30, "end"),
+    "Interlaken":   (6, -24, "start"),
+    "Mürren":       (0, -13, "middle"),
     "Milan":        (8, 9, "start"),
     "Nice":         (9, 8, "start"),
     "Monaco-Ville": (10, -3, "start"),
     "Marseille":    (-9, 6, "end"),
+    "Florence":     (11, 10, "start"),
     "Bled":         (-9, -3, "end"),
     "Ljubljana":    (8, 9, "start"),
     "Vienna":       (8, -3, "start"),
     "Bratislava":   (8, 10, "start"),
     "Zagreb":       (8, 6, "start"),
+    "Kraków":       (8, -3, "start"),
     "Sarajevo":     (9, 6, "start"),
-    "Mostar":       (-9, 4, "end"),
+    "Split":        (0, -16, "middle"),
+    "Mostar":       (-16, 13, "end"),
+    "Žabljak":      (2, -30, "middle"),
+    "Podgorica":    (-24, -2, "end"),
+    "Virpazar":     (-2, 20, "middle"),
+    "Shkodër":      (20, 22, "start"),
+    "Theth":        (22, -4, "start"),
 }
 
 
@@ -279,8 +282,7 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
                         f'<title>{esc(city)}</title></circle>')
             if city in seen:
                 continue
-            note = ROUTE_EXTRA.get(city)
-            if not (big or note is not None):
+            if not (big or city in ROUTE_EXTRA):
                 continue
             seen.add(city)
             dx, dy, anchor = ROUTE_LABEL_POS.get(
@@ -288,10 +290,8 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
             tx, ty = x + dx, y + dy
             lead = (f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{tx:.1f}" y2="{ty - 3:.1f}" '
                     f'stroke="var(--rule)" stroke-width="0.7"/>') if abs(dx) > 11 or abs(dy) > 11 else ""
-            sub = (f'<tspan x="{tx:.1f}" dy="10" class="tr-sub">{esc(note)}</tspan>'
-                   if note else "")
             labels.append(f'{lead}<text x="{tx:.1f}" y="{ty:.1f}" text-anchor="{anchor}" '
-                          f'class="tr-city">{esc(city)}{sub}</text>')
+                          f'class="tr-city">{esc(city)}</text>')
 
     return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="Route trace">'
             f'<rect x="0.5" y="0.5" width="{w-1}" height="{h-1}" fill="none" '
@@ -383,7 +383,7 @@ def masthead(d: dict) -> str:
   <p class="dateline">A gap year &middot; Europe &middot; {yr}</p>
   <h1>A gap year around Europe</h1>
   <p class="dek">Two backpacking trips, Summer 2025 and Spring 2026 &mdash; the route,
-  the spending, and the time spent on trains. {ov['n_countries_visited']} countries,
+  the stops, and the time spent in transit. {ov['n_countries_visited']} countries,
   {ov['n_cities']} cities.</p>
 </header>"""
 
@@ -395,12 +395,12 @@ def trace_movement(d: dict) -> str:
     return f"""
 <section class="movement">
   <p class="tag">Route</p>
-  <p class="map-link"><a href="map/">Interactive map &rarr;</a></p>
+  <p class="map-link"><a href="map/">Interactive map w/ pictures &rarr;</a></p>
   <figure class="trace">{svg}</figure>
 </section>"""
 
 
-def trains_movement(d: dict) -> str:
+def transit_movement(d: dict) -> str:
     ts = A.train_stats(d)
     if not ts.get("has_data"):
         return ""
@@ -420,13 +420,20 @@ def trains_movement(d: dict) -> str:
                 cols.append((day, stack))
     strip = day_strip(span, cols, baseline_label="hours in transit, by day") if cols else ""
     legend = ('<div class="key">'
-              '<span class="k"><i style="background:var(--accent)"></i>train</span>'
-              '<span class="k"><i style="background:var(--ink)"></i>other transit (bus, ferry, flight, car)</span>'
+              '<span class="k"><i style="background:var(--accent);opacity:.9"></i>train</span>'
+              '<span class="k"><i style="background:var(--ink);opacity:.28"></i>other transit (bus, ferry, flight, car)</span>'
               '</div>') if cols else ""
-    ov = [f'{ts["rail_legs"]} trains', f'{fmt(ts["rail_km"])} km']
+    ov = [f'{ts["rail_legs"]} trains']
+    mb = A.mode_breakdown(d)
+    if not mb.empty:
+        for mode, label in (("bus", "buses"), ("flight", "flights")):
+            n = int(mb.loc[mode, "legs"]) if mode in mb.index else 0
+            if n:
+                ov.append(f'{n} {label}')
+    ov.append(f'{fmt(ts["rail_km"])} km')
     return f"""
 <section class="movement">
-  <p class="tag">Trains</p>
+  <p class="tag">Transit</p>
   <p class="statement"><b>{hm(ts['rail_hours'])} on trains</b> &mdash; about
   {ts['full_days_equiv']:.1f} days.</p>
   <figure class="strip">{strip}</figure>
@@ -474,18 +481,23 @@ def tgtg_movement(d: dict) -> str:
 </section>"""
 
 
+def _photo_cell(e: dict) -> str:
+    file = esc(_pub_name(e["file"]))
+    cap = esc(e.get("caption", ""))
+    city = e.get("city", "")
+    city_p = f'<p class="ph-city">{esc(city)}</p>' if city else ""
+    return (f'<figure class="ph"><a href="photos/large/{file}" data-lightbox '
+            f'data-caption="{cap}" data-city="{esc(city)}">'
+            f'<img loading="lazy" src="photos/thumb/{file}" alt="{cap}"></a>'
+            f'<figcaption>{cap}</figcaption>{city_p}</figure>')
+
+
 def gallery_movement(d: dict) -> str:
     # the editorial page shows only the hand-picked few; the map holds them all.
     entries = [e for e in _photo_entries() if e.get("featured")]
     if not entries:
         return ""
-    cells = "".join(
-        f'<figure class="ph"><a href="photos/large/{esc(_pub_name(e["file"]))}" data-lightbox '
-        f'data-caption="{esc(e.get("caption",""))}" data-city="{esc(e.get("city",""))}">'
-        f'<img loading="lazy" src="photos/thumb/{esc(_pub_name(e["file"]))}" alt="{esc(e.get("caption",""))}"></a>'
-        f'<figcaption>{esc(e.get("caption",""))}'
-        f'{" &mdash; " + esc(e["city"]) if e.get("city") else ""}</figcaption></figure>'
-        for e in entries)
+    cells = "".join(_photo_cell(e) for e in entries)
     return f"""
 <section class="movement">
   <p class="tag">Favorites</p>
@@ -569,8 +581,6 @@ figure{{margin:0}}
 .ax-note{{font-size:9px;fill:var(--ink);letter-spacing:.06em}}
 .tr-city{{font-family:var(--mono);font-size:10px;fill:var(--ink);letter-spacing:.01em;
   paint-order:stroke;stroke:var(--paper);stroke-width:2.8px;stroke-linejoin:round}}
-.tr-sub{{font-family:var(--mono);font-size:8px;fill:var(--dim);letter-spacing:.01em;
-  paint-order:stroke;stroke:var(--paper);stroke-width:2.4px;stroke-linejoin:round}}
 .itin-trip{{margin-bottom:34px}}
 .itin{{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}}
 .itin li{{break-inside:avoid;display:flex;align-items:baseline;gap:8px;padding:6px 0;
@@ -579,13 +589,15 @@ figure{{margin:0}}
   flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .itin .co{{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--dim)}}
 .itin .nn{{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em}}
-.mosaic{{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px 12px}}
-@media(max-width:680px){{.mosaic{{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}}.itin{{columns:1}}}}
-.mosaic .ph{{margin:0}}
+@media(max-width:680px){{.itin{{columns:1}}}}
+.mosaic{{column-width:180px;column-gap:20px}}
+.mosaic .ph{{break-inside:avoid;margin:0 0 28px}}
 .mosaic a{{display:block}}
-.mosaic img{{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:3px}}
-.mosaic figcaption{{font-family:var(--serif);font-style:italic;font-size:11px;color:var(--dim);
-  margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.mosaic img{{width:100%;display:block;border-radius:4px}}
+.mosaic figcaption{{font-family:var(--serif);font-style:italic;font-size:13px;line-height:1.45;
+  color:var(--dim);margin:8px 0 0}}
+.mosaic .ph-city{{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin:4px 0 0}}
 #lightbox{{position:fixed;inset:0;z-index:100;background:rgba(20,18,14,.92);display:none;
   align-items:center;justify-content:center;padding:32px;cursor:zoom-out}}
 #lightbox.open{{display:flex}}
@@ -599,7 +611,7 @@ a{{color:var(--accent)}}
 
 def build_html(d: dict) -> str:
     body = "".join([
-        masthead(d), trace_movement(d), trains_movement(d), itinerary_movement(d),
+        masthead(d), trace_movement(d), transit_movement(d), itinerary_movement(d),
         tgtg_movement(d), gallery_movement(d),
     ])
     return f"""<!doctype html>
@@ -626,9 +638,7 @@ def _standalone(svg: str, theme: str) -> str:
              f'text{{font-family:"Spline Sans Mono",ui-monospace,monospace}}'
              f'.ax{{fill:{p["dim"]};font-size:9px}} .ax-note{{fill:{p["ink"]};font-size:9px}}'
              f'.tr-city{{fill:{p["ink"]};font-size:10px;paint-order:stroke;'
-             f'stroke:{p["paper"]};stroke-width:2.8px;stroke-linejoin:round}}'
-             f'.tr-sub{{fill:{p["dim"]};font-size:8px;paint-order:stroke;'
-             f'stroke:{p["paper"]};stroke-width:2.4px;stroke-linejoin:round}}</style>')
+             f'stroke:{p["paper"]};stroke-width:2.8px;stroke-linejoin:round}}</style>')
     return svg.replace(">", ">" + style, 1)
 
 
@@ -665,8 +675,10 @@ def _photo_entries():
     cap = PHOTOS / "captions.yml"
     raw = yaml.safe_load(cap.read_text(encoding="utf-8")) if cap.is_file() else None
     pub = DOCS / "photos" / "thumb"
+    # the published copy is always a .jpg (see _pub_name) regardless of the
+    # source extension, so the fallback check has to look for that name too.
     return [e for e in (raw or []) if isinstance(e, dict) and e.get("file")
-            and ((PHOTO_SRC / e["file"]).is_file() or (pub / e["file"]).is_file())]
+            and ((PHOTO_SRC / e["file"]).is_file() or (pub / _pub_name(e["file"])).is_file())]
 
 
 # cities visited in distinct stints — the map panel gives each its own dated
