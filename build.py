@@ -36,19 +36,17 @@ def _picture(name: str, alt: str) -> str:
 
 def stats_markdown(d: dict) -> str:
     ov = A.overview(d)
-    sp = A.spend_summary(d)
     ts = A.train_stats(d)
-    star = " \\*" if sp["any_partial"] else ""
     charts = D._chart_set(d)
     L: list[str] = []
 
     L.append(f"<sub>{ov['first_day']:%b %Y} – {ov['last_day']:%b %Y} &nbsp;·&nbsp; "
              f"generated {d['generated']:%d %b %Y}</sub>")
     L.append("")
-    L.append("| Countries | Cities | Days | Trains | Spent |")
-    L.append("|:-:|:-:|:-:|:-:|:-:|")
+    L.append("| Countries | Cities | Days | Trains |")
+    L.append("|:-:|:-:|:-:|:-:|")
     L.append(f"| **{ov['n_countries_visited']}** | **{ov['n_cities']}** | **{ov['trip_days']}** "
-             f"| **{ts.get('rail_legs', 0)}** | **${sp['total']:,.0f}**{star} |")
+             f"| **{ts.get('rail_legs', 0)}** |")
     L.append("")
 
     if "route" in charts:
@@ -56,27 +54,13 @@ def stats_markdown(d: dict) -> str:
         L.append("")
 
     if ts.get("has_data"):
-        lg = ts.get("longest")
-        long_txt = (f" The longest single ride was **{lg['from']} → {lg['to']}**, "
-                    f"{lg['hr']:.1f} h.") if lg else ""
         L.append(f"**{ts['rail_hours']:,.0f} hours on trains** — about {ts['full_days_equiv']:.1f} "
-                 f"full days — over {ts['rail_legs']} trains and {ts['rail_km']:,.0f} km of track."
-                 f"{long_txt}")
+                 f"full days — over {ts['rail_legs']} trains and {ts['rail_km']:,.0f} km of track.")
         L.append("")
         if "trains" in charts:
             L.append(_picture("trains", "Hours in transit, by day"))
             L.append("")
 
-    if not d["expenses"].empty:
-        L.append(f"**${sp['total']:,.0f} spent** on the spring trip, "
-                 f"${sp['total'] / d['trips'].loc['trip2', 'days']:,.0f} a day.")
-        L.append("")
-        if "spend" in charts:
-            L.append(_picture("spend", "Spend by category"))
-            L.append("")
-
-    if sp["any_partial"]:
-        L.append("<sub>\\* Summer 2025 not fully logged yet — totals are a floor.</sub>")
     return "\n".join(L).rstrip()
 
 

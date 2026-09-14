@@ -54,7 +54,6 @@ ON_FOOT = {"walk"}
 SPEED_KMH = {"train": 75, "bus": 55, "ferry": 32, "car": 70, "flight": 650, "bike": 15, "walk": 5}
 OVERHEAD_H = {"train": 0.4, "bus": 0.35, "ferry": 1.0, "car": 0.15, "flight": 2.0, "bike": 0.0, "walk": 0.0}
 
-CATEGORY_ORDER = ["lodging", "food", "transport", "shopping", "activities", "gifts", "misc"]
 MODE_ORDER = ["train", "bus", "ferry", "flight", "car", "bike", "walk"]
 
 
@@ -66,12 +65,7 @@ def load_trips() -> pd.DataFrame:
     df["start"] = pd.to_datetime(df["start"])
     df["end"] = pd.to_datetime(df["end"])
     df["days"] = (df["end"] - df["start"]).dt.days + 1
-    df["expenses_complete"] = df.get("expenses_complete", False).fillna(False).astype(bool)
     return df.set_index("id")
-
-
-def load_fx() -> dict:
-    return yaml.safe_load((DATA / "fx.yml").read_text(encoding="utf-8"))
 
 
 def _parse_annotations(raw: dict) -> dict:
@@ -167,33 +161,24 @@ def load_legs(stops: pd.DataFrame | None = None) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def load_expenses(trips: pd.DataFrame | None = None) -> pd.DataFrame:
-    trips = load_trips() if trips is None else trips
-    fx = load_fx()
+def load_tgtg() -> pd.DataFrame:
+    """Too Good To Go pickups, one row per bag: data/tgtg_<trip>.csv with columns
+    date, city, store, note (store/note optional — blank where not logged)."""
     frames = []
-    for tid, row in trips.iterrows():
-        path = DATA / row.get("expenses", f"expenses_{tid}.csv")
-        if not path.is_file():
+    for p in sorted(DATA.glob("tgtg_*.csv")):
+        tid = p.stem.split("_", 1)[1]
+        t = pd.read_csv(p)
+        if t.empty:
             continue
-        e = pd.read_csv(path)
-        if e.empty:
-            continue
-        e["trip"] = tid
-        frames.append(e)
+        t["trip"] = tid
+        frames.append(t)
     if not frames:
         return pd.DataFrame()
     df = pd.concat(frames, ignore_index=True)
     df.columns = [c.strip().lower() for c in df.columns]
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")
-    df["amount"] = pd.to_numeric(df.get("amount"), errors="coerce")
-    df["amount_usd"] = pd.to_numeric(df.get("amount_usd"), errors="coerce")
-    need = df["amount_usd"].isna() & df["amount"].notna()
-    df.loc[need, "amount_usd"] = df.loc[need].apply(
-        lambda r: r["amount"] * fx.get(str(r.get("currency", "")).upper(), float("nan")), axis=1)
-    df["category"] = df.get("category", "misc").fillna("misc").astype(str).str.strip().str.lower()
-    for col in ("city", "country", "description", "currency"):
-        if col in df:
-            df[col] = df[col].fillna("").astype(str).str.strip()
+    df["date"] = pd.to_datetime(df.get("date"), errors="coerce")
+    for col in ("city", "store", "note"):
+        df[col] = df[col].fillna("").astype(str).str.strip() if col in df else ""
     return df.sort_values("date").reset_index(drop=True)
 
 
@@ -213,8 +198,7 @@ def load_all() -> dict:
         "trips": trips,
         "stops": stops,
         "legs": load_legs(stops),
-        "expenses": load_expenses(trips),
-        "fx": load_fx(),
+        "tgtg": load_tgtg(),
         "rail": load_rail_overrides(),
         "generated": dt.datetime.now(dt.timezone.utc),
     }
@@ -266,31 +250,15 @@ def overview(d: dict) -> dict:
     return out
 
 
-def spend_summary(d: dict) -> dict:
-    exp, trips = d["expenses"], d["trips"]
-    res = {"by_trip": {}, "complete": {}, "cost_per_day": {}, "total": 0.0, "any_partial": False}
-    if exp.empty:
-        return res
-    by_trip = exp.groupby("trip")["amount_usd"].sum()
-    for tid, row in trips.iterrows():
-        total = float(by_trip.get(tid, 0.0))
-        res["by_trip"][tid] = total
-        res["complete"][tid] = bool(row["expenses_complete"])
-        res["cost_per_day"][tid] = total / row["days"] if row["days"] else 0.0
-        if not row["expenses_complete"] and total > 0:
-            res["any_partial"] = True
-    res["total"] = float(by_trip.sum())
-    res["by_category"] = (exp.groupby("category")["amount_usd"].sum()
-                          .reindex(CATEGORY_ORDER).dropna().sort_values(ascending=False))
-    res["by_country"] = (exp[exp["country"] != ""].groupby("country")["amount_usd"].sum()
-                         .sort_values(ascending=False))
-    daily = exp.groupby(exp["date"].dt.date)["amount_usd"].sum()
-    if not daily.empty:
-        res["priciest_day"] = (daily.idxmax(), float(daily.max()))
-        nonzero = daily[daily > 0]
-        res["cheapest_day"] = (nonzero.idxmin(), float(nonzero.min())) if not nonzero.empty else None
-        res["mean_day"] = float(daily.mean())
-    res["tgtg_count"] = int(exp["description"].str.contains("tgtg", case=False, na=False).sum())
+def tgtg_summary(d: dict) -> dict:
+    t = d["tgtg"]
+    if t.empty:
+        return {"count": 0}
+    res = {"count": int(len(t)), "cities": int(t.loc[t["city"] != "", "city"].nunique())}
+    stores = t.loc[t["store"] != "", "store"]
+    if not stores.empty:
+        res["stores"] = int(stores.nunique())
+    res["by_city"] = t.groupby("city").size().sort_values(ascending=False)
     return res
 
 
@@ -368,15 +336,10 @@ def transport_timeline(d: dict) -> pd.DataFrame:
 
 
 def active_span(d: dict):
-    """(first, last) date with any expense or journey — the axis for the strips."""
-    dates = []
-    if not d["expenses"].empty:
-        dates += [d["expenses"]["date"].min(), d["expenses"]["date"].max()]
-    if not d["legs"].empty:
-        dates += [d["legs"]["date"].min(), d["legs"]["date"].max()]
-    if not dates:
+    """(first, last) date with any journey — the axis for the strips."""
+    if d["legs"].empty:
         return None
-    return min(dates).date(), max(dates).date()
+    return d["legs"]["date"].min().date(), d["legs"]["date"].max().date()
 
 
 def transit_by_day(d: dict) -> pd.DataFrame:
@@ -405,24 +368,11 @@ def transit_by_day(d: dict) -> pd.DataFrame:
     return tl
 
 
-def spend_by_day(d: dict) -> pd.DataFrame:
-    """index=date, columns: total (USD) and country (the day's biggest-spend country)."""
-    exp = d["expenses"]
-    if exp.empty:
-        return pd.DataFrame()
-    total = exp.groupby(exp["date"].dt.date)["amount_usd"].sum().rename("total")
-    dom = (exp[exp["country"] != ""].groupby([exp["date"].dt.date, "country"])["amount_usd"].sum()
-           .reset_index())
-    dom = (dom.sort_values("amount_usd").groupby("date").tail(1).set_index("date")["country"]
-           .rename("country"))
-    return pd.concat([total, dom], axis=1)
-
-
 # --------------------------------------------------------------------------- #
 # text report
 # --------------------------------------------------------------------------- #
 def build_report(d: dict) -> str:
-    ov, sp, ts = overview(d), spend_summary(d), train_stats(d)
+    ov, tg, ts = overview(d), tgtg_summary(d), train_stats(d)
     L: list[str] = []
     L.append("eubackpacking — data report")
     L.append("=" * 44)
@@ -434,24 +384,14 @@ def build_report(d: dict) -> str:
         L.append("  " + ", ".join(ov["countries"]))
     L.append("")
 
-    L.append("Spend")
-    L.append("-" * 44)
-    for tid, row in d["trips"].iterrows():
-        total = sp["by_trip"].get(tid, 0.0)
-        tag = "" if sp["complete"].get(tid) else "   (PARTIAL)"
-        L.append(f"  {row['name']:<13} ${total:>9,.0f}   ${sp['cost_per_day'].get(tid,0):>5,.0f}/day{tag}")
-    L.append(f"  {'TOTAL':<13} ${sp['total']:>9,.0f}")
-    if not d["expenses"].empty:
+    if tg.get("count"):
+        L.append("Too Good To Go")
+        L.append("-" * 44)
+        line = f"  {tg['count']} bags · {tg['cities']} cities"
+        if tg.get("stores"):
+            line += f" · {tg['stores']} different stores"
+        L.append(line)
         L.append("")
-        for cat, amt in sp["by_category"].items():
-            L.append(f"    {cat:<11} ${amt:>8,.0f}")
-        if sp.get("priciest_day"):
-            L.append("")
-            L.append(f"  priciest day {sp['priciest_day'][0]}  ${sp['priciest_day'][1]:,.0f}")
-        if sp.get("cheapest_day"):
-            L.append(f"  cheapest day {sp['cheapest_day'][0]}  ${sp['cheapest_day'][1]:,.0f}")
-        L.append(f"  Too Good To Go bags: {sp['tgtg_count']}")
-    L.append("")
 
     src = "from the Eurail app" if not ts.get("estimated", True) else "ESTIMATED from route distance"
     L.append(f"Trains  ({src})")

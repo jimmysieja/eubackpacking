@@ -15,9 +15,7 @@ Everything the site shows comes from `data/`. Edit these in a spreadsheet or tex
 editor; the sample rows are real for Trip 2 and empty for Trip 1.
 
 ### `trips.yml`
-The two trips. Set `expenses_complete: true` once a trip's expense list is
-finished — until then the site labels that trip's spend as partial. `stops` and
-`expenses` name the files that hold that trip's data.
+The two trips. `stops` names the itinerary CSV that holds each trip's data.
 
 ### `trip2_stops.csv` / `trip1_stops.csv`
 The itinerary, one row per stop, in order:
@@ -39,24 +37,17 @@ stop_number,city,country,transport,arrival_date,departure_date
 distance-based time estimates. Add a row whenever you add a new city to a stops
 file.
 
-### `expenses_trip2.csv` / `expenses_trip1.csv`
-One row per purchase:
+### `tgtg_trip2.csv` / `tgtg_trip1.csv`
+One row per Too Good To Go bag picked up:
 
 ```
-date,trip,city,country,currency,amount,amount_usd,category,description
-2026-03-02,trip2,Paris,France,EUR,32.40,34.99,transport,week metro pass
+date,city,store,note
+2026-03-02,Paris,Boulangerie du Coin,
 ```
 
-- `category` — one of `lodging, food, transport, shopping, activities, gifts,
-  misc` (anything else is treated as `misc`).
-- `amount_usd` can be left blank; the build fills it from `amount` × the rate in
-  `fx.yml`.
-- `city` / `country` can be left blank; they only feed the "spend by country"
-  chart.
-
-### `fx.yml`
-Currency → USD rates. They're approximate period averages — replace with your
-real statement rates if you have them.
+`store` and `note` are optional — leave them blank if you didn't note which shop
+it was. An empty file (header row only) is fine; the section just doesn't appear
+on the page until it has rows.
 
 ### `annotations.yml` (optional)
 Call-outs for specific stops, keyed by city name. Shows as an italic note in that
@@ -77,19 +68,6 @@ uses these instead of estimating rail time from distance. See `data/rail_trip2.y
 The whole palette lives in one place: the `PAL` dict in `dashboard.py`. Edit it,
 run `python build.py`, and both the main page and the map pick up the change
 (`docs/map/palette.json` is regenerated from it).
-
-### Rebuilding an expense file from raw notes
-If you'd rather paste a rough text log than hand-format a CSV, drop it in
-`data/sources/expenses_<trip>.txt` as date headers plus `- <amount> <description>`
-bullets and run:
-
-```bash
-python tools/parse_expenses.py trip2
-```
-
-It guesses `category` from keywords and fills `city`/`country` from the stops
-file. Skim the result and fix the rows it gets wrong — after that the CSV is the
-source of truth and you can ignore the text file.
 
 ## 3. Photos
 
@@ -131,6 +109,13 @@ If `EUBP_PHOTO_SRC` is unset the build looks in `photos/`, and if there are no
 originals there either it reuses the already-published copies in `docs/photos/`.
 So on a machine without the originals you can still edit captions/dates, run
 `python build.py`, and commit a correct `docs/` — you just can't add new photos.
+
+### Page copy
+The header (dateline, title, dek) and section labels aren't data — they're
+written directly into `dashboard.py`: the headline text is in `masthead()`,
+and each section's heading/blurb lives at the top of its own `*_movement()`
+function (`trains_movement()`, `itinerary_movement()`, etc., all in that file).
+Edit the strings there and rerun `python build.py`.
 
 ## 4. Build
 

@@ -78,8 +78,6 @@ PAL = {
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
 }
-CAT_COLOR = {"lodging": "c0", "food": "c1", "transport": "c2", "shopping": "c3",
-             "activities": "c4", "gifts": "c5", "misc": "c6"}
 
 # which palette colour each trip draws in (route trace + interactive map).
 TRIP_INK = {"trip1": "trip1", "trip2": "trip2"}
@@ -136,15 +134,6 @@ ROUTE_LABEL_POS = {
 
 def esc(x) -> str:
     return html.escape(str(x), quote=True)
-
-
-def money(v) -> str:
-    v = float(v)
-    if v >= 10000:
-        return f"${v/1000:.0f}k"
-    if v >= 1000:
-        return f"${v/1000:.1f}k"
-    return f"${v:,.0f}"
 
 
 def fmt(n, nd=0) -> str:
@@ -209,8 +198,8 @@ def _country_paths(sx, sy, bbox, w, h) -> str:
                 continue
             dd = "".join(f"{'M' if i == 0 else 'L'}{cl(sx(lon), w):.1f} {cl(sy(lat), h):.1f}"
                          for i, (lon, lat) in enumerate(ring))
-            out.append(f'<path d="{dd}Z" fill="none" stroke="var(--rule)" '
-                       f'stroke-width="0.7" opacity="0.8"/>')
+            out.append(f'<path d="{dd}Z" fill="none" stroke="var(--dim)" '
+                       f'stroke-width="0.9" opacity="0.6"/>')
     return "".join(out)
 
 
@@ -304,24 +293,10 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
             labels.append(f'{lead}<text x="{tx:.1f}" y="{ty:.1f}" text-anchor="{anchor}" '
                           f'class="tr-city">{esc(city)}{sub}</text>')
 
-    # annotate the longest ride
-    ts = A.train_stats(d)
-    note = ""
-    lg = ts.get("longest")
-    if lg:
-        row = s[s["city"] == lg["to"]]
-        if not row.empty:
-            r = row.iloc[0]
-            x, y = sx(r["lon"]), sy(r["lat"])
-            note = (f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{x-60:.1f}" y2="{y+36:.1f}" '
-                    f'stroke="var(--dim)" stroke-width="0.8"/>'
-                    f'<text x="{x-64:.1f}" y="{y+40:.1f}" text-anchor="end" class="tr-note">'
-                    f'{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])} · {hm(lg["hr"])}</text>')
-
     return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="Route trace">'
             f'<rect x="0.5" y="0.5" width="{w-1}" height="{h-1}" fill="none" '
             f'stroke="var(--rule)" stroke-width="1"/>'
-            f'{outlines}{"".join(seg)}{"".join(dots)}{"".join(labels)}{note}</svg>')
+            f'{outlines}{"".join(seg)}{"".join(dots)}{"".join(labels)}</svg>')
 
 
 def _month_ticks(span, sx, y):
@@ -339,7 +314,24 @@ def _month_ticks(span, sx, y):
     return "".join(out)
 
 
-def day_strip(span, columns, *, w=900, h=150, pad_l=8, annos=None, baseline_label="") -> str:
+def _nice_step(vmax: float, target: int = 3) -> float:
+    """A 'round' gridline step (1/2/2.5/5 x a power of ten) giving ~`target` ticks."""
+    if vmax <= 0:
+        return 1.0
+    raw = vmax / target
+    mag = 10 ** math.floor(math.log10(raw))
+    for m in (1, 2, 2.5, 5, 10):
+        if raw <= m * mag:
+            return m * mag
+    return 10 * mag
+
+
+def _fmt_tick(v: float) -> str:
+    return f"{v:g}"
+
+
+def day_strip(span, columns, *, w=900, h=150, pad_l=26, annos=None, baseline_label="",
+             y_unit="") -> str:
     """columns: list of (date, [(value, colorvar, opacity), ...]) stacked bottom-up."""
     d0, d1 = span
     ndays = (d1 - d0).days + 1
@@ -348,6 +340,14 @@ def day_strip(span, columns, *, w=900, h=150, pad_l=8, annos=None, baseline_labe
     sx = lambda day: pad_l + (w - pad_l - 8) * ((day - d0).days) / max(1, ndays - 1)
     cw = max(1.4, (w - pad_l - 8) / ndays * 0.7)
     vmax = max((sum(v for v, _, _ in stack) for _, stack in columns), default=1) or 1
+    step = _nice_step(vmax)
+    grid, y = [], step
+    while y <= vmax * 1.001:
+        gy = base_y - plot_h * y / vmax
+        grid.append(f'<line x1="{pad_l}" y1="{gy:.1f}" x2="{w-8}" y2="{gy:.1f}" '
+                    f'stroke="var(--rule)" stroke-width="0.6"/>'
+                    f'<text x="0" y="{gy-3:.1f}" class="ax">{_fmt_tick(y)}{y_unit}</text>')
+        y += step
     bars = []
     for day, stack in columns:
         x = sx(day) - cw / 2
@@ -366,25 +366,10 @@ def day_strip(span, columns, *, w=900, h=150, pad_l=8, annos=None, baseline_labe
     lbl = (f'<text x="{pad_l}" y="{h-6}" class="ax">{esc(baseline_label)}</text>'
            if baseline_label else "")
     return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="daily strip">'
+            f'{"".join(grid)}'
             f'{"".join(bars)}'
             f'<line x1="{pad_l}" y1="{base_y:.1f}" x2="{w-8}" y2="{base_y:.1f}" stroke="var(--rule)"/>'
             f'{_month_ticks(span, sx, base_y)}{"".join(ann)}{lbl}</svg>')
-
-
-def band(rows, *, w=900, h=30) -> str:
-    """rows: [(label, value, colorvar, opacity)] -> one proportional bar."""
-    rows = [r for r in rows if r[1] and r[1] == r[1]]
-    tot = sum(v for _, v, _, _ in rows) or 1
-    x = 0
-    out = [f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="proportional band">']
-    for label, val, col, op in rows:
-        seg = w * val / tot
-        out.append(f'<rect x="{x:.1f}" y="0" width="{max(0,seg-1.4):.1f}" height="{h}" '
-                   f'fill="var(--{col})" opacity="{op}"><title>{esc(label)}: {esc(money(val))}'
-                   f' ({val/tot*100:.0f}%)</title></rect>')
-        x += seg
-    out.append("</svg>")
-    return "".join(out)
 
 
 # --------------------------------------------------------------------------- #
@@ -403,26 +388,6 @@ def masthead(d: dict) -> str:
 </header>"""
 
 
-def ledger(d: dict) -> str:
-    ov, sp, ts = A.overview(d), A.spend_summary(d), A.train_stats(d)
-    sl = A.sleeps(d)
-    top_ctry = sl.groupby("country")["nights"].sum().idxmax() if not sl.empty else ""
-    perday = sp["total"] / d["trips"].loc["trip2", "days"] if sp["total"] else 0
-    items = [
-        (fmt(ov["trip_days"]), "days away", "across two trips"),
-        (fmt(ov["n_countries_visited"]), "countries", f"most nights in {top_ctry}"),
-        (fmt(ts["rail_legs"]), "trains boarded", f"{fmt(ts['rail_km'])} km of track"),
-        (f"{ts['rail_hours']:.0f}", "hours in a seat", f"{ts['full_days_equiv']:.1f} full days"),
-        (money(sp["total"]), "spent" + (" *" if sp["any_partial"] else ""),
-         f"{money(perday)}/day on the road"),
-        (fmt(ov["nights_logged"]), "nights logged", "hostels, mostly"),
-    ]
-    cells = "".join(f'<div class="lg"><div class="lg-n">{v}</div>'
-                    f'<div class="lg-l">{esc(l)}</div>'
-                    f'<div class="lg-a">{esc(a)}</div></div>' for v, l, a in items)
-    return f'<section class="ledger">{cells}</section>'
-
-
 def trace_movement(d: dict) -> str:
     svg = route_trace(d)
     if not svg:
@@ -430,8 +395,8 @@ def trace_movement(d: dict) -> str:
     return f"""
 <section class="movement">
   <p class="tag">Route</p>
+  <p class="map-link"><a href="map/">Interactive map &rarr;</a></p>
   <figure class="trace">{svg}</figure>
-  <p class="caption"><a href="map/">Interactive map &rarr;</a></p>
 </section>"""
 
 
@@ -454,91 +419,19 @@ def trains_movement(d: dict) -> str:
             if stack:
                 cols.append((day, stack))
     strip = day_strip(span, cols, baseline_label="hours in transit, by day") if cols else ""
-    lg = ts.get("longest")
-    longest = (f' Longest single ride: <b>{esc(lg["from"])}&#8202;&#8594;&#8202;{esc(lg["to"])}</b>, '
-               f'{hm(lg["hr"])}.') if lg else ""
-    ov = [f'{ts["rail_legs"]} trains', f'{fmt(ts["rail_km"])} km',
-          f'{ts["rail_hour_share"]*100:.0f}% of all transit']
+    legend = ('<div class="key">'
+              '<span class="k"><i style="background:var(--accent)"></i>train</span>'
+              '<span class="k"><i style="background:var(--ink)"></i>other transit (bus, ferry, flight, car)</span>'
+              '</div>') if cols else ""
+    ov = [f'{ts["rail_legs"]} trains', f'{fmt(ts["rail_km"])} km']
     return f"""
 <section class="movement">
   <p class="tag">Trains</p>
   <p class="statement"><b>{hm(ts['rail_hours'])} on trains</b> &mdash; about
-  {ts['full_days_equiv']:.1f} days.{longest}</p>
+  {ts['full_days_equiv']:.1f} days.</p>
   <figure class="strip">{strip}</figure>
+  {legend}
   <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in ov)}</p>
-</section>"""
-
-
-def money_movement(d: dict) -> str:
-    sp = A.spend_summary(d)
-    if d["expenses"].empty:
-        return ""
-    cats = list(sp["by_category"].items())
-    cat_band = band([(c, v, CAT_COLOR.get(c, "c6"), 0.9) for c, v in cats])
-    cat_key = " &nbsp; ".join(
-        f'<span class="k"><i style="background:var(--{CAT_COLOR.get(c,"c6")})"></i>'
-        f'{esc(c)} {esc(money(v))}</span>' for c, v in cats)
-
-    ctry = sp["by_country"].head(9)
-    rest = sp["by_country"].iloc[9:].sum()
-    crows = [(c, v, "accent", op) for (c, v), op in
-             zip(ctry.items(), np.linspace(0.95, 0.4, len(ctry)))]
-    if rest > 0:
-        crows.append(("elsewhere", rest, "ink", 0.22))
-    ctry_band = band(crows)
-    ctry_key = " &nbsp; ".join(f'<span class="k">{esc(c)} {esc(money(v))}</span>'
-                               for c, v in list(ctry.items())[:6])
-
-    span = A.active_span(d)
-    sbd = A.spend_by_day(d)
-    cols, annos = [], []
-    if span and not sbd.empty:
-        cnames = list(sp["by_country"].head(7).index)
-        cmap = {c: f"c{i}" for i, c in enumerate(cnames)}
-        for day, r in sbd.iterrows():
-            if r["total"] and r["total"] > 0:
-                col = cmap.get(r.get("country", ""), "c6")
-                cols.append((day, [(float(r["total"]), col, 0.85)]))
-        if sp.get("priciest_day"):
-            annos.append((sp["priciest_day"][0], f'${sp["priciest_day"][1]:.0f}'))
-    strip = day_strip(span, cols, annos=annos, h=136,
-                      baseline_label="spend per day, tinted by country") if cols else ""
-
-    perday = sp["total"] / d["trips"].loc["trip2", "days"]
-    facts = [f'{money(perday)}/day', f'{sp["tgtg_count"]} Too Good To Go bags']
-    if sp.get("priciest_day"):
-        facts.append(f'most expensive day {money(sp["priciest_day"][1])} ({sp["priciest_day"][0]:%d %b})')
-    if sp.get("cheapest_day"):
-        facts.append(f'cheapest {money(sp["cheapest_day"][1])} ({sp["cheapest_day"][0]:%d %b})')
-    star = ('<p class="caption">* Summer 2025 isn\'t fully logged yet, so the total is a floor.</p>'
-            if sp["any_partial"] else "")
-    return f"""
-<section class="movement">
-  <p class="tag">Money</p>
-  <figure class="bandfig">{cat_band}<div class="key">{cat_key}</div></figure>
-  <figure class="bandfig">{ctry_band}<div class="key">{ctry_key} &nbsp; &hellip;</div></figure>
-  <figure class="strip">{strip}</figure>
-  <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in facts)}</p>
-  {star}
-</section>"""
-
-
-def countries_movement(d: dict) -> str:
-    sl = A.sleeps(d)
-    if sl.empty:
-        return ""
-    by = sl.groupby("country")["nights"].sum().sort_values(ascending=False)
-    rows = [(c, v, "gold" if t1 else "accent", op) for (c, v), op, t1 in
-            zip(by.items(), np.linspace(0.9, 0.4, len(by)), [False] * len(by))]
-    b = band(rows, h=34)
-    key = " &nbsp; ".join(f'<span class="k">{esc(c)} <b>{int(v)}</b></span>' for c, v in by.items())
-    top = by.index[0]
-    return f"""
-<section class="movement">
-  <p class="tag">Countries</p>
-  <figure class="bandfig">{b}<div class="key">{key}</div></figure>
-  <p class="caption">{int(by.sum())} nights across {len(by)} countries. Most &mdash;
-  {int(by.iloc[0])} &mdash; in {esc(top)}.</p>
 </section>"""
 
 
@@ -549,14 +442,36 @@ def itinerary_movement(d: dict) -> str:
     names = {t: r["name"] for t, r in d["trips"].iterrows()}
     blocks = []
     for tid, grp in sl.groupby("trip"):
+        stints = []
+        for city, g in grp.groupby("city", sort=False):
+            country = g["country"].iloc[0]
+            for a, b in _stay_runs(list(zip(g["arrival_date"], g["departure_date"]))):
+                stints.append({"city": city, "country": country, "arrival_date": a,
+                               "nights": (b - a).days})
+        stints.sort(key=lambda r: r["arrival_date"])
         rows = "".join(
             f'<li><span class="c">{esc(r["city"])}</span>'
             f'<span class="co">{esc(r["country"])}</span>'
-            f'<span class="nn">{int(r["nights"])}&#8202;n</span></li>'
-            for _, r in grp.sort_values("arrival_date").iterrows())
+            f'<span class="nn">{r["nights"]}&#8202;n</span></li>'
+            for r in stints)
         blocks.append(f'<div class="itin-trip"><p class="tag">{esc(names.get(tid, tid))}</p>'
                       f'<ol class="itin">{rows}</ol></div>')
     return f'<section class="movement"><p class="tag">Stops</p>{"".join(blocks)}</section>'
+
+
+def tgtg_movement(d: dict) -> str:
+    tg = A.tgtg_summary(d)
+    if not tg.get("count"):
+        return ""
+    facts = [f'{tg["count"]} bags', f'{tg["cities"]} cities']
+    if tg.get("stores"):
+        facts.append(f'{tg["stores"]} different stores')
+    return f"""
+<section class="movement">
+  <p class="tag">Too Good To Go</p>
+  <p class="statement"><b>{tg['count']} bags</b> rescued across {tg['cities']} cities.</p>
+  <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in facts)}</p>
+</section>"""
 
 
 def gallery_movement(d: dict) -> str:
@@ -585,7 +500,7 @@ def _css() -> str:
     return f"""
 :root{{{vars_('light')};
   --serif:"Fraunces","Iowan Old Style",Georgia,serif;
-  --sans:"Inter",system-ui,-apple-system,sans-serif;
+  --sans:"Instrument Sans",system-ui,-apple-system,sans-serif;
   --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,Menlo,monospace}}
 @media (prefers-color-scheme:dark){{:root:not([data-theme=light]){{{vars_('dark')}}}}}
 :root[data-theme=dark]{{{vars_('dark')}}}
@@ -595,7 +510,7 @@ body{{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
 .page{{max-width:940px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(20px,5vw,52px) 120px}}
 em{{font-style:italic}}
 b{{font-weight:500}}
-.dateline,.tag,.micro,.ax,.ax-note,.tr-note,.key,.lg-l,.colophon{{
+.dateline,.tag,.micro,.ax,.ax-note,.key,.colophon{{
   font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em}}
 header{{margin-bottom:clamp(40px,8vw,88px)}}
 .dateline{{font-size:11px;color:var(--dim);margin:0 0 22px}}
@@ -604,14 +519,11 @@ h1{{font-family:var(--serif);font-weight:400;font-optical-sizing:auto;
 h1 em{{color:var(--accent)}}
 .dek{{font-family:var(--serif);font-size:clamp(17px,2.3vw,21px);line-height:1.5;
   color:var(--dim);max-width:44ch;margin:0}}
-.ledger{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:0 34px;margin:0 0 clamp(50px,9vw,96px)}}
-.lg{{border-top:1.5px solid var(--ink);padding:14px 0 20px}}
-.lg-n{{font-family:var(--serif);font-size:clamp(28px,4.4vw,44px);line-height:1;letter-spacing:-.02em}}
-.lg-l{{font-size:10.5px;color:var(--dim);margin-top:9px}}
-.lg-a{{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--dim);margin-top:4px}}
 .movement{{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}}
 .tag{{font-size:10.5px;color:var(--accent);margin:0 0 20px}}
+.map-link{{font-family:var(--serif);font-size:clamp(18px,2.6vw,22px);margin:0 0 18px}}
+.map-link a{{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}}
+.map-link a:hover{{color:var(--accent);border-color:var(--accent)}}
 .statement{{font-family:var(--serif);font-size:clamp(20px,3vw,28px);line-height:1.4;
   font-weight:400;max-width:32ch;margin:0 0 30px}}
 .statement b{{color:var(--accent);font-weight:500}}
@@ -622,8 +534,6 @@ figure{{margin:0}}
 .trace{{margin:8px 0}}
 .trace svg{{display:block}}
 .strip{{margin:26px 0 4px}}
-.bandfig{{margin:0 0 26px}}
-.bandfig svg{{display:block;border-radius:2px}}
 .key{{font-size:10px;color:var(--dim);margin-top:11px;line-height:2.1}}
 .key .k{{white-space:nowrap;margin-right:2px}}
 .key i{{display:inline-block;width:8px;height:8px;margin-right:5px;vertical-align:baseline}}
@@ -634,8 +544,6 @@ figure{{margin:0}}
   paint-order:stroke;stroke:var(--paper);stroke-width:2.8px;stroke-linejoin:round}}
 .tr-sub{{font-family:var(--mono);font-size:8px;fill:var(--dim);letter-spacing:.01em;
   paint-order:stroke;stroke:var(--paper);stroke-width:2.4px;stroke-linejoin:round}}
-.tr-note{{font-size:9.5px;fill:var(--ink);letter-spacing:.05em;
-  paint-order:stroke;stroke:var(--paper);stroke-width:2.6px;stroke-linejoin:round}}
 .itin-trip{{margin-bottom:34px}}
 .itin{{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}}
 .itin li{{break-inside:avoid;display:flex;align-items:baseline;gap:8px;padding:6px 0;
@@ -644,11 +552,13 @@ figure{{margin:0}}
   flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .itin .co{{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--dim)}}
 .itin .nn{{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em}}
-.mosaic{{columns:3;column-gap:14px}}
-@media(max-width:680px){{.mosaic{{columns:2}}.itin{{columns:1}}}}
-.mosaic .ph{{break-inside:avoid;margin:0 0 14px}}
-.mosaic img{{width:100%;display:block;border-radius:2px}}
-.mosaic figcaption{{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--dim);margin-top:5px}}
+.mosaic{{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px 12px}}
+@media(max-width:680px){{.mosaic{{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}}.itin{{columns:1}}}}
+.mosaic .ph{{margin:0}}
+.mosaic a{{display:block}}
+.mosaic img{{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:3px}}
+.mosaic figcaption{{font-family:var(--serif);font-style:italic;font-size:11px;color:var(--dim);
+  margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 .colophon{{font-size:9.5px;color:var(--dim);margin-top:110px;padding-top:20px;
   border-top:1px solid var(--rule)}}
 a{{color:var(--accent)}}
@@ -657,9 +567,8 @@ a{{color:var(--accent)}}
 
 def build_html(d: dict) -> str:
     body = "".join([
-        masthead(d), ledger(d), trace_movement(d), trains_movement(d),
-        money_movement(d), countries_movement(d), itinerary_movement(d),
-        gallery_movement(d), colophon(d),
+        masthead(d), trace_movement(d), trains_movement(d), itinerary_movement(d),
+        tgtg_movement(d), gallery_movement(d), colophon(d),
     ])
     return f"""<!doctype html>
 <html lang="en"><head>
@@ -668,7 +577,7 @@ def build_html(d: dict) -> str:
 <title>A gap year around Europe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500&family=Spline+Sans+Mono:wght@400;500&display=swap">
 <style>{_css()}</style>
 </head><body><main class="page">
 {body}
@@ -687,9 +596,7 @@ def _standalone(svg: str, theme: str) -> str:
              f'.tr-city{{fill:{p["ink"]};font-size:10px;paint-order:stroke;'
              f'stroke:{p["paper"]};stroke-width:2.8px;stroke-linejoin:round}}'
              f'.tr-sub{{fill:{p["dim"]};font-size:8px;paint-order:stroke;'
-             f'stroke:{p["paper"]};stroke-width:2.4px;stroke-linejoin:round}}'
-             f'.tr-note{{fill:{p["ink"]};font-size:9.5px;paint-order:stroke;'
-             f'stroke:{p["paper"]};stroke-width:2.6px}}</style>')
+             f'stroke:{p["paper"]};stroke-width:2.4px;stroke-linejoin:round}}</style>')
     return svg.replace(">", ">" + style, 1)
 
 
@@ -709,10 +616,6 @@ def _chart_set(d: dict) -> dict:
             if ot > 0: st.append((ot, "ink", 0.28))
             if st: cols.append((day, st))
         charts["trains"] = day_strip(span, cols, baseline_label="hours in transit / day")
-    sp = A.spend_summary(d)
-    if not d["expenses"].empty:
-        charts["spend"] = band([(c, v, CAT_COLOR.get(c, "c6"), 0.9)
-                                for c, v in sp["by_category"].items()], h=34)
     return charts
 
 
