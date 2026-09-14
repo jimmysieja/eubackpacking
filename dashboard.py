@@ -56,6 +56,14 @@ MODE_STYLE = {
 }
 MODE_DASH = {m: s[0] for m, s in MODE_STYLE.items()}
 
+# legs that happened but aren't worth drawing on the map — e.g. a quick
+# pre-flight-home hop that just redraws over an earlier leg between the same
+# two cities. (trip, from city, to city, mode). The stop itself, its nights
+# and its stats are untouched; only the drawn line disappears.
+HIDDEN_LEGS = {
+    ("trip2", "Paris", "London", "flight"),
+}
+
 # "Cotton candy" palette. Single source of truth — the map page reads this too
 # (docs/map/palette.json). Change colours here, rerun build, both pages update.
 # The Transit and Featured sections locally override `accent` (see .movement-
@@ -65,10 +73,9 @@ PAL = {
     "light": {
         "paper": "#f6f2f0", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
         "accent": "#c93f8a", "gold": "#9b6fc9", "faint": "#c9c1ac", "far": "#e2dbc9",
-        # per-trip line/pin colours. trip1 = blue, trip2 = purple — still far
-        # enough apart on the wheel that the two routes don't get mistaken for
-        # each other even in a tangle. tweak freely.
-        "trip1": "#aadbff", "trip2": "#c9a0e8",
+        # per-trip line/pin colours. trip1 (Summer 2025) = pale yellow-green,
+        # trip2 (Spring 2026) = pale cyan — experimenting per Jimmy 2026-09.
+        "trip1": "#f5ffc6", "trip2": "#cef4ff",
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
@@ -268,6 +275,8 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
         for a, b in zip(recs, recs[1:]):
             mode = b["transport"] or "train"
             if a["city"] == b["city"] or mode in A.ON_FOOT:
+                continue
+            if (tid, a["city"], b["city"], mode) in HIDDEN_LEGS:
                 continue
             dash, wt, op, bow, wave = MODE_STYLE.get(mode, MODE_STYLE["train"])
             x1, y1, x2, y2 = sx(a["lon"]), sy(a["lat"]), sx(b["lon"]), sy(b["lat"])
@@ -740,9 +749,12 @@ def write_map_data(d: dict) -> None:
     for tid, grp in s.groupby("trip"):
         recs = grp.to_dict("records")
         for a, b in zip(recs, recs[1:]):
-            if a["city"] == b["city"] or b["transport"] in A.ON_FOOT:
+            mode = b["transport"] or "train"
+            if a["city"] == b["city"] or mode in A.ON_FOOT:
                 continue
-            legs.append({"trip": tid, "mode": b["transport"] or "train",
+            if (tid, a["city"], b["city"], mode) in HIDDEN_LEGS:
+                continue
+            legs.append({"trip": tid, "mode": mode,
                          "a": [round(a["lat"], 4), round(a["lon"], 4)],
                          "b": [round(b["lat"], 4), round(b["lon"], 4)]})
 
