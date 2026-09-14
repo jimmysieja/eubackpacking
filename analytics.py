@@ -338,8 +338,8 @@ def mode_breakdown(d: dict) -> pd.DataFrame:
     return g.reindex(order)
 
 
-def transport_timeline(d: dict) -> pd.DataFrame:
-    legs = d["legs"]
+def transport_timeline(d: dict, legs: pd.DataFrame | None = None) -> pd.DataFrame:
+    legs = d["legs"] if legs is None else legs
     if legs.empty:
         return pd.DataFrame()
     t = legs.dropna(subset=["est_hr"]).copy()
@@ -354,11 +354,15 @@ def active_span(d: dict):
     return d["legs"]["date"].min().date(), d["legs"]["date"].max().date()
 
 
-def transit_by_day(d: dict) -> pd.DataFrame:
+def transit_by_day(d: dict, legs: pd.DataFrame | None = None) -> pd.DataFrame:
     """Per-day hours in transit by mode. Long hauls listed in rail_<trip>.yml
     `notable:` override the estimate for their day; then the whole train series
-    is rescaled so its total matches the real Eurail figure."""
-    tl = transport_timeline(d)
+    is rescaled so its total matches the real Eurail figure.
+
+    Pass `legs` to compute over a subset (e.g. the homepage chart excludes
+    the transatlantic bookend flights) -- the Eurail rescale still targets
+    the real total since train legs never touch home anyway."""
+    tl = transport_timeline(d, legs)
     if tl.empty:
         return tl
     tl = tl.copy()

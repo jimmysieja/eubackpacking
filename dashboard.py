@@ -65,10 +65,12 @@ HIDDEN_LEGS = {
 }
 
 # fixed per-trip identity colours — deliberately NOT theme-dependent, so the
-# same gold/blue means "2025"/"2026" everywhere: the route lines (via PAL
-# below, light and dark alike), and every heading that groups content by
-# year (Stops, Too Good To Go) via the .trip1-tag / .trip2-tag CSS utility.
-TRIP_COLOR = {"trip1": "#fddc5c", "trip2": "#4169e1"}
+# same blue/purple means "2025"/"2026" everywhere: the route lines (via PAL
+# below, light and dark alike), every heading that groups content by year
+# (Stops, Too Good To Go) via the .trip1-tag / .trip2-tag CSS utility, and
+# the Transit chart's train bars. Deepened from the light a0c4ff/e7bfff-ish
+# family requested to stay readable as thin lines and small text.
+TRIP_COLOR = {"trip1": "#4a7fe8", "trip2": "#a873d9"}
 
 # "Cotton candy" palette. Single source of truth — the map page reads this too
 # (docs/map/palette.json). Change colours here, rerun build, both pages update.
@@ -96,30 +98,111 @@ PAL = {
 TRIP_INK = {"trip1": "trip1", "trip2": "trip2"}
 DEFAULT_INK = "accent"
 
-# flag shown next to each country in the Stops list. UK stops use the
-# constituent-nation flag since England, Wales and Northern Ireland are all
-# visited on this trip; Northern Ireland has no standardised flag emoji, so
-# Belfast falls back to the union flag.
-COUNTRY_FLAG = {
-    "France": "🇫🇷", "Spain": "🇪🇸", "Switzerland": "🇨🇭", "Italy": "🇮🇹",
-    "Albania": "🇦🇱", "Hungary": "🇭🇺", "Czechia": "🇨🇿", "Poland": "🇵🇱",
-    "Germany": "🇩🇪", "Netherlands": "🇳🇱", "Ireland": "🇮🇪", "Denmark": "🇩🇰",
-    "Sweden": "🇸🇪", "Finland": "🇫🇮", "Estonia": "🇪🇪", "Latvia": "🇱🇻",
-    "Lithuania": "🇱🇹", "Austria": "🇦🇹", "Slovakia": "🇸🇰", "Slovenia": "🇸🇮",
-    "Croatia": "🇭🇷", "Bosnia and Herzegovina": "🇧🇦", "Montenegro": "🇲🇪",
+# --- flags -------------------------------------------------------------- #
+# Hand-drawn flat SVG flags (emoji rendered as literal fallback letters in
+# testing — no font dependency this way). Each entry is the *inner* markup
+# for a 30x20 canvas; simplified where a real flag carries fine coat-of-arms
+# detail that wouldn't read at icon size anyway. Built once into a <symbol>
+# sprite (see _flag_defs) and referenced per-row with <use>, so the full
+# path data for e.g. France isn't repeated on every French stop.
+def _vtri(c1, c2, c3):
+    return f'<rect width="30" height="20" fill="{c2}"/><rect width="10" height="20" fill="{c1}"/><rect x="20" width="10" height="20" fill="{c3}"/>'
+
+
+def _htri(c1, c2, c3):
+    return f'<rect width="30" height="20" fill="{c2}"/><rect width="30" height="6.67" fill="{c1}"/><rect y="13.33" width="30" height="6.67" fill="{c3}"/>'
+
+
+def _hbi(c1, c2):
+    return f'<rect width="30" height="10" fill="{c1}"/><rect y="10" width="30" height="10" fill="{c2}"/>'
+
+
+def _nordic(bg, cross):
+    return (f'<rect width="30" height="20" fill="{bg}"/>'
+            f'<rect x="10" width="4" height="20" fill="{cross}"/>'
+            f'<rect y="8" width="30" height="4" fill="{cross}"/>')
+
+
+FLAG_SHAPES = {
+    "FR": _vtri("#0055A4", "#FFFFFF", "#EF4135"),
+    "ES": '<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>',
+    "CH": '<rect width="30" height="20" fill="#D52B1E"/><rect x="13" y="3" width="4" height="14" fill="#fff"/><rect x="8" y="8" width="14" height="4" fill="#fff"/>',
+    "IT": _vtri("#008C45", "#FFFFFF", "#CD212A"),
+    "AL": '<rect width="30" height="20" fill="#E41E20"/><path d="M15 6 L11 11 L15 9.5 L19 11 Z" fill="#000"/><path d="M15 9.5 L12 15 L15 13 L18 15 Z" fill="#000"/>',
+    "HU": _htri("#CE2939", "#FFFFFF", "#477050"),
+    "CZ": _hbi("#FFFFFF", "#D7141A") + '<path d="M0 0 L15 10 L0 20 Z" fill="#11457E"/>',
+    "PL": _hbi("#FFFFFF", "#D4213D"),
+    "DE": _htri("#000000", "#DD0000", "#FFCE00"),
+    "NL": _htri("#AE1C28", "#FFFFFF", "#21468B"),
+    "IE": _vtri("#169B62", "#FFFFFF", "#FF883E"),
+    "DK": _nordic("#C8102E", "#FFFFFF"),
+    "SE": _nordic("#006AA7", "#FECC00"),
+    "FI": _nordic("#FFFFFF", "#002F6C"),
+    "EE": _htri("#0072CE", "#000000", "#FFFFFF"),
+    "LV": '<rect width="30" height="20" fill="#9E3039"/><rect y="8" width="30" height="4" fill="#fff"/>',
+    "LT": _htri("#FDB913", "#006A44", "#C1272D"),
+    "AT": _htri("#ED2939", "#FFFFFF", "#ED2939"),
+    "SK": _htri("#FFFFFF", "#0B4EA2", "#EE1C25"),
+    "SI": _htri("#FFFFFF", "#0046AD", "#ED1C24"),
+    "HR": _htri("#FF0000", "#FFFFFF", "#0000FF"),
+    "BA": ('<rect width="30" height="20" fill="#002395"/><path d="M0 0 L14 0 L0 20 Z" fill="#FECB00"/>'
+           '<circle cx="4" cy="3" r="0.8" fill="#fff"/><circle cx="6.5" cy="7" r="0.8" fill="#fff"/>'
+           '<circle cx="4.5" cy="11" r="0.8" fill="#fff"/><circle cx="2" cy="15" r="0.8" fill="#fff"/>'),
+    "ME": '<rect width="30" height="20" fill="#C40308"/><rect x="1" y="1" width="28" height="18" fill="none" stroke="#D4AF37" stroke-width="1.5"/><circle cx="15" cy="10" r="3" fill="#D4AF37"/>',
+    "GB-ENG": '<rect width="30" height="20" fill="#fff"/><rect x="12" width="6" height="20" fill="#CF142B"/><rect y="7" width="30" height="6" fill="#CF142B"/>',
+    "GB-WLS": (_hbi("#FFFFFF", "#00B140") +
+               '<path d="M10 8 Q13 4 17 7 Q21 5 22 9 Q19 9 18 11 Q22 12 21 15 '
+               'Q17 14 15 16 Q13 13 10 13 Q8 11 10 8 Z" fill="#C8102E"/>'),
+    "GB": ('<rect width="30" height="20" fill="#00247D"/>'
+           '<path d="M0 0 L30 20 M30 0 L0 20" stroke="#fff" stroke-width="4"/>'
+           '<path d="M0 0 L30 20 M30 0 L0 20" stroke="#CF142B" stroke-width="1.6"/>'
+           '<rect x="12" width="6" height="20" fill="#fff"/><rect y="7" width="30" height="6" fill="#fff"/>'
+           '<rect x="13.2" width="3.6" height="20" fill="#CF142B"/><rect y="8.2" width="30" height="3.6" fill="#CF142B"/>'),
 }
-UK_CITY_FLAG = {
-    "London": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Oxford": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Liverpool": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-    "Manchester": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chinley": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-    "Betws-y-Coed": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "Abergavenny": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
-    "Belfast": "🇬🇧",
+
+COUNTRY_FLAG_CODE = {
+    "France": "FR", "Spain": "ES", "Switzerland": "CH", "Italy": "IT",
+    "Albania": "AL", "Hungary": "HU", "Czechia": "CZ", "Poland": "PL",
+    "Germany": "DE", "Netherlands": "NL", "Ireland": "IE", "Denmark": "DK",
+    "Sweden": "SE", "Finland": "FI", "Estonia": "EE", "Latvia": "LV",
+    "Lithuania": "LT", "Austria": "AT", "Slovakia": "SK", "Slovenia": "SI",
+    "Croatia": "HR", "Bosnia and Herzegovina": "BA", "Montenegro": "ME",
+}
+UK_CITY_FLAG_CODE = {
+    "London": "GB-ENG", "Oxford": "GB-ENG", "Liverpool": "GB-ENG",
+    "Manchester": "GB-ENG", "Chinley": "GB-ENG",
+    "Betws-y-Coed": "GB-WLS", "Abergavenny": "GB-WLS",
+    "Belfast": "GB",
 }
 
 
-def flag_for(city: str, country: str) -> str:
+def _flag_code(city: str, country: str) -> str:
     if country == "United Kingdom":
-        return UK_CITY_FLAG.get(city, "🇬🇧")
-    return COUNTRY_FLAG.get(country, "")
+        return UK_CITY_FLAG_CODE.get(city, "GB")
+    return COUNTRY_FLAG_CODE.get(country, "")
+
+
+def _flag_defs() -> str:
+    """One hidden sprite sheet of <symbol>s, meant to be emitted once. Each
+    flag's path data lives here exactly once regardless of how many stops
+    use it; every occurrence after is a cheap <use>."""
+    symbols = "".join(
+        f'<symbol id="flag-{code}" viewBox="0 0 30 20">'
+        f'<clipPath id="clip-{code}"><rect width="30" height="20" rx="2.2"/></clipPath>'
+        f'<g clip-path="url(#clip-{code})">{shape}</g>'
+        f'<rect x="0.6" y="0.6" width="28.8" height="18.8" rx="1.8" fill="none" '
+        f'stroke="currentColor" stroke-width="1.2"/>'
+        f'</symbol>'
+        for code, shape in FLAG_SHAPES.items())
+    return f'<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>{symbols}</defs></svg>'
+
+
+def flag_html(city: str, country: str, cls: str = "flag") -> str:
+    code = _flag_code(city, country)
+    if not code:
+        return ""
+    return (f'<svg class="{cls}" viewBox="0 0 30 20" role="img" aria-label="{esc(country)}">'
+            f'<title>{esc(country)}</title><use href="#flag-{code}"/></svg>')
 
 # both trips begin and end here — ringed on the static map so it reads as
 # the shared home base rather than just another overnight stop.
@@ -461,33 +544,65 @@ def trace_movement(d: dict) -> str:
 </section>"""
 
 
-def transit_movement(d: dict) -> str:
-    ts = A.train_stats(d)
-    if not ts.get("has_data"):
-        return ""
+def _home_free_legs(d: dict):
+    """Legs with neither endpoint in the home country. The transit chart
+    leaves the transatlantic bookend flights out -- they're not really
+    "exploring Europe" -- matching what the map already shows, since
+    home-country stops are filtered before it ever draws a leg. Train stats
+    and the flights/km counts elsewhere are unaffected (they use the full,
+    unfiltered legs)."""
+    legs = d["legs"]
+    if legs.empty:
+        return legs
+    home = (legs["from_country"] == A.HOME_COUNTRY) | (legs["to_country"] == A.HOME_COUNTRY)
+    return legs[~home]
+
+
+def _trip_for_day(day, trips):
+    for tid, row in trips.iterrows():
+        if row["start"].date() <= day <= row["end"].date():
+            return tid
+    return None
+
+
+def _transit_columns(d: dict):
+    """(span, columns) for the transit day_strip, train bars colour-coded
+    per trip (trip1/trip2 are far enough apart on the calendar that this
+    never reads ambiguously) -- shared by the homepage chart and the
+    README's exported svg so both stay in sync."""
     span = A.active_span(d)
-    tl = A.transit_by_day(d)
+    tl = A.transit_by_day(d, _home_free_legs(d))
     cols = []
     if span and not tl.empty:
+        trips = d["trips"]
         for day, r in tl.iterrows():
             stack = []
             tr = float(r.get("train", 0))
             if tr > 0:
-                stack.append((tr, "accent", 0.9))
+                stack.append((tr, _trip_for_day(day, trips) or "accent", 0.9))
             other = float(sum(v for m, v in r.items() if m != "train"))
             if other > 0:
                 stack.append((other, "ink", 0.28))
             if stack:
                 cols.append((day, stack))
+    return span, cols
+
+
+def transit_movement(d: dict) -> str:
+    ts = A.train_stats(d)
+    if not ts.get("has_data"):
+        return ""
+    span, cols = _transit_columns(d)
     strip = day_strip(span, cols, baseline_label="hours in transit, by day") if cols else ""
     legend = ('<div class="key">'
-              '<span class="k"><i style="background:var(--accent);opacity:.9"></i>train</span>'
-              '<span class="k"><i style="background:var(--ink);opacity:.28"></i>other transit (bus, ferry, flight, car)</span>'
+              '<span class="k"><i class="split" style="background:'
+              'linear-gradient(90deg,var(--trip1) 50%,var(--trip2) 50%);opacity:.9"></i>trains</span>'
+              '<span class="k"><i style="background:var(--ink);opacity:.28"></i>other transit</span>'
               '</div>') if cols else ""
     ov = [f'{ts["rail_legs"]} trains']
     mb = A.mode_breakdown(d)
     if not mb.empty:
-        for mode, label in (("bus", "buses"), ("flight", "flights")):
+        for mode, label in (("bus", "buses"), ("flight", "flights"), ("ferry", "ferries")):
             n = int(mb.loc[mode, "legs"]) if mode in mb.index else 0
             if n:
                 ov.append(f'{n} {label}')
@@ -519,13 +634,14 @@ def itinerary_movement(d: dict) -> str:
         stints.sort(key=lambda r: r["arrival_date"])
         rows = "".join(
             f'<li><span class="c">{esc(r["city"])}</span>'
-            f'<span class="co" title="{esc(r["country"])}">{flag_for(r["city"], r["country"])}</span>'
+            f'<span class="co">{flag_html(r["city"], r["country"])}</span>'
             f'<span class="nn">{r["nights"]}&#8202;n</span></li>'
             for r in stints)
         blocks.append(f'<div class="itin-trip"><p class="tag {tid}-tag">{esc(names.get(tid, tid))}</p>'
                       f'<ol class="itin">{rows}</ol></div>')
     divider = '<div class="year-fade" aria-hidden="true"></div>'
-    return f'<section class="movement"><p class="tag">Stops</p>{divider.join(blocks)}</section>'
+    return (f'<section class="movement">{_flag_defs()}<p class="tag">Stops</p>'
+            f'{divider.join(blocks)}</section>')
 
 
 def tgtg_movement(d: dict) -> str:
@@ -536,27 +652,26 @@ def tgtg_movement(d: dict) -> str:
     if tg.get("stores"):
         facts.append(f'{tg["stores"]} different stores')
 
-    trip_blocks = "".join(
-        f'<div class="tgtg-trip"><p class="tag {t["trip"]}-tag">{esc(t["name"])}</p>'
-        f'<p class="micro">{t["count"]} bags</p></div>'
-        for t in tg.get("by_trip", []))
-
     countries = tg.get("by_country")
-    country_line = ""
+    country_grid = ""
     if countries is not None and not countries.empty:
-        line = ' &nbsp;&middot;&nbsp; '.join(f'{esc(c)} {n}' for c, n in countries.items())
-        country_line = f'<p class="micro">by country &nbsp;&middot;&nbsp; {line}</p>'
+        # all UK entries here happen to be London -- flag it England rather
+        # than the generic union flag, matching how Stops handles the UK.
+        cells = "".join(
+            flag_html("London" if c == "United Kingdom" else "", c, cls="flag tgtg-flag")
+            + f'<p class="tgtg-count">{n}</p>'
+            for c, n in countries.items())
+        country_grid = f'<div class="tgtg-countries">{cells}</div>'
 
     paul = tg.get("paul_count") or 0
-    shoutout = (f'<p class="caption">&#129360; <b>Paul&rsquo;s, {paul}&times;</b> '
-                f'&mdash; the run-away favorite.</p>') if paul else ""
+    shoutout = (f'<p class="caption">&#129360; <b>Special shoutout to Paul&rsquo;s in Nice</b></p>'
+                f'<p class="paul-address">3 Bd Victor Hugo, 06000 Nice, France</p>') if paul else ""
 
     return f"""
 <section class="movement">
   <p class="tag">Too Good To Go</p>
   <p class="statement"><b>{tg['count']} bags</b> rescued across {tg['cities']} cities.</p>
-  <div class="tgtg-trips">{trip_blocks}</div>
-  {country_line}
+  {country_grid}
   {shoutout}
   <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in facts)}</p>
 </section>"""
@@ -645,7 +760,7 @@ h1 em{{color:var(--accent)}}
 .dek{{font-family:var(--serif);font-size:clamp(17px,2.3vw,21px);line-height:1.5;
   color:var(--dim);max-width:44ch;margin:0}}
 .movement{{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}}
-.tag{{font-size:10.5px;color:var(--accent);margin:0 0 20px}}
+.tag{{font-size:10.5px;color:#97ac89;margin:0 0 20px}}
 .trip1-tag{{color:{TRIP_COLOR['trip1']}}}
 .trip2-tag{{color:{TRIP_COLOR['trip2']}}}
 .map-link{{font-family:var(--serif);font-size:clamp(18px,2.6vw,22px);margin:0 0 18px}}
@@ -678,11 +793,14 @@ figure{{margin:0}}
   border-bottom:1px dotted var(--rule)}}
 .itin .c{{font-family:var(--serif);font-size:15px;font-variant:all-small-caps;letter-spacing:.06em;
   flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.itin .co{{font-size:15px;line-height:1}}
+.itin .co{{line-height:1;display:flex}}
+.flag{{width:21px;height:14px;flex:none;color:var(--rule)}}
 .itin .nn{{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em}}
-.tgtg-trips{{display:flex;gap:36px;flex-wrap:wrap;margin:24px 0 0}}
-.tgtg-trip .tag{{margin-bottom:6px}}
-.tgtg-trip .micro{{margin-top:0}}
+.tgtg-countries{{display:grid;grid-auto-flow:column;grid-template-rows:auto auto;
+  column-gap:14px;row-gap:6px;margin:24px 0 0;overflow-x:auto;padding-bottom:2px}}
+.tgtg-flag{{width:26px;height:17.3px}}
+.tgtg-count{{font-family:var(--mono);font-size:12px;color:var(--ink);text-align:center}}
+.paul-address{{font-size:11px;color:var(--dim);margin:4px 0 0}}
 @media(max-width:680px){{.itin{{columns:1}}}}
 .mosaic{{column-width:180px;column-gap:20px}}
 .mosaic .ph{{break-inside:avoid;margin:0 0 28px}}
@@ -741,16 +859,8 @@ def _chart_set(d: dict) -> dict:
     tr = route_trace(d, 900, 720)
     if tr:
         charts["route"] = tr
-    span = A.active_span(d)
-    tl = A.transit_by_day(d)
-    if span and not tl.empty:
-        cols = []
-        for day, r in tl.iterrows():
-            tr_h = float(r.get("train", 0)); ot = float(sum(v for m, v in r.items() if m != "train"))
-            st = []
-            if tr_h > 0: st.append((tr_h, "accent", 0.9))
-            if ot > 0: st.append((ot, "ink", 0.28))
-            if st: cols.append((day, st))
+    span, cols = _transit_columns(d)
+    if cols:
         charts["trains"] = day_strip(span, cols, baseline_label="hours in transit / day")
     return charts
 
