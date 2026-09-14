@@ -123,12 +123,54 @@ def _nordic(bg, cross):
             f'<rect y="8" width="30" height="4" fill="{cross}"/>')
 
 
+def _star(cx, cy, r):
+    """A regular 5-point star (real proportions, inner/outer radius ratio
+    ~0.382) for Bosnia's hypotenuse -- not a circle standing in for one."""
+    pts = []
+    for i in range(10):
+        ang = math.radians(-90 + i * 36)
+        rad = r if i % 2 == 0 else r * 0.382
+        pts.append((round(cx + rad * math.cos(ang), 2), round(cy + rad * math.sin(ang), 2)))
+    d = f"M{pts[0][0]},{pts[0][1]} " + " ".join(f"L{x},{y}" for x, y in pts[1:]) + " Z"
+    return f'<path d="{d}" fill="#fff"/>'
+
+
+# a double-headed eagle displayed (wings spread, both heads outward) -- the
+# actual charge on Albania's and Montenegro's flags, not a blob or a dot.
+# Drawn once in a -8.2..8.2 x -9.2..6.2 local box, mirrored left/right, and
+# placed per flag via a translate+scale transform.
+_EAGLE_D = (
+    "M0,6.2 L2.6,3.0 L2.0,0.6 L3.2,-1.0 L5.6,-1.4 L3.2,-3.0 L8.2,-3.8 L4.2,-5.2 L6.6,-7.6 "
+    "L2.6,-6.0 L5.2,-9.2 L7.6,-8.0 L4.6,-7.4 L1.2,-5.0 L0,-2.6 L-1.2,-5.0 L-4.6,-7.4 "
+    "L-7.6,-8.0 L-5.2,-9.2 L-2.6,-6.0 L-6.6,-7.6 L-4.2,-5.2 L-8.2,-3.8 L-3.2,-3.0 "
+    "L-5.6,-1.4 L-3.2,-1.0 L-2.0,0.6 L-2.6,3.0 Z"
+)
+
+
+def _eagle(color, scale):
+    return f'<path d="{_EAGLE_D}" fill="{color}" transform="translate(15,10) scale({scale})"/>'
+
+
+# Wales' passant dragon (Y Ddraig Goch) in profile, facing the hoist: open
+# jaw at the end of a deliberately thin neck (so the head reads as a head
+# instead of blending into the body mass), clawed fore and hind legs, one
+# gentle spine ridge, and a curling tail. Drawn in a -12.8..13 x -3.4..7.6
+# local box and placed via translate+scale.
+_DRAGON_D = (
+    "M-9.2,-3.4 L-11.2,-1.8 L-12.8,-0.6 L-10.8,0.2 L-12.0,1.4 L-9.8,1.6 L-8.2,0.6 L-7.0,0.8 "
+    "L-4.8,1.8 L-3.0,3.4 L-3.8,5.4 L-5.6,6.4 L-4.4,7.4 L-3.2,6.8 L-2.6,5.4 L-0.8,3.8 "
+    "L1.6,3.4 L4.0,4.6 L3.2,6.6 L4.6,7.6 L5.8,6.8 L5.0,5.4 L6.4,3.8 L9.0,3.4 L11.6,4.6 "
+    "L13.0,2.4 L11.0,1.0 L8.8,1.6 L9.4,-0.8 L6.0,-2.6 L2.6,-2.2 L-0.4,-3.0 L-3.0,-2.4 "
+    "L-5.4,-1.4 L-7.2,-1.6 Z"
+)
+
+
 FLAG_SHAPES = {
     "FR": _vtri("#0055A4", "#FFFFFF", "#EF4135"),
     "ES": '<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>',
     "CH": '<rect width="30" height="20" fill="#D52B1E"/><rect x="13" y="3" width="4" height="14" fill="#fff"/><rect x="8" y="8" width="14" height="4" fill="#fff"/>',
     "IT": _vtri("#008C45", "#FFFFFF", "#CD212A"),
-    "AL": '<rect width="30" height="20" fill="#E41E20"/><path d="M15 6 L11 11 L15 9.5 L19 11 Z" fill="#000"/><path d="M15 9.5 L12 15 L15 13 L18 15 Z" fill="#000"/>',
+    "AL": '<rect width="30" height="20" fill="#E41E20"/>' + _eagle("#000", 0.95),
     "HU": _htri("#CE2939", "#FFFFFF", "#477050"),
     "CZ": _hbi("#FFFFFF", "#D7141A") + '<path d="M0 0 L15 10 L0 20 Z" fill="#11457E"/>',
     "PL": _hbi("#FFFFFF", "#D4213D"),
@@ -146,16 +188,25 @@ FLAG_SHAPES = {
     "SI": _htri("#FFFFFF", "#0046AD", "#ED1C24"),
     "HR": _htri("#FF0000", "#FFFFFF", "#0000FF"),
     "BA": ('<rect width="30" height="20" fill="#002395"/><path d="M0 0 L14 0 L0 20 Z" fill="#FECB00"/>'
-           '<circle cx="4" cy="3" r="0.8" fill="#fff"/><circle cx="6.5" cy="7" r="0.8" fill="#fff"/>'
-           '<circle cx="4.5" cy="11" r="0.8" fill="#fff"/><circle cx="2" cy="15" r="0.8" fill="#fff"/>'),
-    "ME": '<rect width="30" height="20" fill="#C40308"/><rect x="1" y="1" width="28" height="18" fill="none" stroke="#D4AF37" stroke-width="1.5"/><circle cx="15" cy="10" r="3" fill="#D4AF37"/>',
+           + _star(12.88, 0.45, 1.15) + _star(10.08, 4.45, 1.15) + _star(7.28, 8.45, 1.15)
+           + _star(4.48, 12.45, 1.15) + _star(1.68, 16.45, 1.15)),
+    "ME": ('<rect width="30" height="20" fill="#C40308"/>'
+           '<rect x="1" y="1" width="28" height="18" fill="none" stroke="#D4AF37" stroke-width="1.5"/>'
+           + _eagle("#D4AF37", 0.65)),
     "GB-ENG": '<rect width="30" height="20" fill="#fff"/><rect x="12" width="6" height="20" fill="#CF142B"/><rect y="7" width="30" height="6" fill="#CF142B"/>',
     "GB-WLS": (_hbi("#FFFFFF", "#00B140") +
-               '<path d="M10 8 Q13 4 17 7 Q21 5 22 9 Q19 9 18 11 Q22 12 21 15 '
-               'Q17 14 15 16 Q13 13 10 13 Q8 11 10 8 Z" fill="#C8102E"/>'),
+               f'<path d="{_DRAGON_D}" fill="#C8102E" transform="translate(15,10) scale(0.93)"/>'),
+    # the red St Patrick's saltire is genuinely counter-changed against the
+    # white St Andrew's saltire (not drawn as one symmetric X) -- "the red
+    # always follows the white clockwise", giving the flag's true two-fold
+    # (pinwheel, not mirror) rotational symmetry. Four separate corner-to-
+    # centre segments, each nudged to the clockwise side of its own arm,
+    # stand in for the continuous counter-changed bands of the real flag.
     "GB": ('<rect width="30" height="20" fill="#00247D"/>'
-           '<path d="M0 0 L30 20 M30 0 L0 20" stroke="#fff" stroke-width="4"/>'
-           '<path d="M0 0 L30 20 M30 0 L0 20" stroke="#CF142B" stroke-width="1.6"/>'
+           '<path d="M0 0 L30 20 M30 0 L0 20" stroke="#fff" stroke-width="4.4"/>'
+           '<path d="M15.72 8.92 L0.72 -1.08 M15.72 11.08 L30.72 1.08 '
+           'M14.28 11.08 L29.28 21.08 M14.28 8.92 L-0.72 18.92" '
+           'stroke="#CF142B" stroke-width="2"/>'
            '<rect x="12" width="6" height="20" fill="#fff"/><rect y="7" width="30" height="6" fill="#fff"/>'
            '<rect x="13.2" width="3.6" height="20" fill="#CF142B"/><rect y="8.2" width="30" height="3.6" fill="#CF142B"/>'),
 }
@@ -648,18 +699,15 @@ def tgtg_movement(d: dict) -> str:
     tg = A.tgtg_summary(d)
     if not tg.get("count"):
         return ""
-    facts = [f'{tg["count"]} bags', f'{tg["cities"]} cities']
-    if tg.get("stores"):
-        facts.append(f'{tg["stores"]} different stores')
-
     countries = tg.get("by_country")
     country_grid = ""
     if countries is not None and not countries.empty:
         # all UK entries here happen to be London -- flag it England rather
         # than the generic union flag, matching how Stops handles the UK.
         cells = "".join(
-            flag_html("London" if c == "United Kingdom" else "", c, cls="flag tgtg-flag")
-            + f'<p class="tgtg-count">{n}</p>'
+            '<div class="tgtg-country">'
+            + flag_html("London" if c == "United Kingdom" else "", c, cls="flag tgtg-flag")
+            + f'<p class="tgtg-count">{n}</p></div>'
             for c, n in countries.items())
         country_grid = f'<div class="tgtg-countries">{cells}</div>'
 
@@ -673,7 +721,6 @@ def tgtg_movement(d: dict) -> str:
   <p class="statement"><b>{tg['count']} bags</b> rescued across {tg['cities']} cities.</p>
   {country_grid}
   {shoutout}
-  <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in facts)}</p>
 </section>"""
 
 
@@ -760,16 +807,16 @@ h1 em{{color:var(--accent)}}
 .dek{{font-family:var(--serif);font-size:clamp(17px,2.3vw,21px);line-height:1.5;
   color:var(--dim);max-width:44ch;margin:0}}
 .movement{{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}}
-.tag{{font-size:10.5px;color:#97ac89;margin:0 0 20px}}
+.tag{{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 20px}}
 .trip1-tag{{color:{TRIP_COLOR['trip1']}}}
 .trip2-tag{{color:{TRIP_COLOR['trip2']}}}
 .map-link{{font-family:var(--serif);font-size:clamp(18px,2.6vw,22px);margin:0 0 18px}}
-.map-link a{{color:var(--accent);text-decoration:underline;text-decoration-color:currentColor;
+.map-link a{{color:#97ac89;text-decoration:underline;text-decoration-color:currentColor;
   text-underline-offset:4px}}
 .map-link a:hover{{color:var(--ink)}}
-.statement{{font-family:var(--serif);font-size:clamp(20px,3vw,28px);line-height:1.4;
-  font-weight:400;max-width:32ch;margin:0 0 30px}}
-.statement b{{color:var(--accent);font-weight:500}}
+.statement{{font-family:var(--serif);font-size:clamp(17px,2.2vw,19px);line-height:1.4;
+  font-weight:400;max-width:32ch;margin:0 0 30px;color:#97ac89}}
+.statement b{{font-weight:500}}
 .caption{{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--dim);
   max-width:60ch;margin:18px 0 0}}
 .micro{{font-size:11px;color:var(--dim);margin:20px 0 0;line-height:2}}
@@ -796,11 +843,11 @@ figure{{margin:0}}
 .itin .co{{line-height:1;display:flex}}
 .flag{{width:21px;height:14px;flex:none;color:var(--rule)}}
 .itin .nn{{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em}}
-.tgtg-countries{{display:grid;grid-auto-flow:column;grid-template-rows:auto auto;
-  column-gap:14px;row-gap:6px;margin:24px 0 0;overflow-x:auto;padding-bottom:2px}}
+.tgtg-countries{{display:flex;gap:14px;margin:24px 0 0;overflow-x:auto;padding-bottom:2px}}
+.tgtg-country{{display:flex;flex:none;flex-direction:column;align-items:center;gap:6px}}
 .tgtg-flag{{width:26px;height:17.3px}}
-.tgtg-count{{font-family:var(--mono);font-size:12px;color:var(--ink);text-align:center}}
-.paul-address{{font-size:11px;color:var(--dim);margin:4px 0 0}}
+.tgtg-count{{font-family:var(--mono);font-size:12px;color:var(--ink);text-align:center;margin:0}}
+.paul-address{{font-size:11px;color:var(--dim);margin:4px 0 0 23px}}
 @media(max-width:680px){{.itin{{columns:1}}}}
 .mosaic{{column-width:180px;column-gap:20px}}
 .mosaic .ph{{break-inside:avoid;margin:0 0 28px}}
@@ -833,7 +880,7 @@ def build_html(d: dict) -> str:
 <title>A gap year around Europe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500&family=Spline+Sans+Mono:wght@400;500;700&display=swap">
 <style>{_css()}</style>
 </head><body><main class="page">
 {body}
