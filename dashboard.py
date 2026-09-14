@@ -50,7 +50,7 @@ MODE_STYLE = {
     "train":  ("",           1.9, 0.95, 0.10, 0),
     "bus":    ("9 6",        1.4, 0.85, 0.14, 0),
     "ferry":  ("",           1.4, 0.85, 0.22, 2),   # a wave
-    "flight": ("2 7",        1.3, 0.62, 0.55, 0),   # sparse + big arc
+    "flight": ("4 5",        1.9, 0.88, 0.55, 0),   # bold dashes + big arc
     "car":    ("6 2 1 2 1 2", 1.3, 0.85, 0.10, 0),  # dash-dot-dot, a road marking
     "bike":   ("2 4",        1.2, 0.80, 0.10, 0),
 }
@@ -132,17 +132,17 @@ ROUTE_LABEL_POS = {
     "Bled":         (-9, -3, "end"),
     "Ljubljana":    (8, 9, "start"),
     "Vienna":       (-8, -3, "end"),
-    "Bratislava":   (8, 10, "start"),
+    "Bratislava":   (2, -4, "start"),
     "Zagreb":       (8, 6, "start"),
     "Kraków":       (8, -3, "start"),
     "Budapest":     (0, 13, "middle"),
     "Sarajevo":     (0, -11, "middle"),
     "Split":        (0, -16, "middle"),
-    "Mostar":       (-16, 13, "end"),
+    "Mostar":       (-4, 14, "middle"),
     "Žabljak":      (4, 2, "start"),
-    "Podgorica":    (-10, -2, "end"),
+    "Podgorica":    (2, 8, "end"),
     "Virpazar":     (-2, 20, "middle"),
-    "Shkodër":      (-12, -2, "end"),
+    "Shkodër":      (2, -2, "start"),
     "Theth":        (22, -4, "start"),
     "Tirana":       (0, 13, "middle"),
 }
