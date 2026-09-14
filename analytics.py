@@ -259,6 +259,18 @@ def tgtg_summary(d: dict) -> dict:
     if not stores.empty:
         res["stores"] = int(stores.nunique())
     res["by_city"] = t.groupby("city").size().sort_values(ascending=False)
+
+    names = d["trips"]["name"]
+    res["by_trip"] = [{"trip": tid, "name": names.get(tid, tid), "count": int(len(g))}
+                       for tid, g in t.groupby("trip")]
+
+    coords = load_coords()
+    with_city = t.loc[t["city"] != ""]
+    country = with_city["city"].map(coords["country"])
+    res["by_country"] = country.value_counts()
+
+    # a running favorite across both trips — worth a callout on its own
+    res["paul_count"] = int(t["store"].str.contains("paul", case=False, na=False).sum())
     return res
 
 

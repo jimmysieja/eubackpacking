@@ -64,6 +64,12 @@ HIDDEN_LEGS = {
     ("trip2", "Paris", "London", "flight"),
 }
 
+# fixed per-trip identity colours — deliberately NOT theme-dependent, so the
+# same gold/blue means "2025"/"2026" everywhere: the route lines (via PAL
+# below, light and dark alike), and every heading that groups content by
+# year (Stops, Too Good To Go) via the .trip1-tag / .trip2-tag CSS utility.
+TRIP_COLOR = {"trip1": "#fddc5c", "trip2": "#4169e1"}
+
 # "Cotton candy" palette. Single source of truth — the map page reads this too
 # (docs/map/palette.json). Change colours here, rerun build, both pages update.
 # The Transit and Featured sections locally override `accent` (see .movement-
@@ -73,18 +79,14 @@ PAL = {
     "light": {
         "paper": "#f6f2f0", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
         "accent": "#c93f8a", "gold": "#9b6fc9", "faint": "#c9c1ac", "far": "#e2dbc9",
-        # per-trip line/pin colours. The pastel version of these (2026-09) read
-        # as too washed-out on thin map lines — trip1 (2025) is now a solid
-        # emerald mint, trip2 (2026) a solid steel blue. Both stay saturated
-        # enough to read clearly against the cream paper.
-        "trip1": "#1f8f72", "trip2": "#2f6fb3",
+        "trip1": TRIP_COLOR["trip1"], "trip2": TRIP_COLOR["trip2"],
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
         "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
         "accent": "#ff8fc4", "gold": "#b990e0", "faint": "#3d3a2f", "far": "#2c281f",
-        "trip1": "#4fcba3", "trip2": "#6fa8e0",
+        "trip1": TRIP_COLOR["trip1"], "trip2": TRIP_COLOR["trip2"],
         "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
@@ -93,6 +95,31 @@ PAL = {
 # which palette colour each trip draws in (route trace + interactive map).
 TRIP_INK = {"trip1": "trip1", "trip2": "trip2"}
 DEFAULT_INK = "accent"
+
+# flag shown next to each country in the Stops list. UK stops use the
+# constituent-nation flag since England, Wales and Northern Ireland are all
+# visited on this trip; Northern Ireland has no standardised flag emoji, so
+# Belfast falls back to the union flag.
+COUNTRY_FLAG = {
+    "France": "🇫🇷", "Spain": "🇪🇸", "Switzerland": "🇨🇭", "Italy": "🇮🇹",
+    "Albania": "🇦🇱", "Hungary": "🇭🇺", "Czechia": "🇨🇿", "Poland": "🇵🇱",
+    "Germany": "🇩🇪", "Netherlands": "🇳🇱", "Ireland": "🇮🇪", "Denmark": "🇩🇰",
+    "Sweden": "🇸🇪", "Finland": "🇫🇮", "Estonia": "🇪🇪", "Latvia": "🇱🇻",
+    "Lithuania": "🇱🇹", "Austria": "🇦🇹", "Slovakia": "🇸🇰", "Slovenia": "🇸🇮",
+    "Croatia": "🇭🇷", "Bosnia and Herzegovina": "🇧🇦", "Montenegro": "🇲🇪",
+}
+UK_CITY_FLAG = {
+    "London": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Oxford": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Liverpool": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "Manchester": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chinley": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "Betws-y-Coed": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "Abergavenny": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+    "Belfast": "🇬🇧",
+}
+
+
+def flag_for(city: str, country: str) -> str:
+    if country == "United Kingdom":
+        return UK_CITY_FLAG.get(city, "🇬🇧")
+    return COUNTRY_FLAG.get(country, "")
 
 # both trips begin and end here — ringed on the static map so it reads as
 # the shared home base rather than just another overnight stop.
@@ -492,12 +519,13 @@ def itinerary_movement(d: dict) -> str:
         stints.sort(key=lambda r: r["arrival_date"])
         rows = "".join(
             f'<li><span class="c">{esc(r["city"])}</span>'
-            f'<span class="co">{esc(r["country"])}</span>'
+            f'<span class="co" title="{esc(r["country"])}">{flag_for(r["city"], r["country"])}</span>'
             f'<span class="nn">{r["nights"]}&#8202;n</span></li>'
             for r in stints)
-        blocks.append(f'<div class="itin-trip"><p class="tag">{esc(names.get(tid, tid))}</p>'
+        blocks.append(f'<div class="itin-trip"><p class="tag {tid}-tag">{esc(names.get(tid, tid))}</p>'
                       f'<ol class="itin">{rows}</ol></div>')
-    return f'<section class="movement"><p class="tag">Stops</p>{"".join(blocks)}</section>'
+    divider = '<div class="year-fade" aria-hidden="true"></div>'
+    return f'<section class="movement"><p class="tag">Stops</p>{divider.join(blocks)}</section>'
 
 
 def tgtg_movement(d: dict) -> str:
@@ -507,10 +535,29 @@ def tgtg_movement(d: dict) -> str:
     facts = [f'{tg["count"]} bags', f'{tg["cities"]} cities']
     if tg.get("stores"):
         facts.append(f'{tg["stores"]} different stores')
+
+    trip_blocks = "".join(
+        f'<div class="tgtg-trip"><p class="tag {t["trip"]}-tag">{esc(t["name"])}</p>'
+        f'<p class="micro">{t["count"]} bags</p></div>'
+        for t in tg.get("by_trip", []))
+
+    countries = tg.get("by_country")
+    country_line = ""
+    if countries is not None and not countries.empty:
+        line = ' &nbsp;&middot;&nbsp; '.join(f'{esc(c)} {n}' for c, n in countries.items())
+        country_line = f'<p class="micro">by country &nbsp;&middot;&nbsp; {line}</p>'
+
+    paul = tg.get("paul_count") or 0
+    shoutout = (f'<p class="caption">&#129360; <b>Paul&rsquo;s, {paul}&times;</b> '
+                f'&mdash; the run-away favorite.</p>') if paul else ""
+
     return f"""
 <section class="movement">
   <p class="tag">Too Good To Go</p>
   <p class="statement"><b>{tg['count']} bags</b> rescued across {tg['cities']} cities.</p>
+  <div class="tgtg-trips">{trip_blocks}</div>
+  {country_line}
+  {shoutout}
   <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in facts)}</p>
 </section>"""
 
@@ -599,6 +646,8 @@ h1 em{{color:var(--accent)}}
   color:var(--dim);max-width:44ch;margin:0}}
 .movement{{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}}
 .tag{{font-size:10.5px;color:var(--accent);margin:0 0 20px}}
+.trip1-tag{{color:{TRIP_COLOR['trip1']}}}
+.trip2-tag{{color:{TRIP_COLOR['trip2']}}}
 .map-link{{font-family:var(--serif);font-size:clamp(18px,2.6vw,22px);margin:0 0 18px}}
 .map-link a{{color:var(--accent);text-decoration:underline;text-decoration-color:currentColor;
   text-underline-offset:4px}}
@@ -621,14 +670,19 @@ figure{{margin:0}}
 .ax-note{{font-size:9px;fill:var(--ink);letter-spacing:.06em}}
 .tr-city{{font-family:var(--mono);font-size:9px;fill:var(--ink);letter-spacing:.01em;
   paint-order:stroke;stroke:var(--paper);stroke-width:2.8px;stroke-linejoin:round}}
+.year-fade{{height:3px;margin:0 0 28px;border-radius:2px;
+  background:linear-gradient(90deg,{TRIP_COLOR['trip1']},{TRIP_COLOR['trip2']})}}
 .itin-trip{{margin-bottom:34px}}
 .itin{{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}}
 .itin li{{break-inside:avoid;display:flex;align-items:baseline;gap:8px;padding:6px 0;
   border-bottom:1px dotted var(--rule)}}
 .itin .c{{font-family:var(--serif);font-size:15px;font-variant:all-small-caps;letter-spacing:.06em;
   flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.itin .co{{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--dim)}}
+.itin .co{{font-size:15px;line-height:1}}
 .itin .nn{{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em}}
+.tgtg-trips{{display:flex;gap:36px;flex-wrap:wrap;margin:24px 0 0}}
+.tgtg-trip .tag{{margin-bottom:6px}}
+.tgtg-trip .micro{{margin-top:0}}
 @media(max-width:680px){{.itin{{columns:1}}}}
 .mosaic{{column-width:180px;column-gap:20px}}
 .mosaic .ph{{break-inside:avoid;margin:0 0 28px}}
