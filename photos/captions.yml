@@ -120,6 +120,11 @@
   city: Chamonix
   date: '2025-07-10'
   caption: Snow snow snow
+- file: IMG_8733.PNG
+  city: Chamonix
+  date: '2025-07-10'
+  caption: Adding Tour du Mont Blanc to bucket list
+  featured: true
 - file: img_8741.jpg
   city: Interlaken
   date: '2025-07-11'
@@ -160,6 +165,7 @@
   city: Kandersteg
   date: '2025-07-15'
   caption: Zach is a cow whisperer
+  featured: true
 - file: img_9113.jpg
   city: Kandersteg
   date: '2025-07-15'
@@ -172,6 +178,7 @@
   city: Mürren
   date: '2025-07-17'
   caption: Ready to fall 400m, we have a helmet on we'll be okay
+  featured: true
 - file: img_9191.jpg
   city: Mürren
   date: '2025-07-17'
@@ -440,6 +447,7 @@
   city: Paris
   date: '2025-08-20'
   caption: Eiffel Tower taking flight??
+  featured: true
 - file: img_1202.jpg
   city: Paris
   date: '2025-08-21'
@@ -533,7 +541,6 @@
   city: Manchester
   date: '2026-03-21'
   caption: Old Trafford tour, but the tour guide was just shitting on Liverpool the whole time
-  featured: true
 - file: img_3863.jpg
   city: Manchester
   date: '2026-03-21'
@@ -618,7 +625,6 @@
   city: Cologne
   date: '2026-04-06'
   caption: Walk out of the Cologne train station and BOOM
-  featured: true
 - file: img_4443.jpg
   city: Cologne
   date: '2026-04-06'
@@ -676,7 +682,6 @@
   city: Tallinn
   date: '2026-04-16'
   caption: Bonus points if you can find Justin Kluivert
-  featured: true
 - file: img_4806.jpg
   city: Tallinn
   date: '2026-04-16'
@@ -759,7 +764,6 @@
   city: Zagreb
   date: '2026-04-26'
   caption: Met and talked to Matteo, who lives in Split
-  featured: true
 - file: img_5283.jpg
   city: Split
   date: '2026-04-27'
@@ -872,7 +876,6 @@
   city: Žabljak
   date: '2026-05-04'
   caption: '"Have you ever been to Europe''s deepest canyon?" Better. Pissed in it. Twice.'
-  featured: true
 - file: img_6152.jpg
   city: Žabljak
   date: '2026-05-04'
@@ -895,7 +898,6 @@
   city: Virpazar
   date: '2026-05-06'
   caption: Felix and I on tha boat
-  featured: true
 - file: 5f0a6068-0d8f-4f81-94e5-85e2dc537b67.jpg
   city: Virpazar
   date: '2026-05-06'
@@ -940,7 +942,7 @@
 - file: img_6469.jpg
   city: Tirana
   date: '2026-05-09'
-  caption: Rajmonda!!! Revisited FruitJuiceandMore to talk to Rajmonda for a while once again, almost a year later
+  caption: Rajmonda!!! Revisited FruitJuiceandMore to catch up with her for a while, almost a year later
 - file: 28e388cb-6c76-4846-854c-0174034ecc31.jpg
   city: Paris
   date: '2026-05-10'
@@ -1009,7 +1011,6 @@
   city: Paris
   date: '2026-05-20'
   caption: We da real view
-  featured: true
 - file: img_6933.jpg
   city: Paris
   date: '2026-05-21'

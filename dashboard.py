@@ -565,8 +565,8 @@ def gallery_movement(d: dict) -> str:
     if not entries:
         return ""
     cells = "".join(
-        f'<figure class="ph"><a href="photos/large/{esc(e["file"])}">'
-        f'<img loading="lazy" src="photos/thumb/{esc(e["file"])}" alt="{esc(e.get("caption",""))}"></a>'
+        f'<figure class="ph"><a href="photos/large/{esc(_pub_name(e["file"]))}">'
+        f'<img loading="lazy" src="photos/thumb/{esc(_pub_name(e["file"]))}" alt="{esc(e.get("caption",""))}"></a>'
         f'<figcaption>{esc(e.get("caption",""))}'
         f'{" &mdash; " + esc(e["city"]) if e.get("city") else ""}</figcaption></figure>'
         for e in entries)
@@ -834,7 +834,7 @@ def write_map_data(d: dict) -> None:
 
     photos = {}
     for e in _photo_entries():
-        f = e["file"]
+        f = _pub_name(e["file"])
         photos.setdefault(e.get("city", ""), []).append(
             {"src": f"../photos/large/{f}", "thumb": f"../photos/thumb/{f}",
              "caption": e.get("caption", ""), "date": str(e.get("date", "") or "")})
@@ -855,6 +855,12 @@ def write_map_data(d: dict) -> None:
 # published sizes: 'thumb' for the grid/pins, 'large' for the lightbox.
 # the full-res source in photos/ is never copied into docs/.
 PHOTO_SIZES = {"thumb": (560, 74), "large": (1400, 82)}
+
+
+def _pub_name(file: str) -> str:
+    """_publish_photos always writes JPEG named after the stem, whatever the
+    source extension/case was — so links to the published copy must too."""
+    return f"{Path(file).stem}.jpg"
 
 
 def _publish_photos(imgs, dst):
