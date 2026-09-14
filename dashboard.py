@@ -73,16 +73,18 @@ PAL = {
     "light": {
         "paper": "#f6f2f0", "ink": "#211d17", "dim": "#6f6a5c", "rule": "#d7d0be",
         "accent": "#c93f8a", "gold": "#9b6fc9", "faint": "#c9c1ac", "far": "#e2dbc9",
-        # per-trip line/pin colours. trip1 (Summer 2025) = pale yellow-green,
-        # trip2 (Spring 2026) = pale cyan — experimenting per Jimmy 2026-09.
-        "trip1": "#f5ffc6", "trip2": "#cef4ff",
+        # per-trip line/pin colours. The pastel version of these (2026-09) read
+        # as too washed-out on thin map lines — trip1 (2025) is now a solid
+        # emerald mint, trip2 (2026) a solid steel blue. Both stay saturated
+        # enough to read clearly against the cream paper.
+        "trip1": "#1f8f72", "trip2": "#2f6fb3",
         "c0": "#2f5d54", "c1": "#9a7636", "c2": "#7c3b2c", "c3": "#5b4a6f",
         "c4": "#3a6079", "c5": "#7a7d3c", "c6": "#8a8172",
     },
     "dark": {
         "paper": "#17150f", "ink": "#ece5d5", "dim": "#948c7a", "rule": "#332f26",
         "accent": "#ff8fc4", "gold": "#b990e0", "faint": "#3d3a2f", "far": "#2c281f",
-        "trip1": "#7ec2ff", "trip2": "#d8a6f5",
+        "trip1": "#4fcba3", "trip2": "#6fa8e0",
         "c0": "#5fa093", "c1": "#c8a55f", "c2": "#cf7359", "c3": "#a08fba",
         "c4": "#7ba7c4", "c5": "#b7bb6e", "c6": "#b3aa96",
     },
