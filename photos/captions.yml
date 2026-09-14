@@ -52,6 +52,7 @@
   city: Barcelona
   date: '2025-07-01'
   caption: Beer me
+  featured: true
 - file: img_8174.jpg
   city: Barcelona
   date: '2025-07-02'
@@ -161,11 +162,11 @@
   city: Kandersteg
   date: '2025-07-15'
   caption: Taking in the view over Oeschinensee
+  featured: true
 - file: img_9112.jpg
   city: Kandersteg
   date: '2025-07-15'
   caption: Zach is a cow whisperer
-  featured: true
 - file: img_9113.jpg
   city: Kandersteg
   date: '2025-07-15'
@@ -215,6 +216,7 @@
   city: Florence
   date: '2025-07-22'
   caption: Sunset @ Piazza Michelangelo
+  featured: true
 - file: img_9781.jpg
   city: Rome
   date: '2025-07-24'
@@ -299,6 +301,7 @@
   city: Tirana
   date: '2025-08-03'
   caption: Rajmonda and FruitJuice&More (pt. 1)
+  featured: true
 - file: img_0461.jpg
   city: Tirana
   date: '2025-08-03'
@@ -468,6 +471,7 @@
   city: Paris
   date: '2026-03-06'
   caption: PSG 3-1 Monaco Ligue 1 match
+  featured: true
 - file: img_3305.jpg
   city: Paris
   date: '2026-03-08'
@@ -536,7 +540,8 @@
 - file: img_3816.jpg
   city: Chinley
   date: '2026-03-20'
-  caption: Quick day trip hike near Manchester while waiting for Ralph to get in
+  caption: Quick day trip hike near Manchester
+  featured: true
 - file: 09db6ea9-f8b5-4c6d-9f85-bea76a8d57cd.jpg
   city: Manchester
   date: '2026-03-21'
@@ -674,6 +679,7 @@
   city: Helsinki
   date: '2026-04-14'
   caption: Facts.
+  featured: true
 - file: img_4779.jpg
   city: Tallinn
   date: '2026-04-16'
@@ -763,7 +769,7 @@
 - file: img_5274.jpg
   city: Zagreb
   date: '2026-04-26'
-  caption: Met and talked to Matteo, who lives in Split
+  caption: Met Matteo who lives in Split
 - file: img_5283.jpg
   city: Split
   date: '2026-04-27'
@@ -796,6 +802,7 @@
   city: Split
   date: '2026-04-30'
   caption: yummers
+  featured: true
 - file: img_5786.jpg
   city: Split
   date: '2026-04-30'
@@ -855,6 +862,7 @@
   city: Žabljak
   date: '2026-05-03'
   caption: The Durmitor massif at the bottom of our hike
+  featured: true
 - file: img_6003.jpg
   city: Žabljak
   date: '2026-05-03'
@@ -871,7 +879,6 @@
   city: Žabljak
   date: '2026-05-04'
   caption: Biked ~26 miles across Durmitor National Park
-  featured: true
 - file: img_6034.jpg
   city: Žabljak
   date: '2026-05-04'
@@ -884,7 +891,6 @@
   city: Žabljak
   date: '2026-05-04'
   caption: Quick swim in the Black Lake, Durmitor National Park
-  featured: true
 - file: img_6270.jpg
   city: Žabljak
   date: '2026-05-05'
@@ -926,7 +932,6 @@
   city: Theth
   date: '2026-05-08'
   caption: Early morning start for a day trip to Theth
-  featured: true
 - file: img_6402.jpg
   city: Theth
   date: '2026-05-08'
@@ -942,11 +947,8 @@
 - file: img_6469.jpg
   city: Tirana
   date: '2026-05-09'
-  caption: Rajmonda!!! Revisited FruitJuiceandMore to catch up with her for a while, almost a year later
-- file: 28e388cb-6c76-4846-854c-0174034ecc31.jpg
-  city: Paris
-  date: '2026-05-10'
-  caption: Trocadéro after Lulu's restaurant (& icecream ofc)
+  caption: Rajmonda again!! Revisited FruitJuiceandMore to catch up for a while, almost a year later
+  featured: true
 - file: img_6480.jpg
   city: Tirana
   date: '2026-05-10'
@@ -967,6 +969,11 @@
   city: Paris
   date: '2026-05-10'
   caption: That's mint Dorothy
+- file: 28e388cb-6c76-4846-854c-0174034ecc31.jpg
+  city: Paris
+  date: '2026-05-10'
+  caption: Trocadéro after Lulu's restaurant (& icecream ofc)
+  featured: true
 - file: img_6566.jpg
   city: Paris
   date: '2026-05-12'
@@ -994,7 +1001,7 @@
 - file: img_6775.jpg
   city: Paris
   date: '2026-05-18'
-  caption: Successful G split again (still 50% success rate), but unsuccessful Arsenal hate watch
+  caption: Successful G split, unsuccessful Arsenal hate watch
 - file: img_6777.jpg
   city: Paris
   date: '2026-05-19'
@@ -1031,6 +1038,7 @@
   city: Paris
   date: '2026-05-24'
   caption: Fit check
+  featured: true
 - file: img_7128.jpg
   city: Paris
   date: '2026-05-25'
