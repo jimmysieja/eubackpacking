@@ -7,7 +7,7 @@
 # Night train Budapest -> Kraków: got on the wrong one and ended up routed
 # through Czechia. No separately-timed layovers.
 Břeclav: { kind: transit }
-Ostrava: { kind: transit }
+Ostrava: { kind: transit, label: just passing through }
 
 # Brief stops, no overnight.
 Lyon:

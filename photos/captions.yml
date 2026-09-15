@@ -24,14 +24,14 @@
   city: Marseille
   date: '2025-06-28'
   caption: Plage des Catalans
-- file: img_8097.jpg
-  city: Marseille
-  date: '2025-06-29'
-  caption: Still worth
 - file: img_7724.jpg
   city: Marseille
   date: '2025-06-29'
   caption: No reservation, no problem (until you get halfway down and they turn you away for having no reservation)
+- file: img_8097.jpg
+  city: Marseille
+  date: '2025-06-29'
+  caption: Still worth
 - file: img_8126.jpg
   city: Barcelona
   date: '2025-06-30'
@@ -116,7 +116,7 @@
 - file: img_8671.jpg
   city: Chamonix
   date: '2025-07-10'
-  caption: Chocolate + Bread + Hike
+  caption: Hike + Bread + Chocolate
 - file: img_8692.jpg
   city: Chamonix
   date: '2025-07-10'
@@ -361,11 +361,11 @@
 - file: img_0669.jpg
   city: Warsaw
   date: '2025-08-08'
-  caption: Pierogis street food
+  caption: Pierogi street food
 - file: img_0713.jpg
   city: Prague
   date: '2025-08-09'
-  caption: Pretty city
+  caption: Vltava River at dusk
 - file: img_0730.jpg
   city: Prague
   date: '2025-08-10'
@@ -397,7 +397,7 @@
 - file: img_0861.jpg
   city: Prague
   date: '2025-08-13'
-  caption: Might be the jollyest guy ever in between Zach and I
+  caption: Might be the jollyest guy ever
 - file: img_0891.jpg
   city: Berlin
   date: '2025-08-13'
@@ -413,7 +413,7 @@
 - file: img_0934.jpg
   city: Berlin
   date: '2025-08-14'
-  caption: Now kith
+  caption: Historical
 - file: img_0947.jpg
   city: Berlin
   date: '2025-08-14'
@@ -642,7 +642,7 @@
 - file: img_4466.jpg
   city: Copenhagen
   date: '2026-04-07'
-  caption: Vietnamese Poker with new friends via TripBFF app to watch the Bayern vs RMA game
+  caption: Vietnamese Poker with new friends to drink wine and watch Bayern vs RMA game
 - file: img_4471.jpg
   city: Copenhagen
   date: '2026-04-07'
@@ -803,7 +803,7 @@
   date: '2026-04-30'
   caption: yummers
 - file: img_5786.jpg
-  city: Split
+  city: Mostar
   date: '2026-04-30'
   caption: Least inconveniencing Flixbus occurrence
 - file: img_5794.jpg
@@ -828,23 +828,23 @@
   city: Sarajevo
   date: '2026-05-01'
   caption: View from hostel street
+- file: img_5854.jpg
+  city: Sarajevo
+  date: '2026-05-02'
+  caption: 5am start towards Plužine with Felix, courtesy of Emilie's car
+- file: f6f0ad1c-5103-44cf-b6b0-0b80f47dd071.jpg
+  city: Plužine
+  date: '2026-05-02'
+  caption: Shoutout Emilie for the lift
+- file: img_5874.jpg
+  city: Plužine
+  date: '2026-05-02'
+  caption: Please please please
 - file: 6d5eef40-69c1-487c-8135-6138688adfcc.jpg
   city: Plužine
   date: '2026-05-02'
   caption: This big guy kept us company
   featured: true
-- file: f6f0ad1c-5103-44cf-b6b0-0b80f47dd071.jpg
-  city: Plužine
-  date: '2026-05-02'
-  caption: Shoutout Emilie for the lift
-- file: img_5854.jpg
-  city: Sarajevo
-  date: '2026-05-02'
-  caption: 5am start towards Plužine with Felix, courtesy of Emilie's car
-- file: img_5874.jpg
-  city: Plužine
-  date: '2026-05-02'
-  caption: Please please please
 - file: img_5922.jpg
   city: Žabljak
   date: '2026-05-03'

@@ -736,6 +736,12 @@ def tgtg_movement(d: dict) -> str:
     return f"""
 <section class="movement">
   <p class="tag">Too Good To Go</p>
+  <div class="tgtg-about">
+    <img class="tgtg-logo" src="assets/togo-logo.png" alt="Too Good To Go logo">
+    <p class="tgtg-blurb">Too Good To Go is an app that lets you buy unsold food nearing
+    its sell-by date from nearby restaurants, bakeries and grocery stores at a steep
+    discount, right before it would otherwise be thrown out.</p>
+  </div>
   <p class="statement"><b>{tg['count']} bags</b> rescued across {tg['cities']} cities.</p>
   {country_grid}
   {shoutout}
@@ -835,6 +841,10 @@ h1 em{{color:var(--accent)}}
 .statement{{font-family:var(--serif);font-size:clamp(17px,2.2vw,19px);line-height:1.4;
   font-weight:400;max-width:32ch;margin:0 0 30px;color:#97ac89}}
 .statement b{{font-weight:500}}
+.tgtg-about{{display:flex;align-items:center;gap:16px;margin:0 0 26px}}
+.tgtg-logo{{width:52px;height:52px;border-radius:11px;flex:none;object-fit:cover}}
+.tgtg-blurb{{font-family:var(--serif);font-size:14.5px;line-height:1.5;color:var(--dim);
+  max-width:52ch;margin:0}}
 .caption{{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--dim);
   max-width:60ch;margin:18px 0 0}}
 .micro{{font-size:11px;color:var(--dim);margin:20px 0 0;line-height:2}}

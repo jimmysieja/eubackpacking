@@ -28,27 +28,34 @@ Oxford:
 # The Paris → Copenhagen haul, 6–7 Apr (four changes, then Hamburg overnight)
 Lille:
   kind: transit
+  label: just passing through
   layover: ["2026-04-06 13:00", "2026-04-06 13:54"]
 Tournai:
   kind: transit
+  label: just passing through
   layover: ["2026-04-06 14:21", "2026-04-06 17:58"]
 Brussels:
   kind: transit
+  label: just passing through
   layover: ["2026-04-06 19:12", "2026-04-06 20:25"]
 Cologne:
   kind: transit
+  label: just passing through
   layover: ["2026-04-06 22:15", "2026-04-07 02:09"]   # turned 23 here, waiting on the Hamburg train
 Hamburg:
   kind: transit
+  label: just passing through
   layover: ["2026-04-07 06:50", "2026-04-07 08:53"]
 
 Turku:
   kind: transit
+  label: off the ferry from Stockholm and onto Helsinki via train
   layover: ["2026-04-13 16:00", "2026-04-13 20:57"]   # ferry-in time approximate
 
 # Vilnius → Bratislava, 20–21 Apr (via Warsaw and Kraków, then the sleeper)
 Mockava:
   kind: transit
+  label: just passing through
   layover: ["2026-04-20 14:52", "2026-04-20 15:12"]
 Warsaw:
   kind: transit
