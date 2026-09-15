@@ -277,11 +277,11 @@ def flag_html(city: str, country: str, cls: str = "flag") -> str:
 # the shared home base rather than just another overnight stop.
 START_CITY = "Paris"
 
-# Stops that don't earn their own dot/leg on this simplified overview — the
-# Budapest -> Kraków night train (routed the wrong way through Czechia) reads
-# as one direct hop here. Still full stops elsewhere: nights, annotations,
-# photos and the interactive map are untouched.
-ROUTE_TRACE_SKIP = {("trip1", "Břeclav"), ("trip1", "Ostrava")}
+# Stops left out of the drawn route (static trace + interactive map legs) —
+# the Budapest -> Kraków night train (routed the wrong way through Czechia)
+# reads as one direct hop. Still full stops otherwise: nights, annotations,
+# photos and the map pin/panel for each are untouched.
+ROUTE_SKIP = {("trip1", "Břeclav"), ("trip1", "Ostrava")}
 
 # --- static route-trace map (assets/route-*.svg + the homepage figure) --------
 # Non-overnight stops that still earn a label (name only). Overnight stops are
@@ -450,7 +450,7 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
     if s.empty:
         return ""
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
-    s = s[~s.apply(lambda r: (r["trip"], r["city"]) in ROUTE_TRACE_SKIP, axis=1)]
+    s = s[~s.apply(lambda r: (r["trip"], r["city"]) in ROUTE_SKIP, axis=1)]
     s = s.sort_values(["trip", "stop_number"])
     if s.empty:
         return ""
@@ -1004,7 +1004,8 @@ def write_map_data(d: dict) -> None:
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
     s = s.sort_values(["trip", "stop_number"])
     legs = []
-    for tid, grp in s.groupby("trip"):
+    s_legs = s[~s.apply(lambda r: (r["trip"], r["city"]) in ROUTE_SKIP, axis=1)]
+    for tid, grp in s_legs.groupby("trip"):
         recs = grp.to_dict("records")
         for a, b in zip(recs, recs[1:]):
             mode = b["transport"] or "train"
