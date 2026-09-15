@@ -283,6 +283,16 @@ START_CITY = "Paris"
 # photos and the map pin/panel for each are untouched.
 ROUTE_SKIP = {("trip1", "Břeclav"), ("trip1", "Ostrava")}
 
+# Beyond ROUTE_SKIP, Břeclav doesn't get its own pin/point on either map
+# either — it's a same-day changeover with nothing to show. (Its stop row,
+# nights and stats are untouched; only the map marker disappears.)
+MAP_POINT_SKIP = {("trip1", "Břeclav")}
+
+# Ostrava is a real stop on both trips, but the 2025 leg no longer routes
+# through it (see ROUTE_SKIP above) — so its pin reads as trip2/purple only,
+# not the usual split disc. The panel still lists both stints when clicked.
+MARKER_INK_OVERRIDE = {"Ostrava": "trip2"}
+
 # --- static route-trace map (assets/route-*.svg + the homepage figure) --------
 # Non-overnight stops that still earn a label (name only). Overnight stops are
 # always labelled.
@@ -1022,6 +1032,8 @@ def write_map_data(d: dict) -> None:
     # split-disc for a city seen on two trips and a per-stint panel.
     by_ct: dict = {}
     for _, r in s.iterrows():
+        if (r["trip"], r["city"]) in MAP_POINT_SKIP:
+            continue
         by_ct.setdefault((r["trip"], r["city"]), []).append(r)
 
     per_city: dict = {}
@@ -1067,6 +1079,10 @@ def write_map_data(d: dict) -> None:
         e["trip"] = e["trips"][0] if len(e["trips"]) == 1 else None
         e["ink"] = TRIP_INK.get(e["trip"], DEFAULT_INK) if e["trip"] else None
         e["inks"] = [TRIP_INK.get(t, DEFAULT_INK) for t in e["trips"]]
+        if e["city"] in MARKER_INK_OVERRIDE:
+            e["dual"] = False
+            e["ink"] = MARKER_INK_OVERRIDE[e["city"]]
+            e["inks"] = [e["ink"]]
         cities.append(e)
 
     photos = {}
