@@ -277,6 +277,12 @@ def flag_html(city: str, country: str, cls: str = "flag") -> str:
 # the shared home base rather than just another overnight stop.
 START_CITY = "Paris"
 
+# Stops that don't earn their own dot/leg on this simplified overview — the
+# Budapest -> Kraków night train (routed the wrong way through Czechia) reads
+# as one direct hop here. Still full stops elsewhere: nights, annotations,
+# photos and the interactive map are untouched.
+ROUTE_TRACE_SKIP = {("trip1", "Břeclav"), ("trip1", "Ostrava")}
+
 # --- static route-trace map (assets/route-*.svg + the homepage figure) --------
 # Non-overnight stops that still earn a label (name only). Overnight stops are
 # always labelled.
@@ -444,6 +450,7 @@ def route_trace(d: dict, w: int = 920, h: int = 760) -> str:
     if s.empty:
         return ""
     s = s[(~s["is_home"]) & s["arrival_date"].notna() & s["lat"].notna()]
+    s = s[~s.apply(lambda r: (r["trip"], r["city"]) in ROUTE_TRACE_SKIP, axis=1)]
     s = s.sort_values(["trip", "stop_number"])
     if s.empty:
         return ""
