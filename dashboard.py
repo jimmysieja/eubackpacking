@@ -605,28 +605,91 @@ def day_strip(span, columns, *, w=900, h=150, pad_l=26, annos=None, baseline_lab
 # --------------------------------------------------------------------------- #
 # page movements
 # --------------------------------------------------------------------------- #
-def masthead(d: dict) -> str:
+# the homepage hero photo, and the photo pins drawn over the map preview.
+# The preview (docs/assets/map-preview.jpg) is a screenshot of docs/map/ at its
+# default view; pin positions are % of that image, so re-measure them if the
+# screenshot is ever retaken. Photos are the published names in docs/photos/.
+HERO_PHOTO = "img_9008.jpg"
+MAP_PREVIEW = "assets/map-preview.jpg"
+MAP_PINS = [  # (city, photo, left %, top %)
+    ("Barcelona", "img_8220.jpg", 42.1, 83.8),
+    ("Paris", "img_1227.jpg", 42.6, 59.6),
+    ("Interlaken", "img_9008.jpg", 51.0, 67.0),
+    ("Bled", "img_5149.jpg", 59.5, 68.2),
+    ("Žabljak", "zabljak-durmitor.jpg", 67.5, 78.4),
+    ("Helsinki", "img_4733.jpg", 74.6, 15.0),
+]
+# lighter takes on TRIP_COLOR for text on the black page (the solid colours
+# are too dark to read as small type there).
+TRIP_TEXT = {"trip1": "#6f9bff", "trip2": "#c49bf0"}
+# hand-drawn rings around the intro numbers (viewBox 0 0 100 40) -- one per
+# stat so they don't all look stamped from the same mould.
+SCRIBBLES = [
+    "M7 24 C4 7 90 1 96 17 C101 33 30 41 10 32 C2 27 5 14 19 8",
+    "M9 21 C7 5 88 0 95 15 C101 31 32 41 12 32 C2 26 7 12 22 7",
+    "M6 22 C6 4 92 2 97 18 C100 33 28 41 9 30 C2 25 7 11 24 8",
+    "M5 21 C7 5 91 0 96 16 C100 32 31 42 11 32 C3 27 5 13 21 7",
+]
+ARROW_SVG = ('<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+             'stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>')
+CURSOR_SVG = ('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+              'stroke-width="2" stroke-linejoin="round" aria-hidden="true">'
+              '<path d="M5 3l6.5 17 2.4-7.1L21 10.5z"/></svg>')
+
+
+def _trip_names(d: dict) -> dict:
+    return {t: r["name"] for t, r in d["trips"].iterrows()}
+
+
+def hero_section(d: dict) -> str:
     ov = A.overview(d)
     yr = f"{ov['first_day']:%Y}–{ov['last_day']:%y}"
     return f"""
-<header>
-  <p class="dateline">A gap year &middot; Europe &middot; {yr}</p>
-  <h1>A gap year around Europe</h1>
-  <p class="dek">Two backpacking trips, Summer 2025 and Spring 2026 &mdash; the route,
-  the stops, and the time spent in transit. {ov['n_countries_visited']} countries,
-  {ov['n_cities']} cities.</p>
+<header class="hero">
+  <img class="hero-img" src="photos/large/{HERO_PHOTO}" alt="Jimmy looking out over Oeschinensee">
+  <nav class="topbar"><span class="tb-name">Europe {yr}</span><a class="tb-map" href="map/">Interactive map &rarr;</a></nav>
+  <div class="title-block"><h1>Jimmy&rsquo;s gap year<br>around Europe</h1></div>
 </header>"""
 
 
-def trace_movement(d: dict) -> str:
-    svg = route_trace(d)
-    if not svg:
-        return ""
+def intro_section(d: dict) -> str:
+    ov = A.overview(d)
+    ts = A.train_stats(d)
+    names = _trip_names(d)
+    trips = " and ".join(f'<span class="{t}">{esc(n)}</span>' for t, n in names.items())
+    stats = [(ov["n_countries_visited"], "countries"), (ov["n_cities"], "cities"),
+             (ov["nights_logged"], "nights")]
+    if ts.get("has_data"):
+        stats.append((fmt(ts["rail_km"]), "km by train"))
+    parts = []
+    for i, (n, label) in enumerate(stats):
+        sep = "." if i == len(stats) - 1 else (" and" if i == len(stats) - 2 else ",")
+        parts.append(f'<span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" '
+                     f'aria-hidden="true"><path d="{SCRIBBLES[i % len(SCRIBBLES)]}"/></svg>'
+                     f'<span class="num">{esc(n)}</span></span> {label}{sep}')
     return f"""
-<section class="movement">
-  <p class="tag">Route</p>
-  <p class="map-link"><a href="map/">Interactive map w/ pictures &rarr;</a></p>
-  <figure class="trace">{svg}</figure>
+<section class="intro">
+  <p class="intro-lede">Two backpacking trips, {trips}. The route, the stops, and the time spent in transit.</p>
+  <p class="intro-stats">{' '.join(parts)}</p>
+</section>"""
+
+
+def map_section(d: dict) -> str:
+    thumbs = DOCS / "photos" / "thumb"
+    pins = "".join(
+        f'<span class="pin" style="left:{x}%;top:{y}%"><img src="photos/thumb/{esc(f)}" alt=""></span>'
+        for _, f, x, y in MAP_PINS if (thumbs / f).is_file())
+    return f"""
+<section class="sec">
+  <h2>The map</h2>
+  <a class="map-card" href="map/">
+    <img class="map-img" src="{MAP_PREVIEW}" alt="Preview of the interactive route map">
+    {pins}
+    <span class="map-cta">
+      <span class="map-btn">{CURSOR_SVG}Explore the interactive map{ARROW_SVG}</span>
+      <span class="map-hint">or tap any photo pin or city</span>
+    </span>
+  </a>
 </section>"""
 
 
@@ -674,41 +737,136 @@ def _transit_columns(d: dict):
     return span, cols
 
 
-def transit_movement(d: dict) -> str:
+def _split_strip(d: dict, w: int = 900, h: int = 156) -> str:
+    """Hours in transit per day, one panel per trip placed side by side with
+    the months at home cut out and a bold // marking the cut. Drawn for the
+    white travel-pass card, so colours are fixed rather than theme vars."""
+    _, cols = _transit_columns(d)
+    trips = d["trips"]
+    if not cols or trips.empty:
+        return ""
+    ink, rule, dim = "#141414", "#d9d9d4", "#5c5c5c"
+    font = 'font-family="Helvetica,Arial,sans-serif"'
+    pad_l, gap, base, plot_h = 30, 40, 118, 96
+    spans = [(t, r["start"].date(), r["end"].date()) for t, r in trips.iterrows()]
+    days = [(b - a).days + 1 for _, a, b in spans]
+    usable = w - pad_l - gap * (len(spans) - 1) - 4
+    vmax = max(sum(v for v, _, _ in st) for _, st in cols) or 1
+    out, x0 = [], pad_l
+    segs = []
+    for (tid, a, b), n in zip(spans, days):
+        x1 = x0 + usable * n / sum(days)
+        segs.append((tid, a, b, n, x0, x1))
+        x0 = x1 + gap
+    y = 5
+    while y <= vmax:
+        gy = base - plot_h * y / vmax
+        out += [f'<line x1="{s[4]:.1f}" y1="{gy:.1f}" x2="{s[5]:.1f}" y2="{gy:.1f}" '
+                f'stroke="{rule}" stroke-width="0.7"/>' for s in segs]
+        out.append(f'<text x="0" y="{gy + 4:.1f}" {font} font-size="11" fill="{dim}">{y}h</text>')
+        y += 5
+    for tid, a, b, n, sx0, sx1 in segs:
+        sx = lambda day: sx0 + (sx1 - sx0) * ((day - a).days + 0.5) / n
+        cw = (sx1 - sx0) / n * 0.72
+        for day, stack in cols:
+            if not a <= day <= b:
+                continue
+            yb = base
+            for val, col, _ in stack:
+                bh = plot_h * val / vmax
+                yb -= bh
+                fill, op = (TRIP_COLOR[col], 0.9) if col in TRIP_COLOR else (ink, 0.3)
+                out.append(f'<rect x="{sx(day) - cw / 2:.1f}" y="{yb:.1f}" width="{cw:.1f}" '
+                           f'height="{bh:.2f}" fill="{fill}" opacity="{op}"/>')
+        out.append(f'<line x1="{sx0:.1f}" y1="{base}" x2="{sx1:.1f}" y2="{base}" stroke="{rule}"/>')
+        cur = dt.date(a.year, a.month, 1)
+        while cur <= b:
+            if cur >= a:
+                x = sx0 + (sx1 - sx0) * (cur - a).days / n
+                out.append(f'<line x1="{x:.1f}" y1="{base}" x2="{x:.1f}" y2="{base + 5}" stroke="{rule}"/>'
+                           f'<text x="{x + 3:.1f}" y="{base + 16}" {font} font-size="11" fill="{dim}">{cur:%b}</text>')
+            cur = dt.date(cur.year + (cur.month == 12), cur.month % 12 + 1, 1)
+        out.append(f'<text x="{sx0:.1f}" y="{base + 34}" {font} font-size="12" font-weight="700" '
+                   f'fill="{TRIP_COLOR.get(tid, ink)}">{esc(trips.loc[tid, "name"])}</text>')
+    for (*_, gx), _next in zip(segs, segs[1:]):
+        cx = gx + gap / 2
+        out.append(f'<path d="M{cx - 10:.1f} {base + 13} L{cx - 2:.1f} {base - 13} M{cx + 2:.1f} {base + 13} '
+                   f'L{cx + 10:.1f} {base - 13}" stroke="{ink}" stroke-width="3.6" '
+                   f'stroke-linecap="round" fill="none"/>')
+    return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" '
+            f'aria-label="Hours in transit per day, with the months at home between trips cut out">'
+            f'{"".join(out)}</svg>')
+
+
+def transit_section(d: dict) -> str:
     ts = A.train_stats(d)
     if not ts.get("has_data"):
         return ""
-    span, cols = _transit_columns(d)
-    strip = day_strip(span, cols, baseline_label="hours in transit, by day") if cols else ""
-    legend = ('<div class="key">'
-              '<span class="k"><i class="split" style="background:'
-              'linear-gradient(90deg,var(--trip1) 50%,var(--trip2) 50%);opacity:.9"></i>trains</span>'
-              '<span class="k"><i style="background:var(--ink);opacity:.28"></i>other transit</span>'
-              '</div>') if cols else ""
-    ov = [f'{ts["rail_legs"]} trains']
+    names = _trip_names(d)
     mb = A.mode_breakdown(d)
-    if not mb.empty:
-        for mode, label in (("bus", "buses"), ("flight", "flights"), ("ferry", "ferries")):
-            n = int(mb.loc[mode, "legs"]) if mode in mb.index else 0
-            if n:
-                ov.append(f'{n} {label}')
-    ov.append(f'{fmt(ts["rail_km"])} km')
+    modes = [(ts["rail_legs"], "trains")]
+    for mode, label in (("bus", "buses"), ("flight", "flights"), ("ferry", "ferries")):
+        n = int(mb.loc[mode, "legs"]) if mode in mb.index else 0
+        if n:
+            modes.append((n, label))
+    mode_cells = "".join(f'<div><div class="num">{n}</div><div class="lbl">{label}</div></div>'
+                         for n, label in modes)
+    chips = "".join(f'<span class="chip {t}">{esc(n)}</span>' for t, n in names.items())
+    h = int(ts["rail_hours"])
+    m = round((ts["rail_hours"] - h) * 60)
     return f"""
-<section class="movement movement-transit">
-  <p class="tag">Transit</p>
-  <p class="statement"><b>{hm(ts['rail_hours'])} on trains</b> &mdash; about
-  {ts['full_days_equiv']:.1f} days.</p>
-  <figure class="strip">{strip}</figure>
-  {legend}
-  <p class="micro">{' &nbsp;&middot;&nbsp; '.join(esc(x) for x in ov)}</p>
+<section class="sec">
+  <h2>Getting around</h2>
+  <div class="pass">
+    <div class="pass-top">
+      <div class="pass-main">
+        <div class="pass-head"><span class="pass-title">Travel pass</span>{chips}</div>
+        <div class="pass-modes">{mode_cells}</div>
+      </div>
+      <div class="pass-side">
+        <div><div class="lbl">On trains (&asymp; {ts['full_days_equiv']:.1f} days)</div><div class="num sm">{h}h {m:02d}m</div></div>
+        <div><div class="lbl">By train</div><div class="num sm">{fmt(ts['rail_km'])} km</div></div>
+      </div>
+    </div>
+    <div class="perf" aria-hidden="true"></div>
+    <div class="pass-chart">
+      <p class="lbl">Hours in transit per day. Trains in trip colour, grey for everything else.</p>
+      {_split_strip(d)}
+    </div>
+  </div>
 </section>"""
 
 
-def itinerary_movement(d: dict) -> str:
+def _snake(stints: list, k: int) -> str:
+    """One trip's stops as a line that snakes across the page k stops at a
+    time: left-to-right, U-turn, right-to-left, and so on."""
+    rows = [stints[i:i + k] for i in range(0, len(stints), k)]
+    unit = 100 / k
+    out = []
+    for ri, row in enumerate(rows):
+        rev = ri % 2 == 1
+        side = "right" if rev else "left"
+        line = (f'<span class="sline" style="{side}:{unit / 2:.4f}%;'
+                f'width:{(len(row) - 1) * unit:.4f}%"></span>')
+        turn = (f'<span class="turn {"l" if rev else "r"}" style="width:{unit / 2:.4f}%"></span>'
+                if ri < len(rows) - 1 else "")
+        stops = []
+        for si, r in enumerate(row):
+            end = (ri == 0 and si == 0) or (ri == len(rows) - 1 and si == len(row) - 1)
+            nights = f'{r["nights"]} night{"" if r["nights"] == 1 else "s"}'
+            stops.append(f'<div class="st" style="width:{unit:.4f}%">'
+                         f'<span class="dot{" end" if end else ""}"></span>'
+                         f'<span class="st-name">{flag_html(r["city"], r["country"])}{esc(r["city"])}</span>'
+                         f'<span class="st-n">{nights}</span></div>')
+        out.append(f'<div class="srow{" rev" if rev else ""}">{line}{turn}{"".join(stops)}</div>')
+    return "".join(out)
+
+
+def route_section(d: dict) -> str:
     sl = A.sleeps(d)
     if sl.empty:
         return ""
-    names = {t: r["name"] for t, r in d["trips"].iterrows()}
+    names = _trip_names(d)
     blocks = []
     for tid, grp in sl.groupby("trip"):
         stints = []
@@ -718,50 +876,47 @@ def itinerary_movement(d: dict) -> str:
                 stints.append({"city": city, "country": country, "arrival_date": a,
                                "nights": (b - a).days})
         stints.sort(key=lambda r: r["arrival_date"])
-        rows = "".join(
-            f'<li><span class="c">{esc(r["city"])}</span>'
-            f'<span class="co">{flag_html(r["city"], r["country"])}</span>'
-            f'<span class="nn">{r["nights"]}&#8202;n</span></li>'
-            for r in stints)
-        blocks.append(f'<div class="itin-trip"><p class="tag {tid}-tag">{esc(names.get(tid, tid))}</p>'
-                      f'<ol class="itin">{rows}</ol></div>')
-    divider = '<div class="year-fade" aria-hidden="true"></div>'
-    return (f'<section class="movement">{_flag_defs()}<p class="tag">Stops</p>'
-            f'{divider.join(blocks)}</section>')
+        ends = (f', {esc(stints[0]["city"])} to {esc(stints[-1]["city"])}'
+                if len(stints) > 1 else "")
+        blocks.append(
+            f'<div class="trip" style="--c:{TRIP_COLOR.get(tid, "#888")};--ct:{TRIP_TEXT.get(tid, "#ccc")}">'
+            f'<div class="trip-head"><span class="trip-name">{esc(names.get(tid, tid))}</span>'
+            f'<span class="trip-meta">{len(stints)} stops{ends}</span></div>'
+            f'<div class="snake wide">{_snake(stints, 7)}</div>'
+            f'<div class="snake narrow">{_snake(stints, 3)}</div></div>')
+    return f'<section class="sec">{_flag_defs()}<h2>The route</h2>{"".join(blocks)}</section>'
 
 
-def tgtg_movement(d: dict) -> str:
+def tgtg_section(d: dict) -> str:
     tg = A.tgtg_summary(d)
     if not tg.get("count"):
         return ""
     countries = tg.get("by_country")
-    country_grid = ""
+    bars = ""
     if countries is not None and not countries.empty:
+        top = int(countries.max()) or 1
         # all UK entries here happen to be London -- flag it England rather
-        # than the generic union flag, matching how Stops handles the UK.
-        cells = "".join(
-            '<div class="tgtg-country">'
-            + flag_html("London" if c == "United Kingdom" else "", c, cls="flag tgtg-flag")
-            + f'<p class="tgtg-count">{n}</p></div>'
+        # than the generic union flag, matching how the route handles the UK.
+        bars = "".join(
+            f'<div class="tg-row">{flag_html("London" if c == "United Kingdom" else "", c)}'
+            f'<span class="tg-name">{esc(c)}</span>'
+            f'<span class="tg-track"><span class="tg-fill" style="width:{100 * n / top:.1f}%"></span></span>'
+            f'<span class="num">{n}</span></div>'
             for c, n in countries.items())
-        country_grid = f'<div class="tgtg-countries">{cells}</div>'
-
-    paul = tg.get("paul_count") or 0
-    shoutout = (f'<p class="caption">&#129360; <b>Special shoutout to Paul&rsquo;s in Nice</b></p>'
-                f'<p class="paul-address">3 Bd Victor Hugo, 06000 Nice, France</p>') if paul else ""
-
+    paul = (f'<p class="paul">Special shoutout to Paul&rsquo;s in Nice'
+            f'<span>3 Bd Victor Hugo, 06000 Nice, France</span></p>') if tg.get("paul_count") else ""
     return f"""
-<section class="movement">
-  <p class="tag">Too Good To Go</p>
-  <div class="tgtg-about">
-    <img class="tgtg-logo" src="assets/togo-logo.png" alt="Too Good To Go logo">
-    <p class="tgtg-blurb">Too Good To Go is an app that lets you buy unsold food nearing
-    its sell-by date from nearby restaurants, bakeries and grocery stores at a steep
-    discount, right before it would otherwise be thrown out.</p>
+<section class="sec tgtg">
+  <div class="tg-text">
+    <div class="tg-head"><img class="tg-logo" src="assets/togo-logo.png" alt="Too Good To Go logo"><h2>Too Good To Go</h2></div>
+    <div class="tg-big"><span class="num">{tg['count']}</span> <span class="tg-bags">bags</span></div>
+    <p class="tg-sub">rescued across {tg['cities']} cities.</p>
+    <p class="tg-blurb">Too Good To Go is an app that lets you buy unsold food nearing its sell-by
+    date from nearby restaurants, bakeries and grocery stores at a steep discount, right before it
+    would otherwise be thrown out.</p>
+    {paul}
   </div>
-  <p class="statement"><b>{tg['count']} bags</b> rescued across {tg['cities']} cities.</p>
-  {country_grid}
-  {shoutout}
+  <div class="tg-bars">{bars}</div>
 </section>"""
 
 
@@ -776,15 +931,15 @@ def _photo_cell(e: dict) -> str:
             f'<figcaption>{cap}</figcaption>{city_p}</figure>')
 
 
-def gallery_movement(d: dict) -> str:
-    # the editorial page shows only the hand-picked few; the map holds them all.
+def gallery_section(d: dict) -> str:
+    # the homepage shows only the hand-picked few; the map holds them all.
     entries = [e for e in _photo_entries() if e.get("featured")]
     if not entries:
         return ""
     cells = "".join(_photo_cell(e) for e in entries)
     return f"""
-<section class="movement movement-featured">
-  <p class="tag">Favorites</p>
+<section class="sec">
+  <h2>Favorites</h2>
   <div class="mosaic">{cells}</div>
 </section>
 <div id="lightbox" aria-hidden="true">
@@ -816,118 +971,172 @@ def gallery_movement(d: dict) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# Homepage type roles: title/headings = Indie Flower, accents and the intro =
+# Caveat Brush, every number = Architects Daughter, photo captions = Annie Use
+# Your Telescope, everything else = Nunito. (Nunito is still up for review.)
+FONTS_URL = ("https://fonts.googleapis.com/css2?family=Indie+Flower&family=Caveat+Brush"
+             "&family=Architects+Daughter&family=Annie+Use+Your+Telescope"
+             "&family=Nunito:wght@400;600;700;800&display=swap")
+
+
 def _css() -> str:
-    def vars_(theme):
-        return ";".join(f"--{k}:{v}" for k, v in PAL[theme].items())
     return f"""
-:root{{{vars_('light')};
-  --serif:"Fraunces","Iowan Old Style",Georgia,serif;
-  --sans:"Instrument Sans",system-ui,-apple-system,sans-serif;
-  --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,Menlo,monospace}}
-@media (prefers-color-scheme:dark){{:root:not([data-theme=light]){{{vars_('dark')}}}}}
-:root[data-theme=dark]{{{vars_('dark')}}}
-.movement-transit{{--accent:#1a94c4}}
-.movement-featured{{--accent:#a9713f}}
-@media (prefers-color-scheme:dark){{:root:not([data-theme=light]) .movement-transit{{--accent:#5cd3f5}}
-  :root:not([data-theme=light]) .movement-featured{{--accent:#d19a5e}}}}
-:root[data-theme=dark] .movement-transit{{--accent:#5cd3f5}}
-:root[data-theme=dark] .movement-featured{{--accent:#d19a5e}}
+:root{{--bg:#111111;--ink:#f2f2f2;--dim:#a3a3a3;--hl:#ffd23f;
+  --t1:{TRIP_COLOR['trip1']};--t2:{TRIP_COLOR['trip2']};
+  --t1-text:{TRIP_TEXT['trip1']};--t2-text:{TRIP_TEXT['trip2']};
+  --title:"Indie Flower",cursive;--accent-font:"Caveat Brush",cursive;
+  --num:"Architects Daughter",cursive;--cap:"Annie Use Your Telescope",cursive;
+  --body:"Nunito",system-ui,-apple-system,sans-serif;color-scheme:dark}}
 *{{box-sizing:border-box}}
-body{{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
-  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}}
-.page{{max-width:940px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(20px,5vw,52px) 120px}}
-em{{font-style:italic}}
-b{{font-weight:500}}
-.dateline,.tag,.micro,.ax,.ax-note,.key{{
-  font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em}}
-header{{margin-bottom:clamp(40px,8vw,88px)}}
-.dateline{{font-size:11px;color:var(--dim);margin:0 0 22px}}
-h1{{font-family:var(--serif);font-weight:400;font-optical-sizing:auto;
-  font-size:clamp(38px,7.4vw,72px);line-height:1.03;letter-spacing:-.015em;margin:0 0 24px}}
-h1 em{{color:var(--accent)}}
-.dek{{font-family:var(--serif);font-size:clamp(17px,2.3vw,21px);line-height:1.5;
-  color:var(--dim);max-width:44ch;margin:0}}
-.movement{{margin:clamp(48px,9vw,104px) 0 0;border-top:1px solid var(--rule);padding-top:26px}}
-.tag{{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 20px}}
-.trip1-tag{{color:{TRIP_COLOR['trip1']}}}
-.trip2-tag{{color:{TRIP_COLOR['trip2']}}}
-.map-link{{font-family:var(--serif);font-size:clamp(18px,2.6vw,22px);margin:0 0 18px}}
-.map-link a{{color:#97ac89;text-decoration:underline;text-decoration-color:currentColor;
-  text-underline-offset:4px}}
-.map-link a:hover{{color:var(--ink)}}
-.statement{{font-family:var(--serif);font-size:clamp(17px,2.2vw,19px);line-height:1.4;
-  font-weight:400;max-width:32ch;margin:0 0 30px;color:#97ac89}}
-.statement b{{font-weight:500}}
-.tgtg-about{{display:flex;align-items:center;gap:16px;margin:0 0 26px}}
-.tgtg-logo{{width:52px;height:52px;border-radius:11px;flex:none;object-fit:cover}}
-.tgtg-blurb{{font-family:var(--serif);font-size:14.5px;line-height:1.5;color:var(--dim);
-  max-width:52ch;margin:0}}
-.caption{{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--dim);
-  max-width:60ch;margin:18px 0 0}}
-.micro{{font-size:11px;color:var(--dim);margin:20px 0 0;line-height:2}}
+body{{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}}
+a{{color:inherit}}
 figure{{margin:0}}
-.trace{{margin:8px 0}}
-.trace svg{{display:block}}
-.strip{{margin:26px 0 4px}}
-.key{{font-size:10px;color:var(--dim);margin-top:11px;line-height:2.1}}
-.key .k{{white-space:nowrap;margin-right:2px}}
-.key i{{display:inline-block;width:8px;height:8px;margin-right:5px;vertical-align:baseline}}
-.key b{{color:var(--ink)}}
-.ax{{font-size:9px;fill:var(--dim);letter-spacing:.1em}}
-.ax-note{{font-size:9px;fill:var(--ink);letter-spacing:.06em}}
-.tr-city{{font-family:var(--mono);font-size:9px;fill:var(--ink);letter-spacing:.01em;
-  paint-order:stroke;stroke:var(--paper);stroke-width:2.8px;stroke-linejoin:round}}
-.year-fade{{height:3px;margin:0 0 28px;border-radius:2px;
-  background:linear-gradient(90deg,{TRIP_COLOR['trip1']},{TRIP_COLOR['trip2']})}}
-.itin-trip{{margin-bottom:34px}}
-.itin{{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}}
-.itin li{{break-inside:avoid;display:flex;align-items:baseline;gap:8px;padding:6px 0;
-  border-bottom:1px dotted var(--rule)}}
-.itin .c{{font-family:var(--serif);font-size:15px;font-variant:all-small-caps;letter-spacing:.06em;
-  flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.itin .co{{line-height:1;display:flex}}
-.flag{{width:20px;height:15px;flex:none;color:var(--rule)}}
-.itin .nn{{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em}}
-.tgtg-countries{{display:flex;gap:14px;margin:24px 0 0;overflow-x:auto;padding-bottom:2px}}
-.tgtg-country{{display:flex;flex:none;flex-direction:column;align-items:center;gap:6px}}
-.tgtg-flag{{width:24px;height:18px}}
-.tgtg-count{{font-family:var(--mono);font-size:12px;color:var(--ink);text-align:center;margin:0}}
-.paul-address{{font-size:11px;color:var(--dim);margin:4px 0 0 23px}}
-@media(max-width:680px){{.itin{{columns:1}}}}
+.num{{font-family:var(--num)}}
+.trip1{{color:var(--t1-text)}}
+.trip2{{color:var(--t2-text)}}
+.hero{{position:relative}}
+.hero-img{{display:block;width:100%;aspect-ratio:1280/1460;object-fit:cover;object-position:50% 100%}}
+.topbar{{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
+  align-items:center;gap:12px;padding:16px clamp(16px,3vw,32px);font-weight:700;font-size:15px}}
+.tb-name{{background:var(--bg);padding:6px 12px}}
+.tb-map{{background:var(--ink);color:var(--bg);text-decoration:none;padding:9px 16px;border-radius:999px}}
+.title-block{{position:absolute;left:0;bottom:0;background:var(--bg);
+  padding:22px 36px 6px clamp(16px,3vw,32px)}}
+h1{{margin:0;font-family:var(--title);font-weight:400;font-size:clamp(44px,7.4vw,104px);line-height:.95}}
+.wrap{{max-width:1240px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 96px}}
+.intro{{padding-top:30px}}
+.intro-lede{{font-family:var(--accent-font);font-size:clamp(22px,2.6vw,30px);line-height:1.35;
+  color:#d9d9d9;max-width:42ch;margin:0 0 14px}}
+.intro-stats{{font-family:var(--title);font-size:clamp(26px,3.4vw,40px);line-height:2;margin:0}}
+.circled{{position:relative;display:inline-block;padding:0 .45em;margin:0 2px;line-height:1.2}}
+.circled svg{{position:absolute;left:0;top:-8px;width:100%;height:calc(100% + 16px);
+  overflow:visible;opacity:.7}}
+.circled path{{fill:none;stroke:var(--hl);stroke-width:1.8;stroke-linecap:round;
+  vector-effect:non-scaling-stroke}}
+.circled .num{{position:relative;font-size:1.12em}}
+.sec{{padding-top:clamp(64px,9vw,110px)}}
+h2{{margin:0 0 24px;font-family:var(--title);font-weight:400;font-size:clamp(52px,6.6vw,84px);line-height:1}}
+.map-card{{display:block;position:relative;border:1px solid #333;border-radius:12px;overflow:hidden;
+  text-decoration:none;color:#fff}}
+.map-img{{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}}
+.pin{{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}}
+.pin img{{width:62px;height:62px;border-radius:50%;object-fit:cover;border:3px solid #fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.25)}}
+.pin::after{{content:"";width:0;height:0;border-left:7px solid transparent;
+  border-right:7px solid transparent;border-top:9px solid #fff;margin-top:-1px}}
+.map-cta{{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);display:flex;
+  flex-direction:column;align-items:center;gap:10px}}
+.map-btn{{display:inline-flex;align-items:center;gap:14px;background:var(--bg);color:#fff;
+  padding:22px 36px;border-radius:999px;font-weight:800;font-size:24px;white-space:nowrap;
+  box-shadow:0 16px 40px rgba(0,0,0,.35);transition:transform .15s ease}}
+.map-card:hover .map-btn,.map-card:focus-visible .map-btn{{transform:scale(1.04)}}
+.map-hint{{background:rgba(17,17,17,.8);font-size:14px;font-weight:700;padding:6px 14px;border-radius:999px}}
+.trip{{margin-bottom:56px}}
+.trip-head{{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;margin-bottom:18px}}
+.trip-name{{font-family:var(--accent-font);font-size:46px;line-height:1;color:var(--ct)}}
+.trip-meta{{font-size:15px;color:var(--dim)}}
+.srow{{position:relative;height:124px;display:flex}}
+.srow.rev{{flex-direction:row-reverse}}
+.sline{{position:absolute;top:18px;height:4px;border-radius:2px;background:var(--c)}}
+.turn{{position:absolute;top:18px;height:128px;border:4px solid var(--c)}}
+.turn.r{{right:0;border-left:none;border-radius:0 64px 64px 0}}
+.turn.l{{left:0;border-right:none;border-radius:64px 0 0 64px}}
+.st{{flex:none;text-align:center;position:relative}}
+.dot{{display:block;width:16px;height:16px;margin:12px auto;border-radius:50%;background:var(--bg);
+  border:4px solid var(--c);position:relative;z-index:1}}
+.dot.end{{width:26px;height:26px;margin:7px auto;border-width:5px;box-shadow:0 0 0 3px var(--bg)}}
+.st-name{{display:flex;align-items:center;justify-content:center;gap:7px;padding:0 4px;
+  font-weight:800;font-size:16px;line-height:1.2}}
+.st-n{{display:block;font-size:13px;color:#8c8c8c;margin-top:2px}}
+.flag{{width:20px;height:15px;flex:none;color:#555}}
+.snake.narrow{{display:none}}
+.pass{{background:#fff;color:#141414;border-radius:14px;overflow:hidden}}
+.pass-top{{padding:24px 30px 22px;display:flex;flex-wrap:wrap;gap:24px 48px;align-items:flex-end;
+  justify-content:space-between}}
+.pass-main{{flex:1 1 520px}}
+.pass-head{{display:flex;align-items:center;gap:14px;flex-wrap:wrap}}
+.pass-title{{font-family:var(--title);font-size:54px;line-height:1}}
+.chip{{font-family:var(--accent-font);font-size:18px;padding:2px 12px;border-radius:999px}}
+.chip.trip1{{background:var(--t1);color:#fff}}
+.chip.trip2{{background:var(--t2);color:#fff}}
+.pass-modes{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}}
+.pass .num{{font-size:60px;line-height:1.05}}
+.pass .num.sm{{font-size:40px}}
+.lbl{{font-size:15px;color:#555}}
+.pass-side{{flex:0 1 300px;display:flex;flex-direction:column;gap:10px}}
+.pass-side .lbl{{font-size:14px}}
+.perf{{position:relative;border-top:2px dashed #d6d6d6}}
+.perf::before,.perf::after{{content:"";position:absolute;top:-12px;width:22px;height:22px;
+  border-radius:50%;background:var(--bg)}}
+.perf::before{{left:-12px}}
+.perf::after{{right:-12px}}
+.pass-chart{{padding:22px 30px 24px}}
+.pass-chart .lbl{{font-size:14px;margin:0 0 8px}}
+.pass-chart svg{{display:block;width:100%;height:auto}}
+.tgtg{{display:flex;flex-wrap:wrap;gap:44px}}
+.tg-text{{flex:1 1 340px}}
+.tg-head{{display:flex;align-items:center;gap:14px;margin-bottom:10px}}
+.tg-head h2{{font-size:clamp(44px,5vw,60px);margin:0}}
+.tg-logo{{width:48px;height:48px;border-radius:10px;flex:none;object-fit:cover}}
+.tg-big{{line-height:1}}
+.tg-big .num{{font-size:104px}}
+.tg-bags{{font-family:var(--title);font-size:72px}}
+.tg-sub{{margin:4px 0 18px;font-size:20px;font-weight:700}}
+.tg-blurb{{margin:0;font-size:15px;color:var(--dim);max-width:44ch}}
+.paul{{margin:22px 0 0;font-weight:800}}
+.paul span{{display:block;font-weight:400;font-size:14px;color:var(--dim)}}
+.tg-bars{{flex:1 1 440px;display:flex;flex-direction:column;gap:10px;padding-top:8px}}
+.tg-row{{display:grid;grid-template-columns:26px 136px 1fr 36px;gap:12px;align-items:center;font-size:15px}}
+.tg-row .flag{{width:26px;height:19.5px}}
+.tg-name{{font-weight:700}}
+.tg-track{{display:block;height:16px;background:#262626;border-radius:2px}}
+.tg-fill{{display:block;height:100%;background:var(--ink);border-radius:2px}}
+.tg-row .num{{font-size:22px;line-height:1;text-align:right}}
 .mosaic{{column-width:180px;column-gap:20px}}
 .mosaic .ph{{break-inside:avoid;margin:0 0 28px}}
 .mosaic a{{display:block}}
 .mosaic img{{width:100%;display:block;border-radius:4px}}
-.mosaic figcaption{{font-family:var(--serif);font-style:italic;font-size:13px;line-height:1.45;
-  color:var(--dim);margin:8px 0 0}}
-.mosaic .ph-city{{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--accent);margin:4px 0 0}}
-#lightbox{{position:fixed;inset:0;z-index:100;background:rgba(20,18,14,.92);display:none;
+.mosaic figcaption{{font-family:var(--cap);font-size:18px;line-height:1.3;margin:8px 0 0}}
+.ph-city{{font-size:12px;font-weight:800;color:var(--dim);margin:2px 0 0}}
+#lightbox{{position:fixed;inset:0;z-index:100;background:rgba(10,10,10,.94);display:none;
   align-items:center;justify-content:center;padding:32px;cursor:zoom-out}}
 #lightbox.open{{display:flex}}
 #lightbox figure{{max-width:100%;max-height:100%;cursor:default;text-align:center}}
 #lightbox img{{max-width:100%;max-height:80vh;object-fit:contain;display:block;margin:0 auto}}
-#lightbox figcaption{{font-family:var(--serif);font-style:italic;font-size:14px;
-  color:#f3efe6;margin-top:16px;max-width:60ch}}
-a{{color:var(--accent)}}
+#lightbox figcaption{{font-family:var(--cap);font-size:20px;color:#f2f2f2;margin-top:16px;max-width:60ch}}
+@media(max-width:760px){{
+  .snake.wide{{display:none}}
+  .snake.narrow{{display:block}}
+  .trip-name{{font-size:36px}}
+  .pin img{{width:34px;height:34px;border-width:2px}}
+  .map-btn{{font-size:16px;padding:14px 20px;gap:8px}}
+  .map-btn svg{{width:18px;height:18px}}
+  .map-hint{{font-size:12px}}
+  .pass-modes{{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .pass-title{{font-size:44px}}
+  .tg-row{{grid-template-columns:24px 1fr 2fr 30px}}
+}}
 """
 
 
 def build_html(d: dict) -> str:
     body = "".join([
-        masthead(d), trace_movement(d), transit_movement(d), itinerary_movement(d),
-        tgtg_movement(d), gallery_movement(d),
+        intro_section(d), map_section(d), route_section(d), transit_section(d),
+        tgtg_section(d), gallery_section(d),
     ])
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>A gap year around Europe</title>
+<title>Jimmy&rsquo;s gap year around Europe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500&family=Spline+Sans+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="{FONTS_URL}">
 <style>{_css()}</style>
-</head><body><main class="page">
+</head><body>
+{hero_section(d)}
+<main class="wrap">
 {body}
 </main></body></html>"""
 
