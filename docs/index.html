@@ -21,17 +21,21 @@ figure{margin:0}
 .num{font-family:var(--num)}
 .trip1{color:var(--t1-text)}
 .trip2{color:var(--t2-text)}
-.hero{position:relative}
-.hero-img{display:block;width:100%;height:86vh;height:min(86svh,114vw);object-fit:cover;object-position:50% 62%}
-.topbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
-  align-items:center;gap:12px;padding:16px clamp(16px,3vw,32px);font-weight:700;font-size:15px}
-.tb-name{background:var(--bg);padding:6px 12px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:16px clamp(16px,3vw,32px);font-weight:700;font-size:15px}
 .tb-map{background:var(--ink);color:var(--bg);text-decoration:none;padding:9px 16px;border-radius:999px}
-.title-block{position:absolute;left:0;bottom:0;background:var(--bg);
-  padding:16px 28px 4px clamp(16px,3vw,32px)}
+.hero-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:48px;
+  padding:8px clamp(16px,3vw,32px) 0}
+.hero-text{flex:1 1 420px;min-width:0}
+.hero-text h1{margin-bottom:22px}
+.deck{flex:none;position:relative;width:440px;height:560px;cursor:pointer}
+.card{position:absolute;left:24px;top:24px;margin:0;width:360px;background:#fff;
+  padding:12px 12px 14px;box-shadow:0 14px 34px rgba(0,0,0,.5);transform-origin:50% 60%;
+  transition:transform 1.3s cubic-bezier(.45,0,.2,1),opacity 1.1s ease;will-change:transform,opacity}
+.card img{display:block;width:336px;height:390px;object-fit:cover}
+.card figcaption{font-family:var(--cap);font-size:20px;line-height:1.2;color:#222;margin-top:8px;min-height:48px}
 h1{margin:0;font-family:var(--title);font-weight:400;font-size:clamp(40px,5.6vw,76px);line-height:.95}
 .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 80px}
-.intro{padding-top:24px}
 .intro-lede{font-family:var(--accent-font);font-size:clamp(20px,2vw,24px);line-height:1.35;
   color:#d9d9d9;max-width:42ch;margin:0 0 14px}
 .intro-stats{font-family:var(--title);font-size:clamp(22px,2.4vw,30px);line-height:2;margin:0}
@@ -132,6 +136,12 @@ h2{margin:0 0 18px;font-family:var(--title);font-weight:400;font-size:clamp(40px
 #lightbox img{max-width:100%;max-height:80vh;object-fit:contain;display:block;margin:0 auto}
 #lightbox figcaption{font-family:var(--cap);font-size:20px;color:#f2f2f2;margin-top:16px;max-width:60ch}
 @media(max-width:760px){
+  .hero-in{flex-direction:column;align-items:stretch;gap:12px}
+  .hero-text{flex:none}
+  .deck{width:300px;height:430px;margin:0 auto}
+  .card{left:12px;top:16px;width:264px;padding:10px 10px 12px}
+  .card img{width:244px;height:280px}
+  .card figcaption{font-size:17px;min-height:40px}
   .snake.wide{display:none}
   .snake.narrow{display:block}
   .trip-name{font-size:30px}
@@ -147,16 +157,48 @@ h2{margin:0 0 18px;font-family:var(--title);font-weight:400;font-size:clamp(40px
 </head><body>
 
 <header class="hero">
-  <img class="hero-img" src="photos/large/img_9008.jpg" alt="Jimmy looking out over Oeschinensee">
   <nav class="topbar"><span class="tb-name">Europe 2025–26</span><a class="tb-map" href="map/">Interactive map &rarr;</a></nav>
-  <div class="title-block"><h1>Jimmy&rsquo;s gap year<br>around Europe</h1></div>
+  <div class="hero-in">
+    <div class="hero-text">
+      <h1>Jimmy&rsquo;s gap year<br>around Europe</h1>
+      <p class="intro-lede">Two backpacking trips, <span class="trip1">Summer 2025</span> and <span class="trip2">Spring 2026</span>. The route, the stops, and the time spent in transit.</p><p class="intro-stats"><span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M7 24 C4 7 90 1 96 17 C101 33 30 41 10 32 C2 27 5 14 19 8"/></svg><span class="num">28</span></span> countries, <span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M9 21 C7 5 88 0 95 15 C101 31 32 41 12 32 C2 26 7 12 22 7"/></svg><span class="num">44</span></span> cities, <span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22 C6 4 92 2 97 18 C100 33 28 41 9 30 C2 25 7 11 24 8"/></svg><span class="num">143</span></span> nights and <span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M5 21 C7 5 91 0 96 16 C100 32 31 42 11 32 C3 27 5 13 21 7"/></svg><span class="num">12,709</span></span> km by train.</p>
+    </div>
+    <div class="deck" title="Click for the next photo"><figure class="card" data-r="-4" style="z-index:7;opacity:1;transform:translate(0px,0px) rotate(-4deg)"><img src="photos/large/img_9008.jpg" alt="Taking in the view over Oeschinensee"><figcaption>Taking in the view over Oeschinensee</figcaption></figure><figure class="card" data-r="3" style="z-index:6;opacity:1;transform:translate(10px,9px) rotate(3deg)"><img src="photos/large/img_5149.jpg" alt="Lake Bled (basically Loot Lake from Fortnite)"><figcaption>Lake Bled (basically Loot Lake from Fortnite)</figcaption></figure><figure class="card" data-r="-2" style="z-index:5;opacity:1;transform:translate(20px,18px) rotate(-2deg)"><img src="photos/large/img_9763.jpg" alt="Sunset @ Piazza Michelangelo"><figcaption>Sunset @ Piazza Michelangelo</figcaption></figure><figure class="card" data-r="5" style="z-index:4;opacity:1;transform:translate(30px,27px) rotate(5deg)"><img src="photos/large/6d5eef40-69c1-487c-8135-6138688adfcc.jpg" alt="This big guy kept us company"><figcaption>This big guy kept us company</figcaption></figure><figure class="card" data-r="-5" style="z-index:3;opacity:0;transform:translate(30px,27px) rotate(-5deg)"><img src="photos/large/zabljak-durmitor.jpg" alt="The Durmitor massif at the bottom of our hike"><figcaption>The Durmitor massif at the bottom of our hike</figcaption></figure><figure class="card" data-r="2" style="z-index:2;opacity:0;transform:translate(30px,27px) rotate(2deg)"><img src="photos/large/img_3282.jpg" alt="PSG 3-1 Monaco Ligue 1 match"><figcaption>PSG 3-1 Monaco Ligue 1 match</figcaption></figure><figure class="card" data-r="-3" style="z-index:1;opacity:0;transform:translate(30px,27px) rotate(-3deg)"><img src="photos/large/img_4733.jpg" alt="Facts."><figcaption>Facts.</figcaption></figure></div><script>
+(function(){
+  var deck = document.querySelector('.deck');
+  if (!deck) return;
+  var cards = [].slice.call(deck.querySelectorAll('.card')), n = cards.length, top = 0, timer = null;
+  var SHOWN = 4;
+  function place() {
+    cards.forEach(function(c, k) {
+      var p = (k - top + n) % n, r = +c.dataset.r;
+      if (n > 1 && p === n - 1) {
+        c.style.zIndex = n + 1;
+        c.style.opacity = 0;
+        c.style.transform = 'translate(40px,-30px) rotate(' + (r + 8) + 'deg) scale(1.03)';
+      } else {
+        var q = Math.min(p, SHOWN - 1);
+        c.style.zIndex = n - p;
+        c.style.opacity = p < SHOWN ? 1 : 0;
+        c.style.transform = 'translate(' + q * 10 + 'px,' + q * 9 + 'px) rotate(' + r + 'deg)';
+      }
+    });
+  }
+  function next() { top = (top + 1) % n; place(); }
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function start() { if (!still && !timer && n > 1) timer = setInterval(next, 4500); }
+  function stop() { clearInterval(timer); timer = null; }
+  deck.addEventListener('mouseenter', stop);
+  deck.addEventListener('mouseleave', start);
+  deck.addEventListener('click', function() { stop(); next(); start(); });
+  document.addEventListener('visibilitychange', function() { document.hidden ? stop() : start(); });
+  start();
+})();
+</script>
+  </div>
 </header>
 <main class="wrap">
 
-<section class="intro">
-  <p class="intro-lede">Two backpacking trips, <span class="trip1">Summer 2025</span> and <span class="trip2">Spring 2026</span>. The route, the stops, and the time spent in transit.</p>
-  <p class="intro-stats"><span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M7 24 C4 7 90 1 96 17 C101 33 30 41 10 32 C2 27 5 14 19 8"/></svg><span class="num">28</span></span> countries, <span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M9 21 C7 5 88 0 95 15 C101 31 32 41 12 32 C2 26 7 12 22 7"/></svg><span class="num">44</span></span> cities, <span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22 C6 4 92 2 97 18 C100 33 28 41 9 30 C2 25 7 11 24 8"/></svg><span class="num">143</span></span> nights and <span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M5 21 C7 5 91 0 96 16 C100 32 31 42 11 32 C3 27 5 13 21 7"/></svg><span class="num">12,709</span></span> km by train.</p>
-</section>
 <section class="sec">
   <h2>The map</h2>
   <a class="map-card" href="map/">

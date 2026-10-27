@@ -605,11 +605,18 @@ def day_strip(span, columns, *, w=900, h=150, pad_l=26, annos=None, baseline_lab
 # --------------------------------------------------------------------------- #
 # page movements
 # --------------------------------------------------------------------------- #
-# the homepage hero photo, and the photo pins drawn over the map preview.
-# The preview (docs/assets/map-preview.jpg) is a screenshot of docs/map/ at its
-# default view; pin positions are % of that image, so re-measure them if the
+# the polaroids that shuffle in the hero (top of the pile first), and the
+# photo pins drawn over the map preview. The preview
+# (docs/assets/map-preview.jpg) is a screenshot of docs/map/ at its default
+# view; pin positions are % of that image, so re-measure them if the
 # screenshot is ever retaken. Photos are the published names in docs/photos/.
-HERO_PHOTO = "img_9008.jpg"
+HERO_DECK = [
+    "img_9008.jpg", "img_5149.jpg", "img_9763.jpg",
+    "6d5eef40-69c1-487c-8135-6138688adfcc.jpg", "zabljak-durmitor.jpg",
+    "img_3282.jpg", "img_4733.jpg",
+]
+# a slight, fixed tilt per card so the pile looks dropped rather than stacked
+DECK_TILT = [-4, 3, -2, 5, -5, 2, -3]
 MAP_PREVIEW = "assets/map-preview.jpg"
 MAP_PINS = [  # (city, photo, left %, top %)
     ("Barcelona", "img_8220.jpg", 42.1, 83.8),
@@ -641,18 +648,84 @@ def _trip_names(d: dict) -> dict:
     return {t: r["name"] for t, r in d["trips"].iterrows()}
 
 
+def _deck(d: dict) -> str:
+    """The hero's pile of polaroids. Every card is placed here in its starting
+    spot so the pile reads right before (or without) the script that shuffles
+    it; DECK_JS then takes over the same inline styles."""
+    caps = {_pub_name(e["file"]): e.get("caption", "") for e in _photo_entries()}
+    large = DOCS / "photos" / "large"
+    files = [f for f in HERO_DECK if (large / f).is_file()]
+    cards = []
+    for k, f in enumerate(files):
+        tilt = DECK_TILT[k % len(DECK_TILT)]
+        q = min(k, 3)
+        style = (f"z-index:{len(files) - k};opacity:{1 if k < 4 else 0};"
+                 f"transform:translate({q * 10}px,{q * 9}px) rotate({tilt}deg)")
+        cap = esc(caps.get(f, ""))
+        cards.append(f'<figure class="card" data-r="{tilt}" style="{style}">'
+                     f'<img src="photos/large/{esc(f)}" alt="{cap}">'
+                     f'<figcaption>{cap}</figcaption></figure>')
+    if not cards:
+        return ""
+    return (f'<div class="deck" title="Click for the next photo">{"".join(cards)}</div>'
+            f'<script>{DECK_JS}</script>')
+
+
+# Shuffles the hero pile: every few seconds the top card lifts and fades away
+# while the rest slide up one place, and it fades back in at the bottom of the
+# pile. Pauses on hover and in a background tab, a click deals the next card,
+# and it stays still for anyone who prefers reduced motion.
+DECK_JS = """
+(function(){
+  var deck = document.querySelector('.deck');
+  if (!deck) return;
+  var cards = [].slice.call(deck.querySelectorAll('.card')), n = cards.length, top = 0, timer = null;
+  var SHOWN = 4;
+  function place() {
+    cards.forEach(function(c, k) {
+      var p = (k - top + n) % n, r = +c.dataset.r;
+      if (n > 1 && p === n - 1) {
+        c.style.zIndex = n + 1;
+        c.style.opacity = 0;
+        c.style.transform = 'translate(40px,-30px) rotate(' + (r + 8) + 'deg) scale(1.03)';
+      } else {
+        var q = Math.min(p, SHOWN - 1);
+        c.style.zIndex = n - p;
+        c.style.opacity = p < SHOWN ? 1 : 0;
+        c.style.transform = 'translate(' + q * 10 + 'px,' + q * 9 + 'px) rotate(' + r + 'deg)';
+      }
+    });
+  }
+  function next() { top = (top + 1) % n; place(); }
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function start() { if (!still && !timer && n > 1) timer = setInterval(next, 4500); }
+  function stop() { clearInterval(timer); timer = null; }
+  deck.addEventListener('mouseenter', stop);
+  deck.addEventListener('mouseleave', start);
+  deck.addEventListener('click', function() { stop(); next(); start(); });
+  document.addEventListener('visibilitychange', function() { document.hidden ? stop() : start(); });
+  start();
+})();
+"""
+
+
 def hero_section(d: dict) -> str:
     ov = A.overview(d)
     yr = f"{ov['first_day']:%Y}–{ov['last_day']:%y}"
     return f"""
 <header class="hero">
-  <img class="hero-img" src="photos/large/{HERO_PHOTO}" alt="Jimmy looking out over Oeschinensee">
   <nav class="topbar"><span class="tb-name">Europe {yr}</span><a class="tb-map" href="map/">Interactive map &rarr;</a></nav>
-  <div class="title-block"><h1>Jimmy&rsquo;s gap year<br>around Europe</h1></div>
+  <div class="hero-in">
+    <div class="hero-text">
+      <h1>Jimmy&rsquo;s gap year<br>around Europe</h1>
+      {_intro(d)}
+    </div>
+    {_deck(d)}
+  </div>
 </header>"""
 
 
-def intro_section(d: dict) -> str:
+def _intro(d: dict) -> str:
     ov = A.overview(d)
     ts = A.train_stats(d)
     names = _trip_names(d)
@@ -667,11 +740,9 @@ def intro_section(d: dict) -> str:
         parts.append(f'<span class="circled"><svg viewBox="0 0 100 40" preserveAspectRatio="none" '
                      f'aria-hidden="true"><path d="{SCRIBBLES[i % len(SCRIBBLES)]}"/></svg>'
                      f'<span class="num">{esc(n)}</span></span> {label}{sep}')
-    return f"""
-<section class="intro">
-  <p class="intro-lede">Two backpacking trips, {trips}. The route, the stops, and the time spent in transit.</p>
-  <p class="intro-stats">{' '.join(parts)}</p>
-</section>"""
+    return (f'<p class="intro-lede">Two backpacking trips, {trips}. The route, the stops, '
+            f'and the time spent in transit.</p>'
+            f'<p class="intro-stats">{" ".join(parts)}</p>')
 
 
 def map_section(d: dict) -> str:
@@ -992,17 +1063,21 @@ figure{{margin:0}}
 .num{{font-family:var(--num)}}
 .trip1{{color:var(--t1-text)}}
 .trip2{{color:var(--t2-text)}}
-.hero{{position:relative}}
-.hero-img{{display:block;width:100%;height:86vh;height:min(86svh,114vw);object-fit:cover;object-position:50% 62%}}
-.topbar{{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
-  align-items:center;gap:12px;padding:16px clamp(16px,3vw,32px);font-weight:700;font-size:15px}}
-.tb-name{{background:var(--bg);padding:6px 12px}}
+.topbar{{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:16px clamp(16px,3vw,32px);font-weight:700;font-size:15px}}
 .tb-map{{background:var(--ink);color:var(--bg);text-decoration:none;padding:9px 16px;border-radius:999px}}
-.title-block{{position:absolute;left:0;bottom:0;background:var(--bg);
-  padding:16px 28px 4px clamp(16px,3vw,32px)}}
+.hero-in{{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:48px;
+  padding:8px clamp(16px,3vw,32px) 0}}
+.hero-text{{flex:1 1 420px;min-width:0}}
+.hero-text h1{{margin-bottom:22px}}
+.deck{{flex:none;position:relative;width:440px;height:560px;cursor:pointer}}
+.card{{position:absolute;left:24px;top:24px;margin:0;width:360px;background:#fff;
+  padding:12px 12px 14px;box-shadow:0 14px 34px rgba(0,0,0,.5);transform-origin:50% 60%;
+  transition:transform 1.3s cubic-bezier(.45,0,.2,1),opacity 1.1s ease;will-change:transform,opacity}}
+.card img{{display:block;width:336px;height:390px;object-fit:cover}}
+.card figcaption{{font-family:var(--cap);font-size:20px;line-height:1.2;color:#222;margin-top:8px;min-height:48px}}
 h1{{margin:0;font-family:var(--title);font-weight:400;font-size:clamp(40px,5.6vw,76px);line-height:.95}}
 .wrap{{max-width:1120px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 80px}}
-.intro{{padding-top:24px}}
 .intro-lede{{font-family:var(--accent-font);font-size:clamp(20px,2vw,24px);line-height:1.35;
   color:#d9d9d9;max-width:42ch;margin:0 0 14px}}
 .intro-stats{{font-family:var(--title);font-size:clamp(22px,2.4vw,30px);line-height:2;margin:0}}
@@ -1103,6 +1178,12 @@ h2{{margin:0 0 18px;font-family:var(--title);font-weight:400;font-size:clamp(40p
 #lightbox img{{max-width:100%;max-height:80vh;object-fit:contain;display:block;margin:0 auto}}
 #lightbox figcaption{{font-family:var(--cap);font-size:20px;color:#f2f2f2;margin-top:16px;max-width:60ch}}
 @media(max-width:760px){{
+  .hero-in{{flex-direction:column;align-items:stretch;gap:12px}}
+  .hero-text{{flex:none}}
+  .deck{{width:300px;height:430px;margin:0 auto}}
+  .card{{left:12px;top:16px;width:264px;padding:10px 10px 12px}}
+  .card img{{width:244px;height:280px}}
+  .card figcaption{{font-size:17px;min-height:40px}}
   .snake.wide{{display:none}}
   .snake.narrow{{display:block}}
   .trip-name{{font-size:30px}}
@@ -1119,7 +1200,7 @@ h2{{margin:0 0 18px;font-family:var(--title);font-weight:400;font-size:clamp(40p
 
 def build_html(d: dict) -> str:
     body = "".join([
-        intro_section(d), map_section(d), route_section(d), transit_section(d),
+        map_section(d), route_section(d), transit_section(d),
         tgtg_section(d), gallery_section(d),
     ])
     return f"""<!doctype html>
