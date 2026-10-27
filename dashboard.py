@@ -876,12 +876,9 @@ def route_section(d: dict) -> str:
                 stints.append({"city": city, "country": country, "arrival_date": a,
                                "nights": (b - a).days})
         stints.sort(key=lambda r: r["arrival_date"])
-        ends = (f', {esc(stints[0]["city"])} to {esc(stints[-1]["city"])}'
-                if len(stints) > 1 else "")
         blocks.append(
             f'<div class="trip" style="--c:{TRIP_COLOR.get(tid, "#888")};--ct:{TRIP_TEXT.get(tid, "#ccc")}">'
-            f'<div class="trip-head"><span class="trip-name">{esc(names.get(tid, tid))}</span>'
-            f'<span class="trip-meta">{len(stints)} stops{ends}</span></div>'
+            f'<div class="trip-head"><span class="trip-name">{esc(names.get(tid, tid))}</span></div>'
             f'<div class="snake wide">{_snake(stints, 7)}</div>'
             f'<div class="snake narrow">{_snake(stints, 3)}</div></div>')
     return f'<section class="sec">{_flag_defs()}<h2>The route</h2>{"".join(blocks)}</section>'
@@ -989,57 +986,57 @@ def _css() -> str:
   --body:"Nunito",system-ui,-apple-system,sans-serif;color-scheme:dark}}
 *{{box-sizing:border-box}}
 body{{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
-  font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}}
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}}
 a{{color:inherit}}
 figure{{margin:0}}
 .num{{font-family:var(--num)}}
 .trip1{{color:var(--t1-text)}}
 .trip2{{color:var(--t2-text)}}
 .hero{{position:relative}}
-.hero-img{{display:block;width:100%;aspect-ratio:1280/1460;object-fit:cover;object-position:50% 100%}}
+.hero-img{{display:block;width:100%;height:86vh;height:min(86svh,114vw);object-fit:cover;object-position:50% 62%}}
 .topbar{{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
   align-items:center;gap:12px;padding:16px clamp(16px,3vw,32px);font-weight:700;font-size:15px}}
 .tb-name{{background:var(--bg);padding:6px 12px}}
 .tb-map{{background:var(--ink);color:var(--bg);text-decoration:none;padding:9px 16px;border-radius:999px}}
 .title-block{{position:absolute;left:0;bottom:0;background:var(--bg);
-  padding:22px 36px 6px clamp(16px,3vw,32px)}}
-h1{{margin:0;font-family:var(--title);font-weight:400;font-size:clamp(44px,7.4vw,104px);line-height:.95}}
-.wrap{{max-width:1240px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 96px}}
-.intro{{padding-top:30px}}
-.intro-lede{{font-family:var(--accent-font);font-size:clamp(22px,2.6vw,30px);line-height:1.35;
+  padding:16px 28px 4px clamp(16px,3vw,32px)}}
+h1{{margin:0;font-family:var(--title);font-weight:400;font-size:clamp(40px,5.6vw,76px);line-height:.95}}
+.wrap{{max-width:1120px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 80px}}
+.intro{{padding-top:24px}}
+.intro-lede{{font-family:var(--accent-font);font-size:clamp(20px,2vw,24px);line-height:1.35;
   color:#d9d9d9;max-width:42ch;margin:0 0 14px}}
-.intro-stats{{font-family:var(--title);font-size:clamp(26px,3.4vw,40px);line-height:2;margin:0}}
+.intro-stats{{font-family:var(--title);font-size:clamp(22px,2.4vw,30px);line-height:2;margin:0}}
 .circled{{position:relative;display:inline-block;padding:0 .45em;margin:0 2px;line-height:1.2}}
 .circled svg{{position:absolute;left:0;top:-8px;width:100%;height:calc(100% + 16px);
   overflow:visible;opacity:.7}}
 .circled path{{fill:none;stroke:var(--hl);stroke-width:1.8;stroke-linecap:round;
   vector-effect:non-scaling-stroke}}
 .circled .num{{position:relative;font-size:1.12em}}
-.sec{{padding-top:clamp(64px,9vw,110px)}}
-h2{{margin:0 0 24px;font-family:var(--title);font-weight:400;font-size:clamp(52px,6.6vw,84px);line-height:1}}
+.sec{{padding-top:clamp(56px,7vw,84px)}}
+h2{{margin:0 0 18px;font-family:var(--title);font-weight:400;font-size:clamp(40px,4.6vw,60px);line-height:1}}
 .map-card{{display:block;position:relative;border:1px solid #333;border-radius:12px;overflow:hidden;
   text-decoration:none;color:#fff}}
 .map-img{{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}}
 .pin{{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}}
-.pin img{{width:62px;height:62px;border-radius:50%;object-fit:cover;border:3px solid #fff;
+.pin img{{width:48px;height:48px;border-radius:50%;object-fit:cover;border:3px solid #fff;
   box-shadow:0 6px 16px rgba(0,0,0,.25)}}
-.pin::after{{content:"";width:0;height:0;border-left:7px solid transparent;
-  border-right:7px solid transparent;border-top:9px solid #fff;margin-top:-1px}}
+.pin::after{{content:"";width:0;height:0;border-left:6px solid transparent;
+  border-right:6px solid transparent;border-top:8px solid #fff;margin-top:-1px}}
 .map-cta{{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);display:flex;
   flex-direction:column;align-items:center;gap:10px}}
-.map-btn{{display:inline-flex;align-items:center;gap:14px;background:var(--bg);color:#fff;
-  padding:22px 36px;border-radius:999px;font-weight:800;font-size:24px;white-space:nowrap;
+.map-btn{{display:inline-flex;align-items:center;gap:10px;background:var(--bg);color:#fff;
+  padding:16px 28px;border-radius:999px;font-weight:800;font-size:19px;white-space:nowrap;
   box-shadow:0 16px 40px rgba(0,0,0,.35);transition:transform .15s ease}}
 .map-card:hover .map-btn,.map-card:focus-visible .map-btn{{transform:scale(1.04)}}
-.map-hint{{background:rgba(17,17,17,.8);font-size:14px;font-weight:700;padding:6px 14px;border-radius:999px}}
-.trip{{margin-bottom:56px}}
-.trip-head{{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;margin-bottom:18px}}
-.trip-name{{font-family:var(--accent-font);font-size:46px;line-height:1;color:var(--ct)}}
-.trip-meta{{font-size:15px;color:var(--dim)}}
-.srow{{position:relative;height:124px;display:flex}}
+.map-btn svg{{width:20px;height:20px}}
+.map-hint{{background:rgba(17,17,17,.8);font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px}}
+.trip{{margin-bottom:44px}}
+.trip-head{{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;margin-bottom:12px}}
+.trip-name{{font-family:var(--accent-font);font-size:34px;line-height:1;color:var(--ct)}}
+.srow{{position:relative;height:104px;display:flex}}
 .srow.rev{{flex-direction:row-reverse}}
 .sline{{position:absolute;top:18px;height:4px;border-radius:2px;background:var(--c)}}
-.turn{{position:absolute;top:18px;height:128px;border:4px solid var(--c)}}
+.turn{{position:absolute;top:18px;height:108px;border:4px solid var(--c)}}
 .turn.r{{right:0;border-left:none;border-radius:0 64px 64px 0}}
 .turn.l{{left:0;border-right:none;border-radius:64px 0 0 64px}}
 .st{{flex:none;text-align:center;position:relative}}
@@ -1047,23 +1044,23 @@ h2{{margin:0 0 24px;font-family:var(--title);font-weight:400;font-size:clamp(52p
   border:4px solid var(--c);position:relative;z-index:1}}
 .dot.end{{width:26px;height:26px;margin:7px auto;border-width:5px;box-shadow:0 0 0 3px var(--bg)}}
 .st-name{{display:flex;align-items:center;justify-content:center;gap:7px;padding:0 4px;
-  font-weight:800;font-size:16px;line-height:1.2}}
-.st-n{{display:block;font-size:13px;color:#8c8c8c;margin-top:2px}}
+  font-weight:800;font-size:14px;line-height:1.2}}
+.st-n{{display:block;font-size:12px;color:#8c8c8c;margin-top:2px}}
 .flag{{width:20px;height:15px;flex:none;color:#555}}
 .snake.narrow{{display:none}}
 .pass{{background:#fff;color:#141414;border-radius:14px;overflow:hidden}}
-.pass-top{{padding:24px 30px 22px;display:flex;flex-wrap:wrap;gap:24px 48px;align-items:flex-end;
+.pass-top{{padding:20px 26px 18px;display:flex;flex-wrap:wrap;gap:24px 48px;align-items:flex-end;
   justify-content:space-between}}
 .pass-main{{flex:1 1 520px}}
 .pass-head{{display:flex;align-items:center;gap:14px;flex-wrap:wrap}}
-.pass-title{{font-family:var(--title);font-size:54px;line-height:1}}
-.chip{{font-family:var(--accent-font);font-size:18px;padding:2px 12px;border-radius:999px}}
+.pass-title{{font-family:var(--title);font-size:40px;line-height:1}}
+.chip{{font-family:var(--accent-font);font-size:16px;padding:2px 12px;border-radius:999px}}
 .chip.trip1{{background:var(--t1);color:#fff}}
 .chip.trip2{{background:var(--t2);color:#fff}}
 .pass-modes{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}}
-.pass .num{{font-size:60px;line-height:1.05}}
-.pass .num.sm{{font-size:40px}}
-.lbl{{font-size:15px;color:#555}}
+.pass .num{{font-size:44px;line-height:1.05}}
+.pass .num.sm{{font-size:30px}}
+.lbl{{font-size:14px;color:#555}}
 .pass-side{{flex:0 1 300px;display:flex;flex-direction:column;gap:10px}}
 .pass-side .lbl{{font-size:14px}}
 .perf{{position:relative;border-top:2px dashed #d6d6d6}}
@@ -1071,18 +1068,18 @@ h2{{margin:0 0 24px;font-family:var(--title);font-weight:400;font-size:clamp(52p
   border-radius:50%;background:var(--bg)}}
 .perf::before{{left:-12px}}
 .perf::after{{right:-12px}}
-.pass-chart{{padding:22px 30px 24px}}
+.pass-chart{{padding:18px 26px 20px}}
 .pass-chart .lbl{{font-size:14px;margin:0 0 8px}}
 .pass-chart svg{{display:block;width:100%;height:auto}}
 .tgtg{{display:flex;flex-wrap:wrap;gap:44px}}
 .tg-text{{flex:1 1 340px}}
 .tg-head{{display:flex;align-items:center;gap:14px;margin-bottom:10px}}
-.tg-head h2{{font-size:clamp(44px,5vw,60px);margin:0}}
-.tg-logo{{width:48px;height:48px;border-radius:10px;flex:none;object-fit:cover}}
+.tg-head h2{{font-size:clamp(36px,4vw,48px);margin:0}}
+.tg-logo{{width:40px;height:40px;border-radius:10px;flex:none;object-fit:cover}}
 .tg-big{{line-height:1}}
-.tg-big .num{{font-size:104px}}
-.tg-bags{{font-family:var(--title);font-size:72px}}
-.tg-sub{{margin:4px 0 18px;font-size:20px;font-weight:700}}
+.tg-big .num{{font-size:72px}}
+.tg-bags{{font-family:var(--title);font-size:50px}}
+.tg-sub{{margin:4px 0 16px;font-size:18px;font-weight:700}}
 .tg-blurb{{margin:0;font-size:15px;color:var(--dim);max-width:44ch}}
 .paul{{margin:22px 0 0;font-weight:800}}
 .paul span{{display:block;font-weight:400;font-size:14px;color:var(--dim)}}
@@ -1097,7 +1094,7 @@ h2{{margin:0 0 24px;font-family:var(--title);font-weight:400;font-size:clamp(52p
 .mosaic .ph{{break-inside:avoid;margin:0 0 28px}}
 .mosaic a{{display:block}}
 .mosaic img{{width:100%;display:block;border-radius:4px}}
-.mosaic figcaption{{font-family:var(--cap);font-size:18px;line-height:1.3;margin:8px 0 0}}
+.mosaic figcaption{{font-family:var(--cap);font-size:17px;line-height:1.3;margin:8px 0 0}}
 .ph-city{{font-size:12px;font-weight:800;color:var(--dim);margin:2px 0 0}}
 #lightbox{{position:fixed;inset:0;z-index:100;background:rgba(10,10,10,.94);display:none;
   align-items:center;justify-content:center;padding:32px;cursor:zoom-out}}
@@ -1108,13 +1105,13 @@ h2{{margin:0 0 24px;font-family:var(--title);font-weight:400;font-size:clamp(52p
 @media(max-width:760px){{
   .snake.wide{{display:none}}
   .snake.narrow{{display:block}}
-  .trip-name{{font-size:36px}}
-  .pin img{{width:34px;height:34px;border-width:2px}}
-  .map-btn{{font-size:16px;padding:14px 20px;gap:8px}}
-  .map-btn svg{{width:18px;height:18px}}
+  .trip-name{{font-size:30px}}
+  .pin img{{width:32px;height:32px;border-width:2px}}
+  .map-btn{{font-size:15px;padding:12px 18px;gap:8px}}
+  .map-btn svg{{width:16px;height:16px}}
   .map-hint{{font-size:12px}}
   .pass-modes{{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  .pass-title{{font-size:44px}}
+  .pass-title{{font-size:34px}}
   .tg-row{{grid-template-columns:24px 1fr 2fr 30px}}
 }}
 """

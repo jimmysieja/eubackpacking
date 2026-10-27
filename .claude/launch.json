@@ -4,8 +4,9 @@
     {
       "name": "docs-static",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "docs"],
-      "port": 8765
+      "runtimeArgs": ["-m", "http.server", "8790", "--bind", "127.0.0.1", "--directory", "docs"],
+      "port": 8790,
+      "autoPort": false
     }
   ]
 }

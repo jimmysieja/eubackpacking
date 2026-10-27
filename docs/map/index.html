@@ -216,6 +216,16 @@
   map.createPane('labels').style.zIndex = 650;
   const bounds = [], pins = [], labels = [];
 
+  // pins are tiny for a fingertip, so each city also gets an invisible, wider
+  // hit circle in its own pane above the pins (but under the labels) that
+  // takes the taps. Bigger on touch screens, just a little slack with a mouse.
+  map.createPane('hits').style.zIndex = 640;
+  const hitRenderer = L.svg({ pane:'hits' });
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const hitFor = (c, r) => L.circleMarker([c.lat, c.lon], {
+    renderer: hitRenderer, radius: coarse ? Math.max(16, r + 10) : r + 4,
+    stroke: false, fillColor: '#000', fillOpacity: 0, bubblingMouseEvents: false }).addTo(map);
+
   function addLabel(pin, m, rank, text, cls) {
     const span = document.createElement('span');
     span.className = cls;
@@ -233,22 +243,24 @@
     const m = c.dual
       ? L.marker([c.lat, c.lon], { icon: splitIcon(c.inks.map(k => C[k] || C.accent), r) }).addTo(map)
       : L.circleMarker([c.lat, c.lon], {
-          radius: r, weight: 1.4, color: C.paper,
+          radius: r, weight: 1.4, color: C.paper, interactive: false,
           fillColor: C[c.ink] || C.accent, fillOpacity: 1 }).addTo(map);
+    if (c.dual) m.on('click', () => openPanel(c));
+    const hit = hitFor(c, r);
     const pin = { ll: L.latLng(c.lat, c.lon), r };
     pins.push(pin);
 
     const a = c.trip ? annoOf(c.trip, c.city) : null;
     if (a && a.label && a.kind !== 'transit') {
-      addLabel(pin, m, c.nights, a.label, 'anno-label');
+      addLabel(pin, hit, c.nights, a.label, 'anno-label');
     } else if (c.slept) {
-      addLabel(pin, m, c.nights, c.city, 'city-label');
+      addLabel(pin, hit, c.nights, c.city, 'city-label');
     } else if (c.transit) {
-      m.bindTooltip(`${c.city} · passing through`, { direction:'top' });
+      hit.bindTooltip(`${c.city} · passing through`, { direction:'top' });
     } else {
-      m.bindTooltip(`${c.city} · day trip`, { direction:'top' });
+      hit.bindTooltip(`${c.city} · day trip`, { direction:'top' });
     }
-    m.on('click', () => openPanel(c));
+    hit.on('click', () => openPanel(c));
   });
   labels.sort((a, b) => b.rank - a.rank);
 
@@ -347,7 +359,12 @@
   const panel = document.getElementById('panel');
   const lb = document.getElementById('lightbox');
   const lbImg = lb.querySelector('img');
-  document.querySelector('#panel .close').onclick = () => panel.classList.remove('open');
+  const closePanel = () => panel.classList.remove('open');
+  document.querySelector('#panel .close').onclick = closePanel;
+  // a tap anywhere on the map itself (not a pin -- their hits don't bubble,
+  // and not a drag -- Leaflet only fires click for a still tap) closes it too
+  map.on('click', closePanel);
+  addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
   lb.onclick = () => lb.classList.remove('open');
 
   const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
